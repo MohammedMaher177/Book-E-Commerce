@@ -160,31 +160,39 @@ export const emailTemp = (code) => {
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td align="center" bgcolor="#ffffff" style="padding: 12px;">
-                                            <table border="0" cellpadding="0" cellspacing="0">
+                                            <table border="0" cellpadding="0" cellspacing="5">
                                                 <tr>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[0]}
                                                     </td>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[1]}
                                                     </td>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[2]}
                                                     </td>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[3]}
                                                     </td>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[4]}
                                                     </td>
                                                     <td align="center" bgcolor="#1a82e2"
-                                                        style="border-radius: 6px; padding: 10px; color: #fff;">
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
                                                         ${code[5]}
+                                                    </td>
+                                                    <td align="center" bgcolor="#1a82e2"
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
+                                                        ${code[6]}
+                                                    </td>
+                                                    <td align="center" bgcolor="#1a82e2"
+                                                        style="border-radius: 6px; color: #1A82E2;padding:7px; font-size:18px; background-color: transparent;border: 1px solid #1A82E2;">
+                                                        ${code[7]}
                                                     </td>
                                                 </tr>
                                             </table>
@@ -227,4 +235,4 @@ export const emailTemp = (code) => {
     </body>
     
     </html>`
-  }
+}

@@ -16,18 +16,31 @@ const userSchema = new Schema({
     role: { type: String, enum: ['User', 'Admin'] },
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },
     phone: { type: String },
-    profile: {
-        type: Types.ObjectId, ref: "Profile"
+    addresses: [{
+        type: String, trim: true, require: true, maxLength: 20, minLength: 4
+    }],
+    age: {
+        type: Number, max: 99, min: 12
+    },
+    fav_cats: [{
+        type: Types.ObjectId, ref: "category"
+    }],
+    image: [{ public_id: String, secure_url: String }],
+    whish_list: {
+        type: Types.ObjectId, ref: "Book"
     },
     confirmedEmail: {
         type: Boolean, default: false
-    }
+    },
+    virefyCode: String
 
-})
+
+}, { timestamps: true, v: false })
 
 userSchema.pre(["save", /^update/, /^create/], async function () {
-    if (this.password) {
-        this.password = await bcryptjs.hashSync(this.password, parseInt(process.env.SALT_ROUNDS))
+    const defultRound = parseInt(process.env.SALT_ROUNDS)
+    if (this.password && bcryptjs.getRounds(this.password) != defultRound) {
+        this.password = bcryptjs.hashSync(this.password, parseInt(process.env.SALT_ROUNDS))
     }
 })
 

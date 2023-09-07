@@ -16,3 +16,11 @@ export const signupValidation = {
         phone: joi.string().pattern(/^(\+2)?(01)[0125][0-9]{8}$/),
     })
 }
+
+
+export const signinValidation = {
+    body: joi.object({
+        email: joi.string().required(),
+        password: joi.string().required()
+    })
+}

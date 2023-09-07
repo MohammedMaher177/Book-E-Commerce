@@ -7,6 +7,7 @@ import sendEmail from "../../../util/email/sendEmail.js";
 import { emailTemp } from "../../../util/email/emailTemp.js";
 import bcrypt from "bcryptjs";
 import Token from "../../../../DB/models/token.model.js";
+import { getTokens } from "../../../util/helper-functions.js";
 
 export const signup = catchError(async (req, res, next) => {
   const { email } = req.body;

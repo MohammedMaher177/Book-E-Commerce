@@ -1,15 +1,11 @@
-
-
 import { Router } from "express";
-import { validate } from "../../middleware/authenticate.js";
-import UserModel from "../../../DB/models/user.model.js";
+import { addProfilePhoto, getAllUsers } from "./controller/user.controller.js";
+import { uploadImage, uploadValidation } from "../../multer/multer.cloud.js";
+import { authMiddleware } from "../../middleware/authentication.js";
 
+const userRouter = Router();
 
-const userRouter = Router()
-
-userRouter.get("/", async (req, res) => {
-    const users = await UserModel.find()
-    res.json(users)
-})
+userRouter.get("/", getAllUsers);
+userRouter.post(  "/addPhoto", authMiddleware, uploadImage(uploadValidation.image).single("profile-pic"), addProfilePhoto);
 
 export default userRouter;

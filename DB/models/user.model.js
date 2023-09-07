@@ -17,7 +17,7 @@ const userSchema = new Schema({
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },
     phone: { type: String },
     addresses: [{
-        type: String, trim: true, require: true, maxLength: 20, minLength: 4
+        address: String, city:String, phone:String
     }],
     age: {
         type: Number, max: 99, min: 12
@@ -25,7 +25,7 @@ const userSchema = new Schema({
     fav_cats: [{
         type: Types.ObjectId, ref: "category"
     }],
-    image: [{ public_id: String, secure_url: String }],
+    image: { public_id: String, secure_url: String },
     whish_list: {
         type: Types.ObjectId, ref: "Book"
     },

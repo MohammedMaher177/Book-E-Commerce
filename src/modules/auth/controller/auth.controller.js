@@ -61,3 +61,25 @@ export const signin = catchError(async (req, res) => {
   res.status(201).json({ message: "success", token, refreshToken });
 
 });
+
+export const refresh = catchError(async (req, res) => {
+  const { refreshToken } = req.body;
+  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+  if (!decoded) {
+    throw new AppError("unauthenticated", 401);
+  }
+  const token = await Token.findOne({ userId: decoded.id, token: refreshToken });
+
+  if (!(token.expiredAt >= new Date())) {
+    await token.deleteOne();
+    throw new AppError("reauthenticate", 403);
+  }
+  const newToken = jwt.sign({
+    id: decoded.id,
+    role: decoded.role
+  }, process.env.TOKEN_SECRET,
+    { expiresIn: "2h" });
+
+    res.status(201).json({ message: "success", token: newToken});
+
+})

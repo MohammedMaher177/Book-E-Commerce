@@ -9,7 +9,7 @@ export const getTokens = async (id, role) => {
       role,
     },
     process.env.TOKEN_SECRET,
-    { expiresIn: "8h" }
+    { expiresIn: "2h" }
   );
 
   const refreshToken = jwt.sign(

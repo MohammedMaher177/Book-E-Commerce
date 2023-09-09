@@ -26,7 +26,9 @@ export const signup = catchError(async (req, res, next) => {
       subject: "Verify Your Email",
       html: emailTemp(req.body.virefyCode),
     });
-    res.status(201).json({ message: "success" });
+    const token = await getTokens(user._id, user.role)
+    console.log(token);
+    res.status(201).json({ message: "success", token });
   } else {
     throw new AppError("In-Valid Net Work", 500);
   }
@@ -61,5 +63,5 @@ export const signin = catchError(async (req, res) => {
     sameSite: "none",
   });
 
-  res.status(201).json({ token });
+  res.status(201).json({ message: "success", token });
 });

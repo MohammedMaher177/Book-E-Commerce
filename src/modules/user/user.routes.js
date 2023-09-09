@@ -6,6 +6,6 @@ import { authMiddleware } from "../../middleware/authentication.js";
 const userRouter = Router();
 
 userRouter.get("/", getAllUsers);
-userRouter.post(  "/addPhoto", authMiddleware, uploadImage(uploadValidation.image).single("profile-pic"), addProfilePhoto);
+userRouter.post("/addPhoto", authMiddleware, uploadImage(uploadValidation.image).single("profile-pic"), addProfilePhoto);
 
 export default userRouter;

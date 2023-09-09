@@ -8,15 +8,17 @@ export const authMiddleware = catchError(async (req, res, next) => {
   if (!authorization) {
     return next(new AppError("authorization is required", 403));
   }
-  const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET);
 
+  const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET);
   if (!decoded?.id) {
     return next(new AppError("Invalid Token payload", 401));
   }
+
   const user = await UserModel.findById(decoded.id);
   if (!user) {
     return next(new AppError("Email not found", 404));
   }
+  
   if (user.passwordChangedAt) {
     const passwordChangedAt = parseInt(user.passwordChangedAt.getTime() / 1000);
     if (passwordChangedAt > decoded.iat) {

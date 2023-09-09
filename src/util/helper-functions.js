@@ -50,3 +50,4 @@ export const deleteImg = (model) => {
     }
   };
 };
+

@@ -32,7 +32,10 @@ const userSchema = new Schema({
     confirmedEmail: {
         type: Boolean, default: false
     },
-    virefyCode: String
+    virefyCode:{
+        code:{type:String},
+        expierDate: String
+    }
 
 
 }, { timestamps: true, v: false })

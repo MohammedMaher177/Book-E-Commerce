@@ -56,12 +56,6 @@ export const signin = catchError(async (req, res) => {
     user.role
   );
 
-  // res.cookie("refreshToken", refreshToken, {
-  //   httpOnly: true,
-  //   secure: true,
-  //   sameSite: "none",
-  // });
-
   res.status(201).json({ message: "success", token, refreshToken });
 });
 

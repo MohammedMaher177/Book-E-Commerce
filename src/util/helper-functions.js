@@ -9,7 +9,7 @@ export const getTokens = async (id, role) => {
       role,
     },
     process.env.TOKEN_SECRET,
-    { expiresIn: "2h" }
+    { expiresIn: "8h" }
   );
 
   const refreshToken = jwt.sign(
@@ -50,3 +50,4 @@ export const deleteImg = (model) => {
     }
   };
 };
+

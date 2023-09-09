@@ -13,7 +13,7 @@ const userSchema = new Schema({
     password: {
         type: String, trim: true, require: true, maxLength: 25, minLength: 4
     },
-    role: { type: String, enum: ['User', 'Admin'] },
+    role: { type: String, enum: ['User', 'Admin'], default: "User" },
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },
     phone: { type: String },
     addresses: [{

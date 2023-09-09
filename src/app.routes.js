@@ -5,7 +5,6 @@ import { AppError } from "./util/ErrorHandler/AppError.js";
 
 export const bootstrap = (app) => {
   connectionDb();
-
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/users", userRouter);
 
@@ -16,6 +15,8 @@ export const bootstrap = (app) => {
   app.use((err, req, res, next) => {
     const error = err.message;
     const code = err.statusCode || 500;
-    res.status(code).json({ message: "Error", error, stack: err.stack });
+    process.env.MODE == "PRODUCTION"
+      ? res.status(code).json({ message: "Error", error })
+      : res.status(code).json({ message: "Error", error, stack: err.stack });
   });
 };

@@ -1,4 +1,3 @@
-import cookie_parser from "cookie-parser";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import UserModel from "../../../../DB/models/user.model.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
@@ -8,6 +7,8 @@ import { emailTemp } from "../../../util/email/emailTemp.js";
 import bcrypt from "bcryptjs";
 import Token from "../../../../DB/models/token.model.js";
 import { getTokens } from "../../../util/helper-functions.js";
+import jwt from "jsonwebtoken";
+
 
 export const signup = catchError(async (req, res, next) => {
   const { email } = req.body;
@@ -57,11 +58,33 @@ export const signin = catchError(async (req, res) => {
     user.role
   );
 
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none",
-  });
+  // res.cookie("refreshToken", refreshToken, {
+  //   httpOnly: true,
+  //   secure: true,
+  //   sameSite: "none",
+  // });
 
-  res.status(201).json({ message: "success", token });
+  res.status(201).json({ token });
 });
+
+export const refresh = catchError(async (req, res) => {
+  const { refreshToken } = req.body;
+  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+  if (!decoded) {
+    throw new AppError("unauthenticated", 401);
+  }
+  const token = await Token.findOne({ userId: decoded.id, token: refreshToken });
+
+  if (!(token.expiredAt >= new Date())) {
+    await token.deleteOne();
+    throw new AppError("reauthenticate", 403);
+  }
+  const newToken = jwt.sign({
+    id: decoded.id,
+    role: decoded.role
+  }, process.env.TOKEN_SECRET,
+    { expiresIn: "2h" });
+
+    res.status(201).json({ message: "success", token: newToken});
+
+})

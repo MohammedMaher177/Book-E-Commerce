@@ -1,4 +1,4 @@
-import jwt from "jsonwebtoken";
+import jwt, { decode } from "jsonwebtoken";
 import { catchError } from "../util/ErrorHandler/catchError.js";
 import { AppError } from "../util/ErrorHandler/AppError.js";
 import UserModel from "../../DB/models/user.model.js";
@@ -6,17 +6,17 @@ import UserModel from "../../DB/models/user.model.js";
 export const authMiddleware = catchError(async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
-    return next(new AppError("authorization is required", 403));
+    return next(new AppError("unauthorized", 401));
   }
-
   const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET);
+
   if (!decoded?.id) {
     return next(new AppError("Invalid Token payload", 401));
   }
 
   const user = await UserModel.findById(decoded.id);
   if (!user) {
-    return next(new AppError("Email not found", 404));
+    return next(new AppError("access denied", 403));
   }
   
   if (user.passwordChangedAt) {

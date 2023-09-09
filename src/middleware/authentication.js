@@ -26,6 +26,7 @@ export const authMiddleware = catchError(async (req, res, next) => {
     }
   }
   req.user = user;
+  
   return next();
 });
 
@@ -34,6 +35,7 @@ export const allowedTo = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return next(new AppError("Not Authorized", 401));
     }
+
     next();
   });
 };

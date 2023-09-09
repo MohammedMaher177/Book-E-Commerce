@@ -11,7 +11,7 @@ const userSchema = new Schema({
         type: String, trim: true, require: true, maxLength: 30, minLength: 4, unique: true
     },
     password: {
-        type: String, trim: true, require: true, maxLength: 25, minLength: 4
+        type: String, trim: true, require: true, 
     },
     role: { type: String, enum: ['User', 'Admin'], default: "User" },
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },

@@ -14,9 +14,14 @@ export const signup = catchError(async (req, res, next) => {
   if (existEmail) {
     throw new AppError("Email Already Exist", 403);
   }
-
-  req.body.virefyCode = generateCode();
   const user = await UserModel.create(req.body);
+
+  const {code, generatDate} = generateCode();
+  console.log(code,generatDate);
+  user.virefyCode.code = code;
+  user.virefyCode.expierDate = generatDate;
+    await user.save();
+  req.body.virefyCode= code;
   if (user) {
     await sendEmail({
       to: email,
@@ -89,10 +94,10 @@ export const verifyEmail = catchError(async (req, res, nex) => {
   if (user.confirmedEmail) {
     throw new AppError("Email Already Virefied", 402);
   }
-
-  if (code === user.virefyCode) {
+var currentDate = new Date();
+  if (code === user.virefyCode.code && currentDate <= user.virefyCode.expierDate ) {
     user.confirmedEmail = true;
-    user.virefyCode = generateCode();
+    // user.virefyCode = generateCode();
     await user.save();
     const { token, refreshToken } = await getTokens(
       user._id.toString(),

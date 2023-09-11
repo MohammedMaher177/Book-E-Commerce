@@ -54,7 +54,8 @@ export const deleteImg = (model) => {
 
 export const generateCode = () => {
   let n = uuidv4();
-  n = n.split("-")[0].substring(0, 4);;
-  console.log(n);
-  return n;
+  n = n.split("-")[0].substring(0, 4);
+  var expireDate = new Date() +10 
+  console.log(n,expireDate);
+  return {code :n  , date: expireDate};
 };

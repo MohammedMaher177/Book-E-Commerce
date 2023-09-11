@@ -17,15 +17,16 @@ export const signup = catchError(async (req, res, next) => {
   const user = await UserModel.create(req.body);
 
   const {code, generatDate} = generateCode();
+  console.log(code,generatDate);
   user.virefyCode.code = code;
   user.virefyCode.expierDate = generatDate;
     await user.save();
-  req.body.virefyCode.code = code;
+  req.body.virefyCode= code;
   if (user) {
     await sendEmail({
       to: email,
       subject: "Verify Your Email",
-      html: emailTemp(req.body.virefyCode.code),
+      html: emailTemp(req.body.virefyCode),
     });
     const token = await getTokens(user._id, user.role);
     res.status(201).json({ message: "success", token });

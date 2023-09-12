@@ -21,10 +21,11 @@ const passportConfigGoogle  = (passport)=>{
                 email: emails[0].value,
                 confirmedEmail: emails[0].verified,
             })
+            let redirect_url = "http://localhost:3000/login";
         }
         console.log(user);
-        
         let redirect_url = "http://localhost:3000/login";
+        
         // if (user) {
         //   const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '1h' }); //generating token
         //   redirect_url = `http://localhost:3000/${token}` //registered on FE for auto-login
@@ -48,7 +49,7 @@ const passportConfigFacebook  = (passport)=>{
         clientID        : process.env.FACEBOOK_CLIENT_ID,
         clientSecret    : process.env.FACEBOOK_SECRET_ID,
         callbackURL     : "http://localhost:3000/auth/facebook/callback",
-        profileFields: ['id', 'displayName', 'name', 'gender', 'picture.type(large)','email']
+        profileFields: ['id', 'displayName','email']
     
     },// facebook will send back the token and profile
     function(token, refreshToken, profile, done) {

@@ -34,10 +34,12 @@ const userSchema = new Schema({
     confirmedEmail: {
         type: Boolean, default: false
     },
-    virefyCode:{
-        code:{type:String},
-        expierDate: String
-    },
+    virefyCode:[{
+      
+    }],
+    status:{
+        type:String, enum: ['active','deactive'],default:'deactive'
+    }
     // registerway:{type: String, enum: ['form', 'facebook', 'google'], default: "form"}
 
 

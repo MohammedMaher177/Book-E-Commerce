@@ -8,10 +8,12 @@ const userSchema = new Schema({
         type: String, trim: true, require: true, maxLength: 20, minLength: 4
     },
     email: {
-        type: String, trim: true, require: true, maxLength: 30, minLength: 4, unique: true
+        type: String, trim: true, require: true,  unique: true
+        // type: String, trim: true, require: true, maxLength: 30, minLength: 4, unique: true
     },
     password: {
-        type: String, trim: true, require: true, maxLength: 25, minLength: 4
+        type: String, trim: true
+        // type: String, trim: true, require: true, 
     },
     role: { type: String, enum: ['User', 'Admin'], default: "User" },
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },
@@ -26,13 +28,19 @@ const userSchema = new Schema({
         type: Types.ObjectId, ref: "category"
     }],
     image: { public_id: String, secure_url: String },
-    whish_list: {
+    whish_list: [{
         type: Types.ObjectId, ref: "Book"
-    },
+    }],
     confirmedEmail: {
         type: Boolean, default: false
     },
-    virefyCode: String
+    virefyCode:[{
+      
+    }],
+    status:{
+        type:String, enum: ['active','deactive'],default:'deactive'
+    }
+    // registerway:{type: String, enum: ['form', 'facebook', 'google'], default: "form"}
 
 
 }, { timestamps: true, v: false })

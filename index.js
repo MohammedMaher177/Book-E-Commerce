@@ -9,7 +9,7 @@ import cookie_parser from "cookie-parser";
 const app = express();
 const port = 3000;
 
-app.use(cookie_parser("1234"));
+app.use(cookie_parser());
 app.use(express.json());
 
 bootstrap(app);

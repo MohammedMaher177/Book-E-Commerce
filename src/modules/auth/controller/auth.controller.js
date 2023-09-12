@@ -166,7 +166,7 @@ export const forgetPassword = catchError(async (req, res, nex) => {
       subject: "Reset Password",
       html: resetRassword(code),
     });
-    console.log(code, validationCodes);
+    console.log(code);
     res.status(201).json({ message: "success" });
   }
 });

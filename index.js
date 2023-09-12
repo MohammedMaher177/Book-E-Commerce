@@ -51,20 +51,7 @@ app.get(
   }
 );
 
-// app.use(session({
-//   secret: '7861',
-//   resave: false,
-//   saveUninitialized: false,
-//   cookie: {
-//     secure: true,
-//     maxAge: 3000000 *60
-//   },
-//   store: MongoStore.create({  
-//     mongoUrl:'mongodb+srv://Book-E-Commerce:Book-E-Commerce@atlascluster.7mr3zao.mongodb.net/BookStore', 
-//     collection: 'session',
-//     ttl: 28800 
-//   })
-// }))
+
 app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
 
 app.get('/auth/facebook/callback',
@@ -84,3 +71,4 @@ bootstrap(app);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 // error mongoose@7.5.0: The engine "node" is incompatible with this module. Expected version ">=14.20.1". Got "14.17.0"
+

@@ -41,3 +41,19 @@ export const verifyEmailValidation = {
     code: joi.string().length(4).required(),
   }),
 };
+
+export const resetPasswordValidation = {
+  body: joi.object({
+    password: joi.string().pattern(
+        new RegExp(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+{};:,<.>])[A-Za-z\d!@#$%^&*()\-_=+{};:,<.>]{9,}$/
+        ),
+        `It must contain at least one uppercase letter.
+    It must contain at least one lowercase letter.
+    It must contain at least one digit.
+    It must contain at least one special character.
+    It must be at least 9 characters long.`
+      ).required(),
+    rePassword: joi.string().valid(joi.ref("password")).required(),
+  }),
+};

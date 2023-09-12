@@ -23,7 +23,6 @@ const sendEmail = async ({ to, subject, text, html, attachments = [] } = {}) => 
         html,
         attachments
     });
-    console.log(info);
 }
 
 

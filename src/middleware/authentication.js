@@ -13,17 +13,18 @@ export const authMiddleware = catchError(async (req, res, next) => {
       return next(new AppError("jwt expired", 403));
     }
     if(decoded){
-      return decode;
+      return decoded;
     }
   });
-
   if (!decoded) {
     return next(new AppError("access denied", 403));
   }
+
   const user = await UserModel.findById(decoded.id);
   if (!user) {
     return next(new AppError("access denied", 403));
   }
+  
   if (user.passwordChangedAt) {
     const passwordChangedAt = parseInt(user.passwordChangedAt.getTime() / 1000);
     if (passwordChangedAt > decoded.iat) {

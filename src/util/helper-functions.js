@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import Token from "../../DB/models/token.model.js";
 import cloudinary from "../multer/cloudinary.js";
-
+import { v4 as uuidv4 } from "uuid";
+import bcryptjs from "bcryptjs";
 export const getTokens = async (id, role) => {
   const token = jwt.sign(
     {
@@ -49,4 +50,10 @@ export const deleteImg = (model) => {
       return next(new AppError("In-Valid public_id", 404));
     }
   };
+};
+
+export const generateCode = () => {
+  let n = uuidv4();
+  n = n.split("-")[0].substring(0, 4);
+  return {code :n };
 };

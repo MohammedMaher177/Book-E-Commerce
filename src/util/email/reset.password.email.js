@@ -1,4 +1,4 @@
-export const emailTemp = (code) => {
+export const resetRassword = (code) => {
   return `<!DOCTYPE html>
     <html>
     
@@ -143,8 +143,7 @@ export const emailTemp = (code) => {
                                     style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">
                                     Confirm Your Email Address</h1>
                                 <h4 style="margin: 0; font-size: 18px; font-weight: 700;  line-height: 40px;">
-                                    Thanks for signing up for Book Store E-Commerce. lets get started please enter this code
-                                    in web site Input</h1>
+                                 To resete your password please enter this code in web site Input</h1>
                             </td>
                         </tr>
                     </table>
@@ -201,8 +200,7 @@ export const emailTemp = (code) => {
                             <td align="center" bgcolor="#e9ecef"
                                 style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
                                 <p style="margin: 0;">You received this email because we received a request for
-                                    signing up for your account. If you didn't request this you can safely
-                                    delete this email.</p>
+                                    reset password for your account.</p>
                             </td>
                         </tr>
     

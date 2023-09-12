@@ -8,6 +8,7 @@ import bcrypt from "bcryptjs";
 import Token from "../../../../DB/models/token.model.js";
 import { generateCode, getTokens } from "../../../util/helper-functions.js";
 import { v4 as uuidv4 } from "uuid";
+import jwt from "jsonwebtoken";
 
 const validationCodes = [];
 
@@ -219,3 +220,26 @@ export const resetePassword = catchError(async (req, res, nex) => {
   const { token, refreshToken } = getTokens(user._id, user.role);
   res.json({ message: "success", token, refreshToken });
 });
+
+export const redirectWithToke = catchError(async (req, res, nex) => {
+  console.log(req.user);
+  res.redirect(req.user);
+})
+
+export const signinWithToken = catchError(async (req, res, nex) => {
+  const Urltoken = req.params["token"];
+  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
+  if(!isVerifyed){
+    throw new AppError("access denide", 403);
+  }
+  const payload = jwt.decode(Urltoken);
+  const user = await UserModel.findById(payload.id);
+  if(!user){
+    throw new AppError("access denide", 403);
+  }
+  const { token, refreshToken } = await getTokens(
+    user._id.toString(),
+    user.role
+  );
+  res.status(201).json({ message: "success", token, refreshToken });
+})  

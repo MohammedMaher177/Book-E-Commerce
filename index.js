@@ -10,10 +10,11 @@ import passport from "passport";
 // import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import {passportConfigGoogle , passportConfigFacebook} from "./google_oauth.js"
+import { facebookRedirect } from "./src/middleware/passport.js";
+import { redirectWithToke } from "./src/modules/auth/controller/auth.controller.js";
 
 const app = express();
 const port = 3000; 
-
 
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
@@ -22,50 +23,9 @@ app.use(passport.initialize());
 app.use(cors());
 // app.use(cookie_parser);
 app.use(express.json());
-// ***************************
-// log in with google
-// app.set("view engine", "ejs");
-// app.get('/google', (req, res) => {
-//     console.log("google");
-//       res.render('../login')
-//     //   http://localhost:3000/google
-//   })
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile", "email"],
-    session: false,
-  })
-);
+app.get("/auth/facebook/redirect", facebookRedirect, redirectWithToke)
 
-app.get(
-  "/auth/google/redirect",
-  passport.authenticate("google", {
-    session: false,
-    failureRedirect: `https://localhost:3000/login`,
-  }),
-  (req, res) => {
-    console.log(req.user);
-    res.redirect(req.user); //req.user has the redirection_url
-  }
-);
-
-
-app.get('/auth/facebook', passport.authenticate('facebook', { scope : 'email' }));
-
-app.get('/auth/facebook/callback',
-	passport.authenticate('facebook', {
-    session: false,
-		successRedirect : 'https://localhost:3000/login',
-        failureRedirect : 'https://localhost:3000/login'
-    }
-));
-app.get("/login", (req, res) => {
-  // console.log(req.user);
-  res.status(200).json({ message: "done" });
-});
-//   ****************************
 bootstrap(app);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -31,8 +31,25 @@ export const addProfilePhoto = catchError(async (req, res, next) => {
       },
       { new: true }
     );
-    res.json({ message: "success", user });
+    res.status(201).json({ message: "success", user });
   } else {
     throw new AppError("In-Valid Upload Photo", 403);
   }
 });
+
+export const updateProfile = catchError(async (req, res, next) => {
+  const { userName, phone, gender, age, address, city } = req.body;
+  const user = req.user;
+
+  user.userName = userName;
+  user.phone = phone;
+  user.gender = gender;
+  user.age = age;
+  user.defultAddress = {
+    address,
+    city,
+  }
+  await user.save();
+
+  res.status(201).json({ message: "success"});
+}) 

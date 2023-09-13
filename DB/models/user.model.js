@@ -24,6 +24,10 @@ const userSchema = new Schema({
     age: {
         type: Number, max: 99, min: 12
     },
+    defultAddress: {
+        address: String, city:String
+
+    },
     fav_cats: [{
         type: Types.ObjectId, ref: "category"
     }],

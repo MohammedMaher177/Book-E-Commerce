@@ -243,3 +243,9 @@ export const signinWithToken = catchError(async (req, res, nex) => {
   );
   res.status(201).json({ message: "success", token, refreshToken });
 })  
+
+export const success = catchError(async (req, res , next )=> {
+  const {token } = req.params
+  console.log(token);
+  res.json(token)
+})

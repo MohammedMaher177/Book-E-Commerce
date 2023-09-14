@@ -1,5 +1,6 @@
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
+import cloudinary from "../../../multer/cloudinary.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
@@ -10,8 +11,31 @@ export const addBook = catchError(async (req,res, next)=>{
     if (existBook) {
         throw new AppError("Book already exist", 403);
     }
+    const book = await bookModel.insertMany(req.body);
+    // await noteModel.insertMany({title,desc,createdBy})
+    if (req.file) {
+        if (__user.image.public_id) {
+      const { result } = await cloudinary.uploader.destroy(
+        `${__user.image.public_id}`,
+        (result) => {
+          return result;
+        }
+      );
+    }
+        const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path,
+          { folder: `BookStore/User/${book._id}` }
+        );
     
-    const book = await bookModel.create(req.body);
+        const user = await UserModel.findByIdAndUpdate(
+          book._id,
+          {
+            image: { public_id, secure_url },
+          },
+          { new: true }
+        );
+      } else {
+        throw new AppError("In-Valid Upload Photo", 403);
+      }
     res.json({message: "success",book})
 })
 export const updateBook = catchError(async (req,res, next)=>{

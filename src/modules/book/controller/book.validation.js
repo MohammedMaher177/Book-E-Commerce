@@ -11,14 +11,16 @@ export const bookValidation = {
     lang:joi.string().required(),
     desc: joi.string().required(),
     pages: joi.number().min(10).required(),
+    image:joi.required(),
     stock: joi.number(),
     price: joi.number().required(),
+    discount:joi.number(),
     author:joi.string().required(),
     publisher:joi.string(),
     published:joi.string().required(),
     category:joi.required(),
     rating: joi.number().min(1).max(5),
-    reviews:joi.string(),
+    reviews:joi.array(),
 
   }),
 

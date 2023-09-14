@@ -34,9 +34,10 @@ const userSchema = new Schema({
     confirmedEmail: {
         type: Boolean, default: false
     },
-    virefyCode:[{
-      
-    }],
+    virefyCode:{
+        code:String,
+        date:Number
+    },
     status:{
         type:String, enum: ['active','deactive'],default:'deactive'
     }

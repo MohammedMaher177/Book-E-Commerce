@@ -46,13 +46,14 @@ const passportConfigFacebook = (passport) => {
   },
     async (token, refreshToken, profile, done) => {
       try {
+        console.log(profile);
         let { id, displayName, emails } = profile.emails && profile; //profile object has the user info
         let user = await UserModel.findOne({ email: emails[0].value });
         if (!user) {
           user = await UserModel.create({
             userName: displayName,
             email: emails[0].value,
-            confirmedEmail: emails[0].verified,
+            confirmedEmail: true,
           })
         }
         const token = jwt.sign({
@@ -62,7 +63,7 @@ const passportConfigFacebook = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
-        let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
+        let redirect_url = `http://localhost:3000/api/v1/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)
@@ -71,3 +72,7 @@ const passportConfigFacebook = (passport) => {
 
 }
 export { passportConfigGoogle, passportConfigFacebook }
+
+
+// https://www.freeprivacypolicy.com/live/b869c30c-b1b7-4ba7-a8de-bd10cf6d86b7
+// https://www.freeprivacypolicy.com/live/b869c30c-b1b7-4ba7-a8de-bd10cf6d86b7

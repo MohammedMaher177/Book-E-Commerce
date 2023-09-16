@@ -1,15 +1,15 @@
+import joi from "joi";
 import mongoose, { Schema, Types, model } from "mongoose";
 
 
 const bookSchema = new Schema({
     ISBN:{type:Number ,unique: true, require: true ,minLength: 10, maxLength: 13 },
-    name: { type: String, require: true, trim: true},
+    bookName: { type: String, require: true, trim: true},
+    lang:{type:String ,require: true },
     desc:{type:String },
     pages:{type:Number,require: true},
-    image:{
-        data: Buffer,
-        contentType: String
-    },
+    image: { public_id: String, secure_url: String },
+
     stock:{type:Number, default:0},
 
 
@@ -21,13 +21,14 @@ const bookSchema = new Schema({
     publisher:{type:String ,require: true , trim:true},
     published:{type:Number ,maxLength:4},
     category:{
-        type: mongoose.Types.ObjectId,
+        type: mongoose.ObjectId,
         require: true,
-        ref: "category"},
+        ref: "category"
+    },
 
-    
-
-    rating:{type:Number,default:1,min:1,max:5},
+    rating:[{
+        type:Number,default:1,min:1,max:5
+    }],
     reviews:[{
         review :{
         type: mongoose.Types.ObjectId,

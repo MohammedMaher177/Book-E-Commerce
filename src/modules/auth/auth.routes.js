@@ -10,6 +10,7 @@ import {
   resetePassword,
   redirectWithToke,
   signinWithToken,
+  success,
 } from "./controller/auth.controller.js";
 import {
   signinValidation,
@@ -35,6 +36,7 @@ authRouter.delete("/:id", deleteUser);
 authRouter.post("/forgetPassword", forgetPassword);
 authRouter.post("/varifyPasswordEmail",authMiddleware, varifyPasswordEmail);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
+authRouter.get("/login/success/:token", success);
 
 
 export default authRouter;

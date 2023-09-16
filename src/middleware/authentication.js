@@ -38,7 +38,7 @@ export const authMiddleware = catchError(async (req, res, next) => {
 export const allowedTo = (...roles) => {
   return catchError(async (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return next(new AppError("Not Authorized", 401));
+      return next(new AppError("Not Authorized to perform this action", 401));
     }
     next();
   });

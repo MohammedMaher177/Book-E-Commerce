@@ -29,7 +29,7 @@ authRouter.get("/facebook", facebook)
 authRouter.get("/facebook/redirect", facebookRedirect, redirectWithToke)
 authRouter.post("/signup", validate(signupValidation), signup);
 authRouter.post("/signin", validate(signinValidation), signin);
-authRouter.post("signin/:token", signinWithToken)
+authRouter.post("/signin/:token", signinWithToken)
 authRouter.post("/refresh", refresh);
 authRouter.post("/verifyEmail", validate(verifyEmailValidation) , authMiddleware, verifyEmail);
 authRouter.delete("/:id", deleteUser);

@@ -9,6 +9,7 @@ export const getAllUsers = catchError(async (req, res, next) => {
 });
 export const addProfilePhoto = catchError(async (req, res, next) => {
   const { user: __user } = req;
+  console.log(req.file);
   if (req.file) {
     if (__user.image.public_id) {
       const { result } = await cloudinary.uploader.destroy(

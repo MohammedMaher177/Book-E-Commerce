@@ -9,6 +9,7 @@ import Token from "../../../../DB/models/token.model.js";
 import { generateCode, getTokens } from "../../../util/helper-functions.js";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
+import { response } from "express";
 
 const validationCodes = [];
 
@@ -16,13 +17,24 @@ export const signup = catchError(async (req, res, next) => {
   const { email } = req.body;
   const existEmail = await UserModel.findOne({ email });
   if (existEmail) {
-    throw new AppError("Email Already Exist", 403);
+    throw new AppError("Email Already Exist", 409);
   }
   const user = await UserModel.create(req.body);
   user.virefyCode = {};
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
+
+  // user.virefyCode = [];
+  // user.virefyCode.push({
+  //   code: code,
+  //   date: {
+  //     day: new Date().getDate(),
+  //     hour: new Date().getHours(),
+  //     min: new Date().getMinutes(),
+  //   },
+  // });
+
   user.save();
   console.log(user.virefyCode);
   req.body.virefyCode = code;
@@ -32,7 +44,7 @@ export const signup = catchError(async (req, res, next) => {
       subject: "Verify Your Email",
       html: emailTemp(req.body.virefyCode),
     });
-    const token = await getTokens(user._id, user.role);
+    const { token } = await getTokens(user._id, user.role);
     res.status(201).json({ message: "success", token });
   } else {
     throw new AppError("In-Valid Net Work", 500);
@@ -85,12 +97,21 @@ export const signin = catchError(async (req, res) => {
     user.role
   );
 
-  res.status(201).json({ message: "success", token, refreshToken });
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
+
+  res.status(201).json({ message: "success", token });
 });
 
 export const refresh = catchError(async (req, res) => {
-  const { refreshToken } = req.body;
+
+  const refreshToken = req.cookies['refreshToken'];
+
   const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+
   if (!decoded) {
     throw new AppError("unauthenticated", 401);
   }
@@ -101,6 +122,13 @@ export const refresh = catchError(async (req, res) => {
 
   if (!(token.expiredAt >= new Date())) {
     await token.deleteOne();
+    res.cookie('refreshToken', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none', 
+      maxAge: 0
+    });
+    
     throw new AppError("reauthenticate", 403);
   }
   const newToken = jwt.sign(
@@ -125,7 +153,10 @@ export const verifyEmail = catchError(async (req, res, nex) => {
   console.log(user.virefyCode);
 
   const currentDate = Date.now();
-  if (currentDate - user.virefyCode.date <= 600000) {
+  if (
+    currentDate - user.virefyCode.date <= 600000
+  ) {
+
     codeStatuse = "pass";
   } else {
     codeStatuse = "expired";
@@ -141,7 +172,14 @@ export const verifyEmail = catchError(async (req, res, nex) => {
       user._id.toString(),
       user.role
     );
-    res.status(202).json({ message: "success", token, refreshToken });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    })
+
+    res.status(202).json({ message: "success", token });
   } else {
     throw new AppError("In-Valid Verify Code", 403);
   }
@@ -195,7 +233,6 @@ export const varifyPasswordEmail = catchError(async (req, res, nex) => {
   } else {
     codeStatuse = "expired";
   }
-  
   console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
     user.status = "active";
@@ -264,7 +301,7 @@ export const redirectWithToke = catchError(async (req, res, nex) => {
 
 export const signinWithToken = catchError(async (req, res, nex) => {
   const Urltoken = req.params["token"];
-  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET);
+  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
   if (!isVerifyed) {
     throw new AppError("access denide", 403);
   }
@@ -278,10 +315,11 @@ export const signinWithToken = catchError(async (req, res, nex) => {
     user.role
   );
   res.status(201).json({ message: "success", token, refreshToken });
-});
+})
 
 export const success = catchError(async (req, res, next) => {
-  const { token } = req.params;
+  const { token } = req.params
+
   console.log(token);
   res.json(token);
 });

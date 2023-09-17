@@ -23,15 +23,6 @@ export const signup = catchError(async (req, res, next) => {
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
-  // user.virefyCode = [];
-  // user.virefyCode.push({
-  //   code: code,
-  //   date: {
-  //     day: new Date().getDate(),
-  //     hour: new Date().getHours(),
-  //     min: new Date().getMinutes(),
-  //   },
-  // });
   user.save();
   console.log(user.virefyCode);
   req.body.virefyCode = code;
@@ -152,8 +143,6 @@ export const verifyEmail = catchError(async (req, res, nex) => {
     );
     res.status(202).json({ message: "success", token, refreshToken });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });

@@ -55,12 +55,12 @@ export const resendVaryfyEmail = catchError(async (req, res, nex) => {
     user.virefyCode.code = code;
     user.virefyCode.date = Date.now();
     await user.save();
-      await sendEmail({
-        to: email,
-        subject: "Verify Your Email",
-        html: emailTemp(code),
-      });
-      
+    await sendEmail({
+      to: email,
+      subject: "Verify Your Email",
+      html: emailTemp(code),
+    });
+
     console.log(code);
     const { token, refreshToken } = await getTokens(
       user._id.toString(),
@@ -139,7 +139,6 @@ export const verifyEmail = catchError(async (req, res, nex) => {
   } else {
     codeStatuse = "expired";
   }
-  
 
   console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
@@ -207,20 +206,7 @@ export const varifyPasswordEmail = catchError(async (req, res, nex) => {
   } else {
     codeStatuse = "expired";
   }
-  // var day = new Date().getDate();
-  // var hour = new Date().getHours();
-  // var min = new Date().getMinutes();
-
-  // if (
-  //   user.virefyCode[0].date.day === day &&
-  //   user.virefyCode[0].date.hour === hour &&
-  //   user.virefyCode[0].date.min + 1 >= min
-  // ) {
-  //   codeStatuse = "pass";
-  // } else {
-  //   codeStatuse = "expired";
-  // }
-
+  
   console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
     user.status = "active";
@@ -232,8 +218,6 @@ export const varifyPasswordEmail = catchError(async (req, res, nex) => {
     );
     res.status(202).json({ message: "success", token, refreshToken });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });
@@ -268,11 +252,11 @@ export const resendResetPass = catchError(async (req, res, nex) => {
     //     html: emailTemp(code),
     //   });
     // }else{
-      await sendEmail({
-        to: user.email,
-        subject: "Reset Password",
-        html: resetRassword(code),
-      });
+    await sendEmail({
+      to: user.email,
+      subject: "Reset Password",
+      html: resetRassword(code),
+    });
     // }
     console.log(code);
     const { token, refreshToken } = await getTokens(

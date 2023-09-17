@@ -4,6 +4,7 @@ import {
   refresh,
   signin,
   signup,
+  resendVaryfyEmail,
   verifyEmail,
   forgetPassword,
   varifyPasswordEmail,
@@ -11,7 +12,7 @@ import {
   redirectWithToke,
   signinWithToken,
   success,
-  resendEmail,
+  resendResetPass,
 } from "./controller/auth.controller.js";
 import {
   signinValidation,
@@ -29,6 +30,7 @@ authRouter.get("/google/redirect", googleRedirect, redirectWithToke)
 authRouter.get("/facebook", facebook)
 authRouter.get("/facebook/redirect", facebookRedirect, redirectWithToke)
 authRouter.post("/signup", validate(signupValidation), signup);
+authRouter.post("/resendVaryfyEmail",authMiddleware, resendVaryfyEmail);
 authRouter.post("/signin", validate(signinValidation), signin);
 authRouter.post("signin/:token", signinWithToken)
 authRouter.post("/refresh", refresh);
@@ -36,7 +38,7 @@ authRouter.post("/verifyEmail", validate(verifyEmailValidation) , authMiddleware
 authRouter.delete("/:id", deleteUser);
 authRouter.post("/forgetPassword", forgetPassword);
 authRouter.post("/varifyPasswordEmail",authMiddleware, varifyPasswordEmail);
-authRouter.post("/resendEmail",authMiddleware, resendEmail);
+authRouter.post("/resendResetPass",authMiddleware, resendResetPass);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
 authRouter.get("/login/success/:token", success);
 

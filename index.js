@@ -15,7 +15,6 @@ const port = 3000;
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
 app.use(passport.initialize());
-
 const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080"]
 const corsOptions = {
     origin: function(origin, callback){
@@ -29,7 +28,6 @@ app.use(cors(corsOptions));
 app.use(cookie_parser);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 bootstrap(app);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

@@ -22,16 +22,7 @@ export const signup = catchError(async (req, res, next) => {
   user.virefyCode = {};
   const { code } = generateCode();
   user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-  // user.virefyCode = [];
-  // user.virefyCode.push({
-  //   code: code,
-  //   date: {
-  //     day: new Date().getDate(),
-  //     hour: new Date().getHours(),
-  //     min: new Date().getMinutes(),
-  //   },
-  // });
+  user.virefyCode.date = Date.now();
   user.save();
   console.log(user.virefyCode);
   req.body.virefyCode = code;
@@ -47,7 +38,30 @@ export const signup = catchError(async (req, res, next) => {
     throw new AppError("In-Valid Net Work", 500);
   }
 });
+export const resendVaryfyEmail = catchError(async (req, res, nex) => {
+  const { user } = req;
+  if (user) {
+    user.virefyCode = {};
+    const { code } = generateCode();
+    user.virefyCode.code = code;
+    user.virefyCode.date = Date.now();
+    await user.save();
+    await sendEmail({
+      to: email,
+      subject: "Verify Your Email",
+      html: emailTemp(code),
+    });
 
+    console.log(code);
+    const { token, refreshToken } = await getTokens(
+      user._id.toString(),
+      user.role
+    );
+    res.status(202).json({ message: "success", token, refreshToken });
+  } else {
+    throw new AppError("email not found", 403);
+  }
+});
 export const deleteUser = catchError(async (req, res) => {
   const { id } = req.params;
   const de = await UserModel.findByIdAndDelete(id);
@@ -109,33 +123,13 @@ export const verifyEmail = catchError(async (req, res, nex) => {
   }
   var codeStatuse;
   console.log(user.virefyCode);
-  //   validationCodes.forEach((el, i) => {
-  //     if (el.userId === user._id.toHexString()) {
-  //         index = i
-  //         console.log(index);
-  //     }
-  // });
+
   const currentDate = Date.now();
-  if (
-    currentDate - user.virefyCode.date  <= 600000
-  ) {
+  if (currentDate - user.virefyCode.date <= 600000) {
     codeStatuse = "pass";
   } else {
     codeStatuse = "expired";
   }
-  // var day = new Date().getDate();
-  // var hour = new Date().getHours();
-  // var min = new Date().getMinutes();
-
-  // if (
-  //   user.virefyCode[0].date.day === day &&
-  //   user.virefyCode[0].date.hour === hour &&
-  //   user.virefyCode[0].date.min + 10 >= min
-  // ) {
-  //   codeStatuse = "pass";
-  // } else {
-  //   codeStatuse = "expired";
-  // }
 
   console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
@@ -149,8 +143,6 @@ export const verifyEmail = catchError(async (req, res, nex) => {
     );
     res.status(202).json({ message: "success", token, refreshToken });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });
@@ -197,26 +189,13 @@ export const varifyPasswordEmail = catchError(async (req, res, nex) => {
 
   var codeStatuse;
   console.log(user.virefyCode);
-const currentDate = Date.now();
-if (currentDate - user.virefyCode.date  <= 600000) {
-  codeStatuse = "pass";
-} else {
-  codeStatuse = "expired";
-}
-  // var day = new Date().getDate();
-  // var hour = new Date().getHours();
-  // var min = new Date().getMinutes();
-
-  // if (
-  //   user.virefyCode[0].date.day === day &&
-  //   user.virefyCode[0].date.hour === hour &&
-  //   user.virefyCode[0].date.min + 1 >= min
-  // ) {
-  //   codeStatuse = "pass";
-  // } else {
-  //   codeStatuse = "expired";
-  // }
-
+  const currentDate = Date.now();
+  if (currentDate - user.virefyCode.date <= 600000) {
+    codeStatuse = "pass";
+  } else {
+    codeStatuse = "expired";
+  }
+  
   console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
     user.status = "active";
@@ -228,8 +207,6 @@ if (currentDate - user.virefyCode.date  <= 600000) {
     );
     res.status(202).json({ message: "success", token, refreshToken });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });
@@ -239,7 +216,7 @@ export const resetePassword = catchError(async (req, res, nex) => {
   const { password } = req.body;
 
   user.password = password;
-  user.passwordChangedAt =  Date.now();
+  user.passwordChangedAt = Date.now();
   await user.save();
   const { token, refreshToken } = await getTokens(
     user._id.toString(),
@@ -247,21 +224,53 @@ export const resetePassword = catchError(async (req, res, nex) => {
   );
   res.status(202).json({ message: "success", token, refreshToken });
 });
-
+export const resendResetPass = catchError(async (req, res, nex) => {
+  const { user } = req;
+  // const user = await UserModel.findOne({ email });
+  if (user) {
+    user.virefyCode = {};
+    const { code } = generateCode();
+    user.virefyCode.code = code;
+    user.virefyCode.date = Date.now();
+    user.status = "deactive";
+    await user.save();
+    // if (emailType == "vrify email") {
+    //   await sendEmail({
+    //     to: email,
+    //     subject: "Verify Your Email",
+    //     html: emailTemp(code),
+    //   });
+    // }else{
+    await sendEmail({
+      to: user.email,
+      subject: "Reset Password",
+      html: resetRassword(code),
+    });
+    // }
+    console.log(code);
+    const { token, refreshToken } = await getTokens(
+      user._id.toString(),
+      user.role
+    );
+    res.status(202).json({ message: "success", token, refreshToken });
+  } else {
+    throw new AppError("email not found", 403);
+  }
+});
 export const redirectWithToke = catchError(async (req, res, nex) => {
   console.log(req.user);
   res.redirect(req.user);
-})
+});
 
 export const signinWithToken = catchError(async (req, res, nex) => {
   const Urltoken = req.params["token"];
-  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
-  if(!isVerifyed){
+  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET);
+  if (!isVerifyed) {
     throw new AppError("access denide", 403);
   }
   const payload = jwt.decode(Urltoken);
   const user = await UserModel.findById(payload.id);
-  if(!user){
+  if (!user) {
     throw new AppError("access denide", 403);
   }
   const { token, refreshToken } = await getTokens(
@@ -269,10 +278,10 @@ export const signinWithToken = catchError(async (req, res, nex) => {
     user.role
   );
   res.status(201).json({ message: "success", token, refreshToken });
-})  
+});
 
-export const success = catchError(async (req, res , next )=> {
-  const {token } = req.params
+export const success = catchError(async (req, res, next) => {
+  const { token } = req.params;
   console.log(token);
-  res.json(token)
-})
+  res.json(token);
+});

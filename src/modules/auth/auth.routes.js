@@ -11,6 +11,7 @@ import {
   redirectWithToke,
   signinWithToken,
   success,
+  resendEmail,
 } from "./controller/auth.controller.js";
 import {
   signinValidation,
@@ -35,6 +36,7 @@ authRouter.post("/verifyEmail", validate(verifyEmailValidation) , authMiddleware
 authRouter.delete("/:id", deleteUser);
 authRouter.post("/forgetPassword", forgetPassword);
 authRouter.post("/varifyPasswordEmail",authMiddleware, varifyPasswordEmail);
+authRouter.post("/resendEmail",authMiddleware, resendEmail);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
 authRouter.get("/login/success/:token", success);
 

@@ -9,7 +9,7 @@ import cors from "cors";
 import passport from "passport";
 import bodyParser from "body-parser";
 import {passportConfigGoogle , passportConfigFacebook} from "./passport-strategies.js"
-
+import AppError from "./src/util/ErrorHandler/AppError.js"
 const app = express();
 const port = 3000; 
 passportConfigGoogle(passport);

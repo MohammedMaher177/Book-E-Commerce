@@ -18,14 +18,18 @@ app.use(passport.initialize());
 const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080"]
 const corsOptions = {
     origin: function(origin, callback){
+        console.log(origin);
+        console.log(whiteList.indexOf(origin));
         if(whiteList.indexOf(origin) !== -1){
             callback(null, true);
+        }else{
+            callback(new AppError('Not allowed by CORS'))
         }
     },
     credentials: true
 }
 app.use(cors(corsOptions));
-app.use(cookie_parser);
+app.use(cookie_parser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 bootstrap(app);

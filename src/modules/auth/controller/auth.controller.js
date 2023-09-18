@@ -253,8 +253,9 @@ export const signinWithToken = catchError(async (req, res, next) => {
 
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    // secure: true,
+    secure: true,
     sameSite: 'none',
+    domain: 'https://book-store-uusp.onrender.com' 
   });
 
   res.status(201).json({ message: "success", token });

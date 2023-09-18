@@ -5,47 +5,47 @@ dotenv.config();
 import express from "express";
 import { bootstrap } from "./src/app.routes.js";
 import cookie_parser from "cookie-parser";
-import cors from "cors";
+// import cors from "cors";
 import passport from "passport";
 import bodyParser from "body-parser";
-import {passportConfigGoogle , passportConfigFacebook} from "./passport-strategies.js"
+import { passportConfigGoogle, passportConfigFacebook } from "./passport-strategies.js"
 import { AppError } from "./src/util/ErrorHandler/AppError.js";
+import cors from "./src/middleware/cors.js";
 const app = express();
-const port = 8080; 
+const port = 8080;
+app.use(cors);
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
-app.use(passport.initialize());
 // const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://book-store-an5l.onrender.com"]
-const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://accounts.google.com/", "https://accounts.google.com/", "https://book-store-an5l.onrender.com", "https://book-store-uusp.onrender.com"]
+// const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://accounts.google.com/", "https://accounts.google.com/", "https://book-store-an5l.onrender.com", "https://book-store-uusp.onrender.com"]
 const corsOptions = {
-    origin: function(origin, callback){
+    origin: function (origin, callback) {
         console.log(origin);
         console.log("hi from origin + ", origin)
         console.log(whiteList.indexOf(origin));
-        if(!origin){
+        if (!origin) {
             callback(null, true);
         }
-        if(whiteList.indexOf(origin) !== -1){
+        if (whiteList.indexOf(origin) !== -1) {
             callback(null, true);
-        }else{
+        } else {
             callback(new AppError('Not allowed by CORS'))
         }
     },
     credentials: true
 }
-app.use(cors({
-    origin: ["http://localhost:3000"],
-    credentials: true,
-    allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With"],
-    exposedHeaders: ['set-cookie'],
-}));
+// app.use(cors({
+//     // origin: ["http://localhost:3000"],
+//     origin: "*",
+//     credentials: true,
+//     allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With"],
+//     exposedHeaders: ['set-cookie'],
+// }));
+app.use(passport.initialize());
 app.use(cookie_parser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));    
+app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/he', function(req, res){
-    console.log(req.body);
-})
 bootstrap(app);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 

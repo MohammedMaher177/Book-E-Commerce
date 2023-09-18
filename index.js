@@ -11,7 +11,7 @@ import bodyParser from "body-parser";
 import {passportConfigGoogle , passportConfigFacebook} from "./passport-strategies.js"
 import { AppError } from "./src/util/ErrorHandler/AppError.js";
 const app = express();
-const port = 3000; 
+const port = 8080; 
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
 app.use(passport.initialize());
@@ -36,8 +36,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookie_parser());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-bootstrap(app);
+app.use(bodyParser.urlencoded({ extended: false }));    
 
+app.use('/he', function(req, res){
+    console.log(req.body);
+})
+bootstrap(app);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 

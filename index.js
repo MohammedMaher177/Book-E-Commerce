@@ -37,7 +37,7 @@ app.use(cors({
     origin: ["http://localhost:3000"],
     credentials: true,
     allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With"],
-    
+    exposedHeaders: ['set-cookie'],
 }));
 app.use(cookie_parser());
 app.use(bodyParser.json());

@@ -254,7 +254,7 @@ export const signinWithToken = catchError(async (req, res, next) => {
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: 'none',
+    sameSite: 'Lax',
   });
 
   res.status(201).json({ message: "success", token });

@@ -53,3 +53,16 @@ export const updateProfile = catchError(async (req, res, next) => {
 
   res.status(201).json({ message: "success"});
 }) 
+
+export const profile = catchError(async (req, res, next) => {
+  const user = req.user;
+  
+  const returnUser = {
+    userName: user.userName,
+    gender: user.gender,
+    phone: user.phone,
+    address: user.defultAddress,
+    age: user.age
+  }
+  res.status(200).json({ message: "success", user: returnUser});
+})

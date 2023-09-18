@@ -33,7 +33,7 @@ const corsOptions = {
     },
     credentials: true
 }
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(cookie_parser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));    

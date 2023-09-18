@@ -118,7 +118,7 @@ export const refresh = catchError(async (req, res) => {
   res.status(201).json({ message: "success", token: newToken });
 });
 
-export const verifyEmail = catchError(async (req, res, nex) => {
+export const verifyEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
 
@@ -158,7 +158,7 @@ export const verifyEmail = catchError(async (req, res, nex) => {
   }
 });
 
-export const forgetPassword = catchError(async (req, res, nex) => {
+export const forgetPassword = catchError(async (req, res, next) => {
   const { email } = req.body;
   console.log(email);
   const user = await UserModel.findOne({ email });
@@ -186,7 +186,7 @@ export const forgetPassword = catchError(async (req, res, nex) => {
   res.status(202).json({ message: "success", token });
 });
 
-export const varifyPasswordEmail = catchError(async (req, res, nex) => {
+export const varifyPasswordEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
   var codeStatuse;
@@ -209,7 +209,7 @@ export const varifyPasswordEmail = catchError(async (req, res, nex) => {
   }
 });
 
-export const resetePassword = catchError(async (req, res, nex) => {
+export const resetePassword = catchError(async (req, res, next) => {
   const { user } = req;
   const { password } = req.body;
 
@@ -230,12 +230,12 @@ export const resetePassword = catchError(async (req, res, nex) => {
   res.status(202).json({ message: "success", token });
 });
 
-export const redirectWithToke = catchError(async (req, res, nex) => {
+export const redirectWithToke = catchError(async (req, res, next) => {
   console.log(req.user);
   res.redirect(req.user);
 })
 
-export const signinWithToken = catchError(async (req, res, nex) => {
+export const signinWithToken = catchError(async (req, res, next) => {
   const Urltoken = req.params["token"];
   const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
   if (!isVerifyed) {

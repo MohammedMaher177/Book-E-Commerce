@@ -14,29 +14,20 @@ export const allBook = catchError(async (req, res, next) => {
 });
 export const bookBy = catchError(async (req, res, next) => {
   let filterObj = req.query
-      console.log(filterObj);
-      filterObj = JSON.stringify(filterObj)
-      filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
-      filterObj = JSON.parse(filterObj)
-      console.log(filterObj);
-        // const mongooseQuery = usersModel.find(filterObj).skip(SKIP).limit(PAGE_LIMIT)
-        // this.mongooseQuery.find(filterObj)
-  // const {name, ISBN, grt, lst } = req.query 
-  // console.log(req.query);
-  // const book = await bookModel.find({
-  //   $or:{
-  //     bookName: name,
-  //     price: {$lt: 500}
-  // }}).where({
-  //   ISBN
-  // });
-  const book = await bookModel.find(filterObj)
+  const delObj = ['page', 'sort', 'fields', 'keyword']
+  delObj.forEach(ele => {
+      delete filterObj[ele]
+  })
+  filterObj = JSON.stringify(filterObj)
+  filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
+  filterObj = JSON.parse(filterObj)
+  console.log(filterObj);
+  const book = await bookModel.find({ 
+    $or:
+     [ filterObj ]
+    });
   console.log(book);
-  if (book) {
-    res.json({ message: "success", book });
-  } else {
-    throw new AppError("There is no data", 403);
-  }
+  res.json({massege:"success",book})
 });
 export const addBook = catchError(async (req, res, next) => {
   const { ISBN } = req.body;

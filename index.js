@@ -16,7 +16,7 @@ passportConfigGoogle(passport);
 passportConfigFacebook(passport);
 app.use(passport.initialize());
 // const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://book-store-an5l.onrender.com"]
-const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://accounts.google.com", "https://book-store-an5l.onrender.com"]
+const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://accounts.google.com/", "https://book-store-an5l.onrender.com"]
 const corsOptions = {
     origin: function(origin, callback){
         console.log(origin);

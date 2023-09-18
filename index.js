@@ -33,7 +33,12 @@ const corsOptions = {
     },
     credentials: true
 }
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:3000"],
+    credentials: true,
+    allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With"],
+    
+}));
 app.use(cookie_parser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));    

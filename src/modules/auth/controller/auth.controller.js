@@ -24,17 +24,6 @@ export const signup = catchError(async (req, res, next) => {
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
-
-  // user.virefyCode = [];
-  // user.virefyCode.push({
-  //   code: code,
-  //   date: {
-  //     day: new Date().getDate(),
-  //     hour: new Date().getHours(),
-  //     min: new Date().getMinutes(),
-  //   },
-  // });
-
   user.save();
   console.log(user.virefyCode);
   req.body.virefyCode = code;
@@ -192,16 +181,6 @@ export const forgetPassword = catchError(async (req, res, nex) => {
     const { code } = generateCode();
     user.virefyCode.code = code;
     user.virefyCode.date = Date.now();
-
-    // user.virefyCode.push({
-    //   code: code,
-    //   date: {
-    //     day: new Date().getDate(),
-    //     hour: new Date().getHours(),
-    //     min: new Date().getMinutes(),
-    //   },
-    // });
-
     console.log(user.virefyCode);
     user.status = "deactive";
     await user.save();
@@ -215,7 +194,7 @@ export const forgetPassword = catchError(async (req, res, nex) => {
       user._id.toString(),
       user.role
     );
-    res.status(202).json({ message: "success", token, refreshToken });
+    res.status(202).json({ message: "success", token });
   } else {
     throw new AppError("email not found", 403);
   }
@@ -263,7 +242,6 @@ export const resetePassword = catchError(async (req, res, nex) => {
 });
 export const resendResetPass = catchError(async (req, res, nex) => {
   const { user } = req;
-  // const user = await UserModel.findOne({ email });
   if (user) {
     user.virefyCode = {};
     const { code } = generateCode();
@@ -271,19 +249,11 @@ export const resendResetPass = catchError(async (req, res, nex) => {
     user.virefyCode.date = Date.now();
     user.status = "deactive";
     await user.save();
-    // if (emailType == "vrify email") {
-    //   await sendEmail({
-    //     to: email,
-    //     subject: "Verify Your Email",
-    //     html: emailTemp(code),
-    //   });
-    // }else{
     await sendEmail({
       to: user.email,
       subject: "Reset Password",
       html: resetRassword(code),
     });
-    // }
     console.log(code);
     const { token, refreshToken } = await getTokens(
       user._id.toString(),

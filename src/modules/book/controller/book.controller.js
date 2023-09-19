@@ -23,11 +23,10 @@ export const bookBy = catchError(async (req, res, next) => {
   filterObj = JSON.parse(filterObj)
   console.log(filterObj);
   const book = await bookModel.find({ 
-    $or:
-     [ filterObj ]
+    filterObj
     });
-  console.log(book);
-  res.json({massege:"success",book})
+    console.log(book);
+  res.json({massege:"success"})
 });
 export const addBook = catchError(async (req, res, next) => {
   const { ISBN } = req.body;

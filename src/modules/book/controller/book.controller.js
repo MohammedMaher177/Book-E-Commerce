@@ -58,6 +58,7 @@ export const addBook = catchError(async (req, res, next) => {
         (result) => {
           return result;
         }
+
       );
     }
     const { public_id, secure_url } = await cloudinary.uploader.upload(
@@ -76,7 +77,7 @@ export const addBook = catchError(async (req, res, next) => {
   } else {
     throw new AppError("In-Valid Upload Photo", 403);
   }
-  res.json({ message: "success", bookWithImage });
+  res.json({ message: "success",book });
 });
 export const updateBook = catchError(async (req, res, next) => {
   const { bookId } = req.params;

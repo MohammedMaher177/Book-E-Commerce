@@ -12,7 +12,7 @@ import { passportConfigGoogle, passportConfigFacebook } from "./passport-strateg
 import { AppError } from "./src/util/ErrorHandler/AppError.js";
 import cors from "./src/middleware/cors.js";
 const app = express();
-const port = 8080;
+const port = 3000;
 app.use(cors);
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
@@ -23,6 +23,7 @@ const corsOptions = {
         console.log(origin);
         console.log("hi from origin + ", origin)
         console.log(whiteList.indexOf(origin));
+        
         if (!origin) {
             callback(null, true);
         }

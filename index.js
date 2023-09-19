@@ -16,32 +16,6 @@ const port = 3000;
 app.use(cors);
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);
-// const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://book-store-an5l.onrender.com"]
-// const whiteList = ["http://localhost:3000", "https://localhost:3000", "http://localhost:8080", "https://localhost:8080", "https://accounts.google.com/", "https://accounts.google.com/", "https://book-store-an5l.onrender.com", "https://book-store-uusp.onrender.com"]
-const corsOptions = {
-    origin: function (origin, callback) {
-        console.log(origin);
-        console.log("hi from origin + ", origin)
-        console.log(whiteList.indexOf(origin));
-        
-        if (!origin) {
-            callback(null, true);
-        }
-        if (whiteList.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new AppError('Not allowed by CORS'))
-        }
-    },
-    credentials: true
-}
-// app.use(cors({
-//     // origin: ["http://localhost:3000"],
-//     origin: "*",
-//     credentials: true,
-//     allowedHeaders: ["Authorization", "Content-Type", "X-Requested-With"],
-//     exposedHeaders: ['set-cookie'],
-// }));
 app.use(passport.initialize());
 app.use(cookie_parser());
 app.use(bodyParser.json());

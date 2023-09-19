@@ -251,7 +251,7 @@ export const signinWithToken = catchError(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    domain: 'http://localhost:3000'
+    domain: 'onrender.com'
   });
 
   res.status(201).json({ message: "success", token });

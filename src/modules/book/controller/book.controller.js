@@ -28,12 +28,6 @@ export const bookBy = catchError(async (req, res, next) => {
     console.log(book);
   res.json({massege:"success"})
 });
-export const addBook = catchError(async (req, res, next) => {
-  const { ISBN } = req.body;
-  const existBook = await bookModel.findOne({ ISBN });
-  if (existBook) {
-    throw new AppError("Book already exist", 403);
-  }
 
 export const addBook = catchError(async (req,res, next)=>{
     const {ISBN}= req.body;

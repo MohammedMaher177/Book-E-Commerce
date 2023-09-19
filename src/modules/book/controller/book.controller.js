@@ -35,75 +35,66 @@ export const addBook = catchError(async (req, res, next) => {
     throw new AppError("Book already exist", 403);
   }
 
-  const book = await bookModel.create(req.body);
-  book.save();
-  if (req.file) {
-    if (book.image.public_id) {
+export const addBook = catchError(async (req,res, next)=>{
+    const {ISBN}= req.body;
+    const existBook = await bookModel.findOne({ISBN});
+    if (existBook) {
+        throw new AppError("Book already exist", 403);
+    }
+    const book = await bookModel.insertMany(req.body);
+    // await noteModel.insertMany({title,desc,createdBy})
+    if (req.file) {
+        if (__user.image.public_id) {
       const { result } = await cloudinary.uploader.destroy(
-        `${book.image.public_id}`,
+        `${__user.image.public_id}`,
         (result) => {
           return result;
         }
       );
     }
-
-    const { public_id, secure_url } = await cloudinary.uploader.upload(
-      req.file.path,
-      { folder: `BookStore/Book/${book._id}` }
-    );
-
-    const bookImage = await bookModel.findByIdAndUpdate(
-      book._id,
-      {
-        image: { public_id, secure_url },
-      },
-      { new: true }
-    );
-    res.json({ message: "success", user });
-  } else {
-    throw new AppError("In-Valid Upload Photo", 403);
-  }
-  res.json({ message: "success", book });
-});
-export const updateBook = catchError(async (req, res, next) => {
-  const { bookId } = req.params;
-  const {
-    bookName,
-    lang,
-    desc,
-    pages,
-    image,
-    stock,
-    price,
-    discount,
-    author,
-    publisher,
-    published,
-    category,
-  } = req.body;
-  const book = await bookModel.findById(bookId);
-  if (!book) {
-    throw new AppError("Book Not found", 403);
-  }
-  console.log(book);
-  const categoryInfo = await categoryModel.findById(category);
-  await bookModel.findByIdAndUpdate(
-    id,
-    {
-      bookName: bookName,
-      lang: lang,
-      desc: desc,
-      pages: pages,
-      //   image: { public_id, secure_url },
-      stock: stock,
-      price: price,
-      discount: discount,
-      author: author,
-      publisher: publisher,
-      published: published,
-      category: category,
-    },
-    { new: true }
-  );
-  res.json({ message: "success", book });
-});
+        const { public_id, secure_url } = await cloudinary.uploader.upload(req.file.path,
+          { folder: `BookStore/User/${book._id}` }
+        );
+    
+        const user = await UserModel.findByIdAndUpdate(
+          book._id,
+          {
+            image: { public_id, secure_url },
+          },
+          { new: true }
+        );
+      } else {
+        throw new AppError("In-Valid Upload Photo", 403);
+      }
+    res.json({message: "success",book})
+})
+export const updateBook = catchError(async (req,res, next)=>{
+    const {bookId}=req.params
+    const {bookName ,lang ,desc ,pages ,image ,stock ,price,
+        discount,author, publisher,published ,category}= req.body;
+    const book = await bookModel.findById(bookId);
+    if (!book) {
+        throw new AppError("Book Not found", 403);
+    }
+    console.log(book);
+    const categoryInfo = await categoryModel.findById(category);
+     await bookModel.findByIdAndUpdate(
+        id,
+        {
+            bookName:bookName,
+            lang:lang,
+            desc:desc,
+            pages:pages, 
+        //   image: { public_id, secure_url },
+        stock:stock,
+        price:price,
+        discount:discount,
+        author:author,
+        publisher:publisher,
+        published:published,
+       category:category
+        },
+        { new: true }
+      );
+    res.json({message: "success",book})
+})

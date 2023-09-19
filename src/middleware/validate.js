@@ -3,7 +3,7 @@ const keys = ["body", "params", "query", "headers", "file"]
 
 export const validate = (schema) => {
     return (req, res, next) => {
-        console.log(req.body);
+        
         const errors = []
         keys.forEach(key=>{
             if(schema[key]){

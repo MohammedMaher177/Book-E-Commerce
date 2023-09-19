@@ -28,7 +28,7 @@ const passportConfigGoogle = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
-        let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
+        let redirect_url = `https://book-store-front.onrender.com/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)
@@ -40,7 +40,7 @@ const passportConfigFacebook = (passport) => {
   passport.use(new facebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_SECRET_ID,
-    callbackURL: "https://book-store-uusp.onrender.com/api/v1auth/facebook/redirect",
+    callbackURL: "https://book-store-an5l.onrender.com/api/v1/auth/facebook/redirect",
     profileFields: ['id', 'displayName', 'email']
 
   },
@@ -63,7 +63,7 @@ const passportConfigFacebook = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
-        let redirect_url = `http://localhost:3000/api/v1/auth/login/success/${token}`;
+        let redirect_url = `https://book-store-front.onrender.com/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)

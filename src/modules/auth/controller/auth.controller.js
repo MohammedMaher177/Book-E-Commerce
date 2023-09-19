@@ -152,8 +152,6 @@ export const verifyEmail = catchError(async (req, res, next) => {
 
     res.status(202).json({ message: "success", token });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 401);
   }
 });
@@ -203,8 +201,6 @@ export const varifyPasswordEmail = catchError(async (req, res, next) => {
 
     res.status(202).json({ message: "success" });
   } else {
-    user.virefyCode = {};
-    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });

@@ -4,6 +4,36 @@ import cloudinary from "../../../multer/cloudinary.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
+export const allBook = catchError(async (req, res, next) => {
+  const books = await bookModel.find();
+  if (books) {
+    res.json({ message: "success", books });
+  } else {
+    throw new AppError("There is no data", 403);
+  }
+});
+export const bookBy = catchError(async (req, res, next) => {
+  let filterObj = req.query
+  const delObj = ['page', 'sort', 'fields', 'keyword']
+  delObj.forEach(ele => {
+      delete filterObj[ele]
+  })
+  filterObj = JSON.stringify(filterObj)
+  filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
+  filterObj = JSON.parse(filterObj)
+  console.log(filterObj);
+  const book = await bookModel.find({ 
+    filterObj
+    });
+    console.log(book);
+  res.json({massege:"success"})
+});
+export const addBook = catchError(async (req, res, next) => {
+  const { ISBN } = req.body;
+  const existBook = await bookModel.findOne({ ISBN });
+  if (existBook) {
+    throw new AppError("Book already exist", 403);
+  }
 
 export const addBook = catchError(async (req,res, next)=>{
     const {ISBN}= req.body;

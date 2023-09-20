@@ -16,7 +16,7 @@ const bookRouter = Router();
 bookRouter.get("/",allBook);
 bookRouter.get("/filter",filterBook);
 bookRouter.get("/search",searchBook);
-bookRouter.post("/addBook",uploadImage(uploadValidation.image).single("image"),addBook);
+bookRouter.post("/addBook",validate(bookValidation),uploadImage(uploadValidation.image).single("image"),addBook);
 bookRouter.patch("/:bookId",validate(bookValidation),updateBook);
 
 

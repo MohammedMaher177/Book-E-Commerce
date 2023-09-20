@@ -11,7 +11,7 @@ export const bookValidation = {
     lang:joi.string().required(),
     desc: joi.string().required(),
     pages: joi.number().min(10).required(),
-    image:joi.required(),
+    // image:joi.required(),
     stock: joi.number(),
     price: joi.number().required(),
     discount:joi.number(),

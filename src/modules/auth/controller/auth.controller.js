@@ -306,8 +306,9 @@ export const signinWithToken = catchError(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    // domain: 'codecraftsportfolio.online'
-    domain: '.onrender.com'
+    domain: '.codecraftsportfolio.online',
+    
+    // domain: '.onrender.com'
   });
 
   res.status(201).json({ message: "success", token });

@@ -57,12 +57,12 @@ export const resendVaryfyEmail = catchError(async (req, res, nex) => {
     user.virefyCode.date = Date.now();
     await user.save();
     await sendEmail({
-      to: email,
+      to: user.email,
       subject: "Verify Your Email",
       html: emailTemp(code),
     });
 
-    console.log(code);
+    console.log(user.email);
     const { token, refreshToken } = await getTokens(
       user._id.toString(),
       user.role

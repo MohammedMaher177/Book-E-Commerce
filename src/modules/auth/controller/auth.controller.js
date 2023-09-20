@@ -43,6 +43,14 @@ export const signup = catchError(async (req, res, next) => {
       html: emailTemp(req.body.virefyCode),
     });
     const { token } = await getTokens(user._id, user.role);
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: 'codecraftsportfolio.online',
+  
+      // domain: '.onrender.com'
+    });
     res.status(201).json({ message: "success", token });
   } else {
     throw new AppError("In-Valid Net Work", 500);
@@ -306,8 +314,8 @@ export const signinWithToken = catchError(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    domain: '.codecraftsportfolio.online',
-    
+    domain: 'codecraftsportfolio.online',
+
     // domain: '.onrender.com'
   });
 

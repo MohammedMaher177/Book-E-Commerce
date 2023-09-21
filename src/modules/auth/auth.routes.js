@@ -30,7 +30,7 @@ authRouter.get("/google/redirect", googleRedirect, redirectWithToke)
 authRouter.get("/facebook", facebook)
 authRouter.get("/facebook/redirect", facebookRedirect, redirectWithToke)
 authRouter.post("/signup", validate(signupValidation), signup);
-authRouter.post("/resendVaryfyEmail",authMiddleware, resendVaryfyEmail);
+authRouter.get("/resendVaryfyEmail",authMiddleware, resendVaryfyEmail);
 authRouter.post("/signin", validate(signinValidation), signin);
 authRouter.post("/signin/:token", signinWithToken)
 authRouter.post("/refresh", refresh);

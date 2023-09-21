@@ -40,7 +40,7 @@ const passportConfigFacebook = (passport) => {
   passport.use(new facebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_SECRET_ID,
-    callbackURL: "https://book-store-an5l.onrender.com/api/v1/auth/facebook/redirect",
+    callbackURL: "https://bookstore-api.codecraftsportfolio.online/api/v1/auth/facebook/redirect",
     profileFields: ['id', 'displayName', 'email']
 
   },

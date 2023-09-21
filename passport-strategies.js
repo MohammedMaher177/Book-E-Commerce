@@ -6,7 +6,7 @@ import UserModel from "./DB/models/user.model.js";
 
 const passportConfigGoogle = (passport) => {
   passport.use(new GoogleStrategy({
-    callbackURL: `https://book-store-an5l.onrender.com/api/v1/auth/google/redirect`,
+    callbackURL: `https://bookstore-api.codecraftsportfolio.online/api/v1/auth/google/redirect`,
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   },
@@ -28,7 +28,7 @@ const passportConfigGoogle = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
-        let redirect_url = `bookstore-front.codecraftsportfolio.online/auth/login/success/${token}`;
+        let redirect_url = `https://bookstore-front.codecraftsportfolio.online/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)

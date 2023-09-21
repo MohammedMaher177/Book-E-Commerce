@@ -1,7 +1,7 @@
 
 
 const cors = (req, res, next) => {
-    const allowedOrigins = ['http://localhost:3000', 'https://book-store-front.onrender.com'];
+    const allowedOrigins = ['http://localhost:3000', 'https://book-store-front.onrender.com', 'https://bookstore-front.codecraftsportfolio.online'];
     const origin = req.headers.origin;
     if (allowedOrigins.includes(origin)) {
         res.setHeader('Access-Control-Allow-Origin', origin);

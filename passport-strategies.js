@@ -6,7 +6,7 @@ import UserModel from "./DB/models/user.model.js";
 
 const passportConfigGoogle = (passport) => {
   passport.use(new GoogleStrategy({
-    callbackURL: `https://book-store-uusp.onrender.com/api/v1/auth/google/redirect`,
+    callbackURL: `https://book-store-an5l.onrender.com/api/v1/auth/google/redirect`,
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   },

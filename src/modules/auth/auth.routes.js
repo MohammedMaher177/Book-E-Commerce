@@ -8,9 +8,10 @@ import {
   forgetPassword,
   varifyPasswordEmail,
   resetePassword,
-  redirectWithToke,
+  redirectWithToken,
   signinWithToken,
-  success,
+  resendCode,
+  logout,
 } from "./controller/auth.controller.js";
 import {
   signinValidation,
@@ -23,41 +24,32 @@ import { authMiddleware } from "../../middleware/authentication.js";
 import { facebook, facebookRedirect, google, googleRedirect } from "../../middleware/passport.js";
 
 const authRouter = Router();
+
+// social auth
 authRouter.get("/google", google)
-authRouter.get("/google/redirect", googleRedirect, redirectWithToke)
+authRouter.get("/google/redirect", googleRedirect, redirectWithToken)
 authRouter.get("/facebook", facebook)
-authRouter.get("/facebook/redirect", facebookRedirect, redirectWithToke)
-authRouter.post("/signup", validate(signupValidation), signup);
-authRouter.post("/signin", validate(signinValidation), signin);
+authRouter.get("/facebook/redirect", facebookRedirect, redirectWithToken)
 authRouter.post("/signin/:token", signinWithToken)
-authRouter.post("/refresh", refresh);
+
+// local auth
+authRouter.post("/signin", validate(signinValidation), signin);
+authRouter.post("/signup", validate(signupValidation), signup);
 authRouter.post("/verifyEmail", validate(verifyEmailValidation) , authMiddleware, verifyEmail);
-authRouter.delete("/:id", deleteUser);
+
+// forget password
 authRouter.post("/forgetPassword", forgetPassword);
-authRouter.post("/varifyPasswordEmail",authMiddleware, varifyPasswordEmail);
+authRouter.post("/varifyPasswordEmail", authMiddleware, varifyPasswordEmail);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
-authRouter.get("/login/success/:token", success);
 
+// resend code for verifying email or reset password
+authRouter.post("/resendCode", authMiddleware, resendCode);
 
+// for geting new token using refresh token
+authRouter.post("/refresh", refresh);
+
+// log out 
+authRouter.post("/logout",authMiddleware, logout);
+
+// authRouter.delete("/:id", deleteUser);
 export default authRouter;
-
-
-// app.get(
-//   "/auth/google",
-//   passport.authenticate("google", {
-//     scope: ["profile", "email"],
-//     session: false,
-//   })
-// );
-
-// app.get(
-//   "/auth/google/redirect",
-//   passport.authenticate("google", {
-//     session: false,
-//     failureRedirect: `https://localhost:3000/login`,
-//   }),
-//   (req, res) => {
-//     console.log(req.user);
-//     res.redirect(req.user); //req.user has the redirection_url
-//   }
-// );

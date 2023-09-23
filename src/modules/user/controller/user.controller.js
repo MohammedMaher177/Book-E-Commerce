@@ -61,7 +61,8 @@ export const profile = catchError(async (req, res, next) => {
     userName: user.userName,
     gender: user.gender,
     phone: user.phone,
-    address: user.defultAddress,
+    address: user.defultAddress.address,
+    city: user.defultAddress.city,
     age: user.age
   }
   res.status(200).json({ message: "success", user: returnUser});

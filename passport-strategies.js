@@ -6,7 +6,7 @@ import UserModel from "./DB/models/user.model.js";
 
 const passportConfigGoogle = (passport) => {
   passport.use(new GoogleStrategy({
-    callbackURL: `https://book-store-uusp.onrender.com/api/v1/auth/google/redirect`,
+    callbackURL: process.env.MODE == "PRODUCTION" ? `https://bookstore-api.codecraftsportfolio.online/api/v1/auth/google/redirect` : 'http://localhost:3000/api/v1/auth/google/redirect',
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   },
@@ -28,6 +28,7 @@ const passportConfigGoogle = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
+        // let redirect_url = `https://bookstore-front.codecraftsportfolio.online/auth/login/success/${token}`;
         let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
@@ -40,7 +41,7 @@ const passportConfigFacebook = (passport) => {
   passport.use(new facebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_SECRET_ID,
-    callbackURL: "https://book-store-uusp.onrender.com/api/v1auth/facebook/redirect",
+    callbackURL: process.env.MODE == "PRODUCTION" ? "https://bookstore-api.codecraftsportfolio.online/api/v1/auth/google/redirect" : "http://localhost:3000/api/v1/auth/google/redirect",
     profileFields: ['id', 'displayName', 'email']
 
   },
@@ -63,7 +64,8 @@ const passportConfigFacebook = (passport) => {
           process.env.TOKEN_SECRET,
           { expiresIn: "2h" }
         );
-        let redirect_url = `http://localhost:3000/api/v1/auth/login/success/${token}`;
+        // let redirect_url = `https://book-store-front.onrender.com/auth/login/success/${token}`;
+        let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)

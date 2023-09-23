@@ -7,7 +7,6 @@ export const uploadSingleFile = (fieldName, folderName) => {
       cb(null, `uploads/${folderName}`);
     },
     filename: (req, file, cb) => {
-      console.log(file);
       const uniqueSuffix =
         Date.now() + "-" + Math.round(Math.random() * 1e9) + file.originalname;
       // const uniqueSuffix = file.originalname

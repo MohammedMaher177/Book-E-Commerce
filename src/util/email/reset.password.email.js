@@ -141,9 +141,9 @@ export const resetRassword = (code) => {
                                 style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
                                 <h1
                                     style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">
-                                    Confirm Your Email Address</h1>
+                                    Reseting Your Email Password</h1>
                                 <h4 style="margin: 0; font-size: 18px; font-weight: 700;  line-height: 40px;">
-                                 To resete your password please enter this code in web site Input</h1>
+                                 To resete your password please enter this code in web site Input</h4>
                             </td>
                         </tr>
                     </table>

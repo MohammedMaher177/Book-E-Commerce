@@ -24,6 +24,15 @@ export const signup = catchError(async (req, res, next) => {
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
+  // user.virefyCode = [];
+  // user.virefyCode.push({
+  //   code: code,
+  //   date: {
+  //     day: new Date().getDate(),
+  //     hour: new Date().getHours(),
+  //     min: new Date().getMinutes(),
+  //   },
+  // });
   user.save();
   console.log(user.virefyCode);
   req.body.virefyCode = code;
@@ -39,30 +48,7 @@ export const signup = catchError(async (req, res, next) => {
     throw new AppError("In-Valid Net Work", 500);
   }
 });
-export const resendVaryfyEmail = catchError(async (req, res, nex) => {
-  const { user } = req;
-  if (user) {
-    user.virefyCode = {};
-    const { code } = generateCode();
-    user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-    await user.save();
-    await sendEmail({
-      to: email,
-      subject: "Verify Your Email",
-      html: emailTemp(code),
-    });
 
-    console.log(code);
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token, refreshToken });
-  } else {
-    throw new AppError("email not found", 403);
-  }
-});
 export const deleteUser = catchError(async (req, res) => {
   const { id } = req.params;
   const de = await UserModel.findByIdAndDelete(id);
@@ -114,10 +100,10 @@ export const refresh = catchError(async (req, res) => {
     res.cookie('refreshToken', '', {
       httpOnly: true,
       secure: true,
-      sameSite: 'none', 
+      sameSite: 'none',
       maxAge: 0
     });
-    
+
     throw new AppError("reauthenticate", 403);
   }
   const newToken = jwt.sign(
@@ -132,26 +118,22 @@ export const refresh = catchError(async (req, res) => {
   res.status(201).json({ message: "success", token: newToken });
 });
 
-export const verifyEmail = catchError(async (req, res, nex) => {
+export const verifyEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
+
   if (user.confirmedEmail) {
     throw new AppError("Email Already Virefied", 402);
   }
   var codeStatuse;
-  console.log(user.virefyCode);
-
   const currentDate = Date.now();
   if (
     currentDate - user.virefyCode.date <= 600000
   ) {
-
     codeStatuse = "pass";
   } else {
     codeStatuse = "expired";
   }
-
-  console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
     user.confirmedEmail = true;
     user.status = "active";
@@ -170,64 +152,64 @@ export const verifyEmail = catchError(async (req, res, nex) => {
 
     res.status(202).json({ message: "success", token });
   } else {
-    throw new AppError("In-Valid Verify Code", 403);
-  }
-});
-export const forgetPassword = catchError(async (req, res, nex) => {
-  const { email } = req.body;
-  const user = await UserModel.findOne({ email });
-  if (user) {
     user.virefyCode = {};
-    const { code } = generateCode();
-    user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-    console.log(user.virefyCode);
-    user.status = "deactive";
     await user.save();
-    await sendEmail({
-      to: email,
-      subject: "Reset Password",
-      html: resetRassword(code),
-    });
-    console.log(code);
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token });
-  } else {
-    throw new AppError("email not found", 403);
+    throw new AppError("In-Valid Verify Code", 401);
   }
 });
 
-export const varifyPasswordEmail = catchError(async (req, res, nex) => {
+export const forgetPassword = catchError(async (req, res, next) => {
+  const { email } = req.body;
+  console.log(email);
+  const user = await UserModel.findOne({ email });
+  if (!user) {
+    throw new AppError("This email does not exsist", 404);
+  }
+  user.virefyCode = {};
+  const { code } = generateCode();
+  user.virefyCode.code = code;
+  user.virefyCode.date = Date.now();
+  console.log(user.virefyCode);
+  user.status = "deactive";
+  await user.save();
+  
+  await sendEmail({
+    to: email,
+    subject: "Reset Password",
+    html: resetRassword(code),
+  });
+
+  const { token } = await getTokens(
+    user._id.toString(),
+    user.role
+  );
+  res.status(202).json({ message: "success", token });
+});
+
+export const varifyPasswordEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
-
   var codeStatuse;
-  console.log(user.virefyCode);
   const currentDate = Date.now();
   if (currentDate - user.virefyCode.date <= 600000) {
     codeStatuse = "pass";
   } else {
     codeStatuse = "expired";
   }
-  console.log(codeStatuse);
   if (user.virefyCode.code === code && codeStatuse == "pass") {
     user.status = "active";
     user.virefyCode = {};
     await user.save();
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token, refreshToken });
+
+    res.status(202).json({ message: "success" });
   } else {
+    user.virefyCode = {};
+    await user.save();
     throw new AppError("In-Valid Verify Code", 403);
   }
 });
 
-export const resetePassword = catchError(async (req, res, nex) => {
+export const resetePassword = catchError(async (req, res, next) => {
   const { user } = req;
   const { password } = req.body;
 
@@ -238,58 +220,49 @@ export const resetePassword = catchError(async (req, res, nex) => {
     user._id.toString(),
     user.role
   );
-  res.status(202).json({ message: "success", token, refreshToken });
-});
-export const resendResetPass = catchError(async (req, res, nex) => {
-  const { user } = req;
-  if (user) {
-    user.virefyCode = {};
-    const { code } = generateCode();
-    user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-    user.status = "deactive";
-    await user.save();
-    await sendEmail({
-      to: user.email,
-      subject: "Reset Password",
-      html: resetRassword(code),
-    });
-    console.log(code);
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token, refreshToken });
-  } else {
-    throw new AppError("email not found", 403);
-  }
-});
-export const redirectWithToke = catchError(async (req, res, nex) => {
-  console.log(req.user);
-  res.redirect(req.user);
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  })
+  
+  res.status(202).json({ message: "success", token });
 });
 
-export const signinWithToken = catchError(async (req, res, nex) => {
+export const redirectWithToke = catchError(async (req, res, next) => {
+  console.log(req.user);
+  res.redirect(req.user);
+})
+
+export const signinWithToken = catchError(async (req, res, next) => {
   const Urltoken = req.params["token"];
   const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
   if (!isVerifyed) {
-    throw new AppError("access denide", 403);
+    throw new AppError("Invalid token", 401);
   }
   const payload = jwt.decode(Urltoken);
   const user = await UserModel.findById(payload.id);
   if (!user) {
-    throw new AppError("access denide", 403);
+    throw new AppError("This user does not exist", 404);
   }
   const { token, refreshToken } = await getTokens(
     user._id.toString(),
     user.role
   );
-  res.status(201).json({ message: "success", token, refreshToken });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    domain: 'http://localhost:3000'
+  });
+
+  res.status(201).json({ message: "success", token });
 })
 
 export const success = catchError(async (req, res, next) => {
   const { token } = req.params
-
   console.log(token);
-  res.json(token);
-});
+  res.json(token)
+})

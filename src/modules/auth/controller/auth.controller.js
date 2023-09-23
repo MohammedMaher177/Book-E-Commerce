@@ -110,12 +110,7 @@ export const signin = catchError(async (req, res, next) => {
 export const refresh = catchError(async (req, res, next) => {
   const refreshToken = req.cookies["refreshToken"];
 
-  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET,(err,decode) => {
-    if(err){
-      throw new AppError("unauthenticated", 401);
-    }
-    return decode
-  });
+  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
 
   if (!decoded) {
     throw new AppError("unauthenticated", 401);
@@ -233,18 +228,13 @@ export const redirectWithToken = catchError(async (req, res, next) => {
 
 export const signinWithToken = catchError(async (req, res, next) => {
   const Urltoken = req.params["token"];
-  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET,(err, decode)=>{
-    if(err) {
-    throw new AppError("Invalid token", 401);
-    }
-    return decode
-  });
+  const decoded = jwt.verify(Urltoken, process.env.TOKEN_SECRET);
 
-  if (!isVerifyed) {
+  if (!decoded) {
     throw new AppError("Invalid token", 401);
   }
-  const payload = jwt.decode(Urltoken);
-  const user = await UserModel.findById(payload.id);
+  // const payload = jwt.decode(Urltoken);
+  const user = await UserModel.findById(decoded.id);
   if (!user) {
     throw new AppError("This user does not exist", 404);
   }

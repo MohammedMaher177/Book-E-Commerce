@@ -34,8 +34,13 @@ export const signup = catchError(async (req, res, next) => {
   res.status(201).json({ message: "success", token });
 });
 
-export const resendCode = catchError(async (req, res, nex) => {
+export const resendCode = catchError(async (req, res, next) => {
   const { user } = req;
+
+  // if(user.status !== "not confirmed" && user.status !== "reseting password"){
+  //   throw new AppError('this email is either confirmed or diactivated', 401);
+  // }
+
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
@@ -54,7 +59,7 @@ export const resendCode = catchError(async (req, res, nex) => {
   }
   if (user.status === "reseting password") {
     await sendEmail({
-      to: email,
+      to: user.email,
       subject: "Reset Password",
       html: emailTemp(
         "Reseting Your Email Password",
@@ -67,13 +72,13 @@ export const resendCode = catchError(async (req, res, nex) => {
   res.status(202).json({ message: "success" });
 });
 
-export const deleteUser = catchError(async (req, res) => {
+export const deleteUser = catchError(async (req, res, next) => {
   const { id } = req.params;
   const de = await UserModel.findByIdAndDelete(id);
   res.status(202).json(de);
 });
 
-export const signin = catchError(async (req, res) => {
+export const signin = catchError(async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await UserModel.findOne({ email });
@@ -83,7 +88,7 @@ export const signin = catchError(async (req, res) => {
 
   const isIdentical = await bcrypt.compare(password, user.password);
   if (!isIdentical) {
-    throw new AppError("invalid email or password", 401);
+    throw new AppError("invalid password", 401);
   }
 
   const { token, refreshToken } = await getTokens(
@@ -102,10 +107,15 @@ export const signin = catchError(async (req, res) => {
   res.status(201).json({ message: "success", token });
 });
 
-export const refresh = catchError(async (req, res) => {
+export const refresh = catchError(async (req, res, next) => {
   const refreshToken = req.cookies["refreshToken"];
 
-  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
+  const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET,(err,decode) => {
+    if(err){
+      throw new AppError("unauthenticated", 401);
+    }
+    return decode
+  });
 
   if (!decoded) {
     throw new AppError("unauthenticated", 401);
@@ -146,7 +156,7 @@ export const verifyEmail = catchError(async (req, res, next) => {
   const currentDate = Date.now();
   const codeStatuse =
     currentDate - user.virefyCode.date <= 600000 ? "pass" : "expired";
-  if (user.virefyCode.code !== code && codeStatuse !== "pass") {
+  if (user.virefyCode.code !== code || codeStatuse !== "pass") {
     throw new AppError("In-Valid Verify Code", 401);
   }
   user.confirmedEmail = true;
@@ -181,7 +191,7 @@ export const forgetPassword = catchError(async (req, res, next) => {
   user.status = "reseting password";
   await user.save();
   await sendEmail({
-    to: email,
+    to: user.email,
     subject: "Reset Password",
     html: emailTemp(
       "Reseting Your Email Password",
@@ -199,7 +209,7 @@ export const varifyPasswordEmail = catchError(async (req, res, next) => {
   const currentDate = Date.now();
   const codeStatuse =
     currentDate - user.virefyCode.date <= 600000 ? "pass" : "expired";
-  if (user.virefyCode.code !== code && codeStatuse !== "pass") {
+  if (user.virefyCode.code !== code || codeStatuse !== "pass") {
     throw new AppError("In-Valid Verify Code", 403);
   }
   user.virefyCode = {};
@@ -212,6 +222,7 @@ export const resetePassword = catchError(async (req, res, next) => {
   const { password } = req.body;
   user.password = password;
   user.passwordChangedAt = Date.now();
+  user.status = "active"
   await user.save();
   res.status(202).json({ message: "success" });
 });
@@ -222,7 +233,13 @@ export const redirectWithToken = catchError(async (req, res, next) => {
 
 export const signinWithToken = catchError(async (req, res, next) => {
   const Urltoken = req.params["token"];
-  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET);
+  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET,(err, decode)=>{
+    if(err) {
+    throw new AppError("Invalid token", 401);
+    }
+    return decode
+  });
+
   if (!isVerifyed) {
     throw new AppError("Invalid token", 401);
   }

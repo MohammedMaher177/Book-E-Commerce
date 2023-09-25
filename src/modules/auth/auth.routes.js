@@ -10,8 +10,8 @@ import {
   resetePassword,
   redirectWithToken,
   signinWithToken,
-  success,
   resendCode,
+  logout,
 } from "./controller/auth.controller.js";
 import {
   signinValidation,
@@ -43,11 +43,13 @@ authRouter.post("/varifyPasswordEmail", authMiddleware, varifyPasswordEmail);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
 
 // resend code for verifying email or reset password
-authRouter.get("/resendCode", authMiddleware, resendCode);
+authRouter.post("/resendCode", authMiddleware, resendCode);
 
 // for geting new token using refresh token
 authRouter.post("/refresh", refresh);
 
+// log out 
+authRouter.post("/logout",authMiddleware, logout);
 
 // authRouter.delete("/:id", deleteUser);
 export default authRouter;

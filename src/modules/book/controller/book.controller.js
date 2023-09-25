@@ -24,7 +24,6 @@ export const filterBook = catchError(async (req, res) => {
   filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
   filterObj = JSON.parse(filterObj);
   const book = await bookModel.find(filterObj);
-  console.log(filterObj);
   res.json({ massege: "success", book });
 });
 export const searchBook = catchError(async (req, res, next) => {
@@ -38,8 +37,6 @@ export const searchBook = catchError(async (req, res, next) => {
       
     ],
   });
-
-  console.log(book);
   res.json({ massege: "success", book });
 });
 
@@ -50,7 +47,6 @@ export const addBook = catchError(async (req, res, next) => {
     throw new AppError("Book already exist", 403);
   }
   const book = await bookModel.create(req.body);
- console.log(req.file);
   if (req.file) {
     if (book.image.public_id) {
       const { result } = await cloudinary.uploader.destroy(

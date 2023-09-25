@@ -9,11 +9,9 @@ const userSchema = new Schema({
     },
     email: {
         type: String, trim: true, require: true,  unique: true
-        // type: String, trim: true, require: true, maxLength: 30, minLength: 4, unique: true
     },
     password: {
         type: String, trim: true
-        // type: String, trim: true, require: true, 
     },
     role: { type: String, enum: ['User', 'Admin'], default: "User" },
     gender: { type: String, enum: ['Male', 'Female', 'Not Selected'], default: "Not Selected" },
@@ -31,7 +29,6 @@ const userSchema = new Schema({
     fav_cats: [{
         type: Types.ObjectId, ref: "category"
     }],
-    image: { public_id: String, secure_url: String },
     whish_list: [{
         type: Types.ObjectId, ref: "Book"
     }],
@@ -43,7 +40,7 @@ const userSchema = new Schema({
         date:Number
     },
     status:{
-        type:String, enum: ['active','deactive'],default:'deactive'
+        type:String, enum: ['active','deactive','reseting password','not confirmed'], default:'not confirmed'
     }
     // registerway:{type: String, enum: ['form', 'facebook', 'google'], default: "form"}
 
@@ -53,7 +50,7 @@ const userSchema = new Schema({
 userSchema.pre(["save", /^update/, /^create/], async function () {
     const defultRound = parseInt(process.env.SALT_ROUNDS)
     if (this.password && bcryptjs.getRounds(this.password) != defultRound) {
-        this.password = bcryptjs.hashSync(this.password, parseInt(process.env.SALT_ROUNDS))
+        this.password = await bcryptjs.hash(this.password, parseInt(process.env.SALT_ROUNDS))
     }
 })
 

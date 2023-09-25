@@ -7,11 +7,7 @@ import { resetRassword } from "../../../util/email/reset.password.email.js";
 import bcrypt from "bcryptjs";
 import Token from "../../../../DB/models/token.model.js";
 import { generateCode, getTokens } from "../../../util/helper-functions.js";
-import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
-import { response } from "express";
-
-const validationCodes = [];
 
 export const signup = catchError(async (req, res, next) => {
   const { email } = req.body;
@@ -20,66 +16,56 @@ export const signup = catchError(async (req, res, next) => {
     throw new AppError("Email Already Exist", 409);
   }
   const user = await UserModel.create(req.body);
-  user.virefyCode = {};
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
-  // user.virefyCode = [];
-  // user.virefyCode.push({
-  //   code: code,
-  //   date: {
-  //     day: new Date().getDate(),
-  //     hour: new Date().getHours(),
-  //     min: new Date().getMinutes(),
-  //   },
-  // });
-  user.save();
-  console.log(user.virefyCode);
-  req.body.virefyCode = code;
-  if (user) {
-    await sendEmail({
-      to: email,
-      subject: "Verify Your Email",
-      html: emailTemp(req.body.virefyCode),
-    });
-    const { token } = await getTokens(user._id, user.role);
-    res.cookie('refreshToken', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      domain: 'codecraftsportfolio.online',
-  
-      // domain: '.onrender.com'
-    });
-    res.status(201).json({ message: "success", token });
-  } else {
-    throw new AppError("In-Valid Net Work", 500);
-  }
+  await user.save();
+  await sendEmail({
+    to: email,
+    subject: "Verify Your Email",
+    html: emailTemp(
+      "Confirm Your Email Address",
+      `Thanks for signing up for Book Store E-Commerce. lets get started please enter this code
+      in web site Input`,
+      code
+    ),
+  });
+  const { token } = await getTokens(user._id, user.role);
+  res.status(201).json({ message: "success", token });
 });
-export const resendVaryfyEmail = catchError(async (req, res, nex) => {
+
+export const resendCode = catchError(async (req, res, nex) => {
   const { user } = req;
-  if (user) {
-    user.virefyCode = {};
-    const { code } = generateCode();
-    user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-    await user.save();
+  const { code } = generateCode();
+  user.virefyCode.code = code;
+  user.virefyCode.date = Date.now();
+  await user.save();
+  if(user.status === "not confirmed"){
     await sendEmail({
       to: user.email,
       subject: "Verify Your Email",
-      html: emailTemp(code),
+      html: emailTemp("Confirm Your Email Address",
+        `Thanks for signing up for Book Store E-Commerce. lets get started please enter this code
+        in web site Input`,
+        code
+      ),
     });
-
-    console.log(user.email);
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token, refreshToken });
-  } else {
-    throw new AppError("email not found", 403);
   }
+  if(user.status === "reseting password"){
+    await sendEmail({
+      to: email,
+      subject: "Reset Password",
+      html: emailTemp(
+        "Reseting Your Email Password",
+        "To resete your password please enter this code in web site Input",
+        code
+      ),
+    });
+  }
+
+  res.status(202).json({ message: "success"});
 });
+
 export const deleteUser = catchError(async (req, res) => {
   const { id } = req.params;
   const de = await UserModel.findByIdAndDelete(id);
@@ -93,6 +79,7 @@ export const signin = catchError(async (req, res) => {
   if (!user) {
     throw new AppError("this email doesn't exist", 400);
   }
+
   const isIdentical = await bcrypt.compare(password, user.password);
   if (!isIdentical) {
     throw new AppError("invalid email or password", 400);
@@ -107,6 +94,7 @@ export const signin = catchError(async (req, res) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
+    domain: 'codecraftsportfolio.online',
   });
 
   res.status(201).json({ message: "success", token });
@@ -132,6 +120,7 @@ export const refresh = catchError(async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
+    domain: 'codecraftsportfolio.online',
       maxAge: 0
     });
 
@@ -152,62 +141,50 @@ export const refresh = catchError(async (req, res) => {
 export const verifyEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
-
-  if (user.confirmedEmail) {
-    throw new AppError("Email Already Virefied", 402);
-  }
-  var codeStatuse;
   const currentDate = Date.now();
-  if (
-    currentDate - user.virefyCode.date <= 600000
-  ) {
-    codeStatuse = "pass";
-  } else {
-    codeStatuse = "expired";
-  }
-  if (user.virefyCode.code === code && codeStatuse == "pass") {
-    user.confirmedEmail = true;
-    user.status = "active";
-    user.virefyCode = {};
-    await user.save();
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-    })
-
-    res.status(202).json({ message: "success", token });
-  } else {
+  const codeStatuse = currentDate - user.virefyCode.date <= 600000 ? "pass" : "expired";
+  if (user.virefyCode.code !== code && codeStatuse !== "pass") {
     throw new AppError("In-Valid Verify Code", 401);
   }
+  user.confirmedEmail = true;
+  user.status = "active";
+  user.virefyCode = {};
+  await user.save();
+  const { token, refreshToken } = await getTokens(
+    user._id.toString(),
+    user.role
+  );
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    domain: 'codecraftsportfolio.online',
+  })
+
+  res.status(202).json({ message: "success", token });
 });
 
 export const forgetPassword = catchError(async (req, res, next) => {
   const { email } = req.body;
-  console.log(email);
   const user = await UserModel.findOne({ email });
   if (!user) {
     throw new AppError("This email does not exsist", 404);
   }
-  user.virefyCode = {};
   const { code } = generateCode();
   user.virefyCode.code = code;
   user.virefyCode.date = Date.now();
-  console.log(user.virefyCode);
-  user.status = "deactive";
+  user.status = "reseting password";
   await user.save();
-  
   await sendEmail({
     to: email,
     subject: "Reset Password",
-    html: resetRassword(code),
+    html: emailTemp(
+      "Reseting Your Email Password",
+      "To resete your password please enter this code in web site Input",
+      code
+    ),
   });
-
   const { token } = await getTokens(
     user._id.toString(),
     user.role
@@ -218,28 +195,19 @@ export const forgetPassword = catchError(async (req, res, next) => {
 export const varifyPasswordEmail = catchError(async (req, res, next) => {
   const { user } = req;
   const { code } = req.body;
-  var codeStatuse;
   const currentDate = Date.now();
-  if (currentDate - user.virefyCode.date <= 600000) {
-    codeStatuse = "pass";
-  } else {
-    codeStatuse = "expired";
-  }
-  if (user.virefyCode.code === code && codeStatuse == "pass") {
-    user.status = "active";
-    user.virefyCode = {};
-    await user.save();
-
-    res.status(202).json({ message: "success" });
-  } else {
+  const codeStatuse = currentDate - user.virefyCode.date <= 600000 ? "pass" : "expired";
+  if (user.virefyCode.code !== code && codeStatuse !== "pass") {
     throw new AppError("In-Valid Verify Code", 403);
   }
+  user.virefyCode = {};
+  await user.save();
+  res.status(202).json({ message: "success" });
 });
 
 export const resetePassword = catchError(async (req, res, next) => {
   const { user } = req;
   const { password } = req.body;
-
   user.password = password;
   user.passwordChangedAt = Date.now();
   await user.save();
@@ -252,45 +220,14 @@ export const resetePassword = catchError(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
+    domain: 'codecraftsportfolio.online',
   })
-  
+
   res.status(202).json({ message: "success", token });
 });
-export const resendResetPass = catchError(async (req, res, nex) => {
-  const { user } = req;
-  // const user = await UserModel.findOne({ email });
-  if (user) {
-    user.virefyCode = {};
-    const { code } = generateCode();
-    user.virefyCode.code = code;
-    user.virefyCode.date = Date.now();
-    user.status = "deactive";
-    await user.save();
-    // if (emailType == "vrify email") {
-    //   await sendEmail({
-    //     to: email,
-    //     subject: "Verify Your Email",
-    //     html: emailTemp(code),
-    //   });
-    // }else{
-    await sendEmail({
-      to: user.email,
-      subject: "Reset Password",
-      html: resetRassword(code),
-    });
-    // }
-    console.log(code);
-    const { token, refreshToken } = await getTokens(
-      user._id.toString(),
-      user.role
-    );
-    res.status(202).json({ message: "success", token, refreshToken });
-  } else {
-    throw new AppError("email not found", 403);
-  }
-});
-export const redirectWithToke = catchError(async (req, res, next) => {
-  console.log(req.user);
+
+
+export const redirectWithToken = catchError(async (req, res, next) => {
   res.redirect(req.user);
 })
 
@@ -315,15 +252,7 @@ export const signinWithToken = catchError(async (req, res, next) => {
     secure: true,
     sameSite: 'none',
     domain: 'codecraftsportfolio.online',
-
-    // domain: '.onrender.com'
   });
 
   res.status(201).json({ message: "success", token });
-})
-
-export const success = catchError(async (req, res, next) => {
-  const { token } = req.params
-  console.log(token);
-  res.json(token)
 })

@@ -5,13 +5,12 @@ dotenv.config();
 import express from "express";
 import { bootstrap } from "./src/app.routes.js";
 import cookie_parser from "cookie-parser";
-// import cors from "cors";
 import passport from "passport";
 import bodyParser from "body-parser";
 import { passportConfigGoogle, passportConfigFacebook } from "./passport-strategies.js"
-import { AppError } from "./src/util/ErrorHandler/AppError.js";
 import cors from "./src/middleware/cors.js";
 const app = express();
+// const port = 8080;
 const port = 3000;
 app.use(cors);
 passportConfigGoogle(passport);

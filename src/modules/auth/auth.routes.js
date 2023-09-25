@@ -10,7 +10,6 @@ import {
   resetePassword,
   redirectWithToken,
   signinWithToken,
-  success,
   resendCode,
 } from "./controller/auth.controller.js";
 import {

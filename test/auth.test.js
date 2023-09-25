@@ -3,6 +3,7 @@ import * as authController from "../src/modules/auth/controller/auth.controller.
 import { describe } from "mocha";
 import UserModel from "../DB/models/user.model.js";
 import mongoose from "mongoose";
+import { catchError } from "../src/util/ErrorHandler/catchError.js";
 
 
 describe("Auth Controllers", function () {
@@ -35,11 +36,9 @@ describe("Auth Controllers", function () {
         }
       };
 
-      const result = await authController.signup(req, res, () => { });
-      console.log(result);
-      console.log(res);
+      await catchError(authController.signup)(req, res, () => { })
       expect(res.statusCode).to.be.equal(201);
-      expect(res.body).to.be.equal("success");
+      expect(res.message).to.be.equal("success");
 
     })
 

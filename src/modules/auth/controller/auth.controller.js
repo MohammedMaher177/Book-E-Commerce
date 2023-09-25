@@ -43,12 +43,43 @@ export const signup = catchError(async (req, res, next) => {
       html: emailTemp(req.body.virefyCode),
     });
     const { token } = await getTokens(user._id, user.role);
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      domain: 'codecraftsportfolio.online',
+  
+      // domain: '.onrender.com'
+    });
     res.status(201).json({ message: "success", token });
   } else {
     throw new AppError("In-Valid Net Work", 500);
   }
 });
+export const resendVaryfyEmail = catchError(async (req, res, nex) => {
+  const { user } = req;
+  if (user) {
+    user.virefyCode = {};
+    const { code } = generateCode();
+    user.virefyCode.code = code;
+    user.virefyCode.date = Date.now();
+    await user.save();
+    await sendEmail({
+      to: user.email,
+      subject: "Verify Your Email",
+      html: emailTemp(code),
+    });
 
+    console.log(user.email);
+    const { token, refreshToken } = await getTokens(
+      user._id.toString(),
+      user.role
+    );
+    res.status(202).json({ message: "success", token, refreshToken });
+  } else {
+    throw new AppError("email not found", 403);
+  }
+});
 export const deleteUser = catchError(async (req, res) => {
   const { id } = req.params;
   const de = await UserModel.findByIdAndDelete(id);
@@ -225,7 +256,39 @@ export const resetePassword = catchError(async (req, res, next) => {
   
   res.status(202).json({ message: "success", token });
 });
-
+export const resendResetPass = catchError(async (req, res, nex) => {
+  const { user } = req;
+  // const user = await UserModel.findOne({ email });
+  if (user) {
+    user.virefyCode = {};
+    const { code } = generateCode();
+    user.virefyCode.code = code;
+    user.virefyCode.date = Date.now();
+    user.status = "deactive";
+    await user.save();
+    // if (emailType == "vrify email") {
+    //   await sendEmail({
+    //     to: email,
+    //     subject: "Verify Your Email",
+    //     html: emailTemp(code),
+    //   });
+    // }else{
+    await sendEmail({
+      to: user.email,
+      subject: "Reset Password",
+      html: resetRassword(code),
+    });
+    // }
+    console.log(code);
+    const { token, refreshToken } = await getTokens(
+      user._id.toString(),
+      user.role
+    );
+    res.status(202).json({ message: "success", token, refreshToken });
+  } else {
+    throw new AppError("email not found", 403);
+  }
+});
 export const redirectWithToke = catchError(async (req, res, next) => {
   console.log(req.user);
   res.redirect(req.user);
@@ -251,7 +314,9 @@ export const signinWithToken = catchError(async (req, res, next) => {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    domain: 'http://localhost:3000'
+    domain: 'codecraftsportfolio.online',
+
+    // domain: '.onrender.com'
   });
 
   res.status(201).json({ message: "success", token });

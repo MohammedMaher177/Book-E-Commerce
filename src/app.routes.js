@@ -6,7 +6,7 @@ import categoryRouter from "./modules/categories/category.routs.js";
 import { AppError } from "./util/ErrorHandler/AppError.js";
 
 export const bootstrap = (app) => {
-  connectionDb();
+  // connectionDb();
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/users", userRouter);
   app.use("/api/v1/books", bookRouter);

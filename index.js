@@ -22,4 +22,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 bootstrap(app);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+// export const server = app.listen(5000, () => console.log(`Example app listening on port 5000!`));
+
 

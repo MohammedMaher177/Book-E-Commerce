@@ -90,7 +90,7 @@ export const signin = catchError(async (req, res) => {
     user.role
   );
 
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
@@ -101,8 +101,7 @@ export const signin = catchError(async (req, res) => {
 });
 
 export const refresh = catchError(async (req, res) => {
-
-  const refreshToken = req.cookies['refreshToken'];
+  const refreshToken = req.cookies["refreshToken"];
 
   const decoded = jwt.verify(refreshToken, process.env.REFRESHTOKEN_SECRET);
 
@@ -116,7 +115,7 @@ export const refresh = catchError(async (req, res) => {
 
   if (!(token.expiredAt >= new Date())) {
     await token.deleteOne();
-    res.cookie('refreshToken', '', {
+    res.cookie("refreshToken", "", {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
@@ -216,7 +215,7 @@ export const resetePassword = catchError(async (req, res, next) => {
     user.role
   );
 
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
@@ -229,11 +228,11 @@ export const resetePassword = catchError(async (req, res, next) => {
 
 export const redirectWithToken = catchError(async (req, res, next) => {
   res.redirect(req.user);
-})
+});
 
 export const signinWithToken = catchError(async (req, res, next) => {
   const Urltoken = req.params["token"];
-  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET)
+  const isVerifyed = jwt.verify(Urltoken, process.env.TOKEN_SECRET);
   if (!isVerifyed) {
     throw new AppError("Invalid token", 401);
   }
@@ -247,7 +246,7 @@ export const signinWithToken = catchError(async (req, res, next) => {
     user.role
   );
 
-  res.cookie('refreshToken', refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
@@ -255,4 +254,4 @@ export const signinWithToken = catchError(async (req, res, next) => {
   });
 
   res.status(201).json({ message: "success", token });
-})
+});

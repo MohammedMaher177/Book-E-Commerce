@@ -29,7 +29,7 @@ const passportConfigGoogle = (passport) => {
           { expiresIn: "2h" }
         );
         // let redirect_url = `https://bookstore-front.codecraftsportfolio.online/auth/login/success/${token}`;
-        let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
+        let redirect_url = process.env.MODE == "PRODUCTION"? `https://bookstore-front.codecraftsportfolio.online/auth/login/success/${token}`:`http://localhost:3000/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)
@@ -65,7 +65,7 @@ const passportConfigFacebook = (passport) => {
           { expiresIn: "2h" }
         );
         // let redirect_url = `https://book-store-front.onrender.com/auth/login/success/${token}`;
-        let redirect_url = `http://localhost:3000/auth/login/success/${token}`;
+        let redirect_url = process.env.MODE == "PRODUCTION"?`https://book-store-front.onrender.com/auth/login/success/${token}`:`http://localhost:3000/auth/login/success/${token}`;
         done(null, redirect_url);
       } catch (error) {
         done(error)

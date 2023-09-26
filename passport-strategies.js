@@ -41,7 +41,7 @@ const passportConfigFacebook = (passport) => {
   passport.use(new facebookStrategy({
     clientID: process.env.FACEBOOK_CLIENT_ID,
     clientSecret: process.env.FACEBOOK_SECRET_ID,
-    callbackURL: process.env.MODE == "PRODUCTION" ? "https://bookstore-api.codecraftsportfolio.online/api/v1/auth/google/redirect" : "http://localhost:3000/api/v1/auth/google/redirect",
+    callbackURL: process.env.MODE == "PRODUCTION" ? "https://bookstore-api.codecraftsportfolio.online/api/v1/auth/facebook/redirect" : "http://localhost:3000/api/v1/auth/facebook/redirect",
     profileFields: ['id', 'displayName', 'email']
 
   },

@@ -4,7 +4,8 @@ import UserModel from "../../DB/models/user.model.js";
 import mongoose from "mongoose";
 import { catchError } from "../../src/util/ErrorHandler/catchError.js";
 import { forgetPassword, refresh, resendCode, resetePassword, signin, signinWithToken, signup, varifyPasswordEmail, verifyEmail } from "../../src/modules/auth/controller/auth.controller.js";
-
+import Jwt from "jsonwebtoken";
+import Token from "../../DB/models/token.model.js";
 
 describe("Auth Controllers", () => {
 
@@ -12,6 +13,7 @@ describe("Auth Controllers", () => {
 
     before(async () => {
       await mongoose.connect("mongodb+srv://Book-E-Commerce:Book-E-Commerce@atlascluster.7mr3zao.mongodb.net/test-db")
+      console.log("DB Connected");
     });
 
     it("should have a success message with status code 201 if user created successfully", async () => {
@@ -228,11 +230,32 @@ describe("Auth Controllers", () => {
 
   describe("refresh controller", () => {
 
+    let token
     before(async () => {
       await mongoose.connect("mongodb+srv://Book-E-Commerce:Book-E-Commerce@atlascluster.7mr3zao.mongodb.net/test-db")
+      const user = await UserModel.create({
+        email: "mohamed.elsayed.1.3.1999@gmail.com",
+        userName: "Mohamed",
+        password: "123456789Me@",
+        rePassword: "123456789Me@",
+      })
+
+      token = Jwt.sign({
+        id: user._id,
+        role: user.role
+      }, process.env.REFRESHTOKEN_SECRET);
+
+      const expiredAt = new Date();
+      expiredAt.setHours(expiredAt.getHours() + 2);
+
+      await Token.create({
+        userId: user._id,
+        token,
+        expiredAt
+      })
     });
 
-    it("should throw an error if refreshToken is not valid with message 'unauthenticated' with status code 401", async () => {
+    it("should throw an error if refreshToken is not standerd with message 'jwt malformed'", async () => {
 
       const req = {
         cookies: {
@@ -240,11 +263,38 @@ describe("Auth Controllers", () => {
         }
       }
       const next = (err) => {
-        expect(err).to.have.property('statusCode', 401);
-        expect(err).to.have.property('message', 'unauthenticated');
+        expect(err.message).to.be.equal('jwt malformed');
       }
 
       await catchError(refresh)(req, null, next)
+    })
+
+    it("should return success message and new token with code 201", async () => {
+
+      const req = {
+        cookies: {
+          refreshToken: token
+        }
+      }
+      const res = {
+        statusCode: 500,
+        message: null,
+        token: null,
+        status: function (code) {
+          this.statusCode = code
+          return this
+        },
+        json: function (data) {
+          this.message = data.message;
+          this.token = data.token
+        }
+      }
+      const next = () => { }
+
+      await catchError(refresh)(req, res, next)
+      expect(res).to.have.property('statusCode', 201);
+      expect(res).to.have.property('message', 'success');
+      expect(res.token).to.not.be.null;
     })
 
     after(async () => {
@@ -513,17 +563,23 @@ describe("Auth Controllers", () => {
 
   describe('signin with token controller', () => {
 
+    let token
     before(async () => {
       await mongoose.connect("mongodb+srv://Book-E-Commerce:Book-E-Commerce@atlascluster.7mr3zao.mongodb.net/test-db")
-      await UserModel.create({
+      const user = await UserModel.create({
         email: "mohamed.elsayed.1.3.1999@gmail.com",
         userName: "Mohamed",
         password: "123456789Me@",
         rePassword: "123456789Me@",
       })
+
+      token = Jwt.sign({
+        id: user._id.toString(),
+        role: user.role
+      }, process.env.TOKEN_SECRET);
     })
 
-    it("should return status code of 401 with error message if token is not valid", async () => {
+    it("should return error message with 'jwt malformed' if token is not valid", async () => {
 
       const req = {
         params: {
@@ -531,11 +587,64 @@ describe("Auth Controllers", () => {
         }
       };
       const next = (err) => {
-        expect(err.message).to.be.equal("Invalid token")
-        expect(err.statusCode).to.be.equal(401)
+        expect(err.message).to.be.equal("jwt malformed")
       }
 
       await catchError(signinWithToken)(req, null, next)
+    })
+
+    it("should return status code of 404 with error message if there is no user id saved in token", async () => {
+
+      const token = Jwt.sign({
+        id: "650ee73fe10e88fff6e1d4bc",
+        role: 'User'
+      }, process.env.TOKEN_SECRET);
+
+
+      const req = {
+        params: {
+          token,
+        }
+      };
+      const next = (err) => {
+        expect(err.message).to.be.equal("This user does not exist")
+        expect(err.statusCode).to.be.equal(404)
+      }
+
+      await catchError(signinWithToken)(req, null, next)
+    })
+
+    it("should return status code of 201 with success message and token if there user id saved in token", async () => {
+
+      const req = {
+        params: {
+          token,
+        }
+      };
+      const res = {
+        statusCode: 500,
+        message: null,
+        token: null,
+        headers: {},
+        cookie: function (name, value, options) {
+          this.headers[name] = value;
+        },
+        status: function (code) {
+          this.statusCode = code;
+          return this
+        },
+        json: function (data) {
+          this.message = data.message,
+            this.token = data.token
+        }
+      }
+      const next = () => {}
+
+      await catchError(signinWithToken)(req, res, next)
+
+      expect(res.message).to.be.equal("success")
+      expect(res.statusCode).to.be.equal(201)
+      expect(res.token).to.not.be.null
     })
 
     after(async () => {

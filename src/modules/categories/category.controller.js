@@ -66,7 +66,7 @@ export const updateCategory = catchError(async (req, res, next) => {
       },
       { new: true }
     );
-    res.json({ message: "success", categoryWithImage });
+    res.json({ message: "success", category });
   } else {
     throw new AppError("In-Valid Upload Photo", 403);
   }

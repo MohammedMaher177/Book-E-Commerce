@@ -2,10 +2,13 @@ import { Router } from "express";
 import {
     addCategory,
     updateCategory,
-    viewCategory,
+    // getCategory,
     deletCategory,
     allCategory,
+    viewCategory,
 } from "./category.controller.js"
+import { validate } from "../../middleware/validate.js";
+import { addCategoryValidation, updateCategoryValidation } from "./caategory.validation.js";
 
 
 const categoryRouter = Router();

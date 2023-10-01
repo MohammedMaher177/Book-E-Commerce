@@ -6,8 +6,8 @@ export const bookValidation = {
 
     bookName: joi
       .string()
-      .required()
-      .pattern(new RegExp(/^[a-zA-Z]{3,8}([_ -]?[a-zA-Z0-9]{3,8})*$/)),
+      .required(),
+      // .pattern(new RegExp(/^[a-zA-Z]{3,8}([_ -]?[a-zA-Z0-9]{3,8})*$/)),
     lang:joi.string().required(),
     desc: joi.string().required(),
     pages: joi.number().min(10).required(),
@@ -21,7 +21,6 @@ export const bookValidation = {
     category:joi.required(),
     rating: joi.number().min(1).max(5),
     reviews:joi.array(),
-
   }),
 
 };

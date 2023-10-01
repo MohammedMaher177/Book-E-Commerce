@@ -1,3 +1,4 @@
+import cloudinary from "../../multer/cloudinary.js";
 import { ApiFeatures } from "../../util/ApiFeatures.js";
 import { AppError } from "../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../util/ErrorHandler/catchError.js";
@@ -31,6 +32,7 @@ export const addCategory = catchError(async (req, res, next) => {
   const category = await categoryModel.create(req.body);
   res.json({ message: "success", category });
 });
+
 export const updateCategory = catchError(async (req, res, next) => {
   const { id, name, desc } = req.body;
   const existCategory = await categoryModel.findById(id);
@@ -42,6 +44,33 @@ export const updateCategory = catchError(async (req, res, next) => {
     { name: name, desc: desc },
     { new: true }
   );
+  if (req.file) {
+    if (category.image.public_id) {
+      const { result } = await cloudinary.uploader.destroy(
+        `${category.image.public_id}`,
+        (result) => {
+          return result;
+        }
+
+      );
+    }
+    const { public_id, secure_url } = await cloudinary.uploader.upload(
+      req.file.path,
+      { folder: `BookStore/category/${category._id}` }
+    );
+
+    const categoryWithImage = await categoryModel.findByIdAndUpdate(
+        category._id,
+      {
+        image: { public_id, secure_url },
+      },
+      { new: true }
+    );
+    res.json({ message: "success", categoryWithImage });
+  } else {
+    throw new AppError("In-Valid Upload Photo", 403);
+  }
+ 
   res.json({ message: "success", category });
 });
 export const deletCategory = catchError(async (req, res, next) => {

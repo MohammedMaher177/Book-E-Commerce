@@ -8,6 +8,7 @@ const categorySchema = new Schema({
         trim: true,
         unique: true
     },
+    image: { public_id: String, secure_url: String },
     desc: {
         type: String,
         required: true,

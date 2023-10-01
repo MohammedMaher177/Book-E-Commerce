@@ -2,18 +2,21 @@ import { Router } from "express";
 import {
     addCategory,
     updateCategory,
-    viewCategory,
+    getCategory,
     deletCategory,
     allCategory,
 } from "./category.controller.js"
+import { validate } from "../../middleware/validate.js";
+import { addCategoryValidation, updateCategoryValidation } from "./caategory.validation.js";
 
 
 const categoryRouter = Router();
 
-categoryRouter.get("/allcategory", allCategory);
-categoryRouter.post("/viewCategory", viewCategory);
-categoryRouter.post("/addCategory", addCategory);
-categoryRouter.post("/updateCategory", updateCategory);
+categoryRouter.get("/", allCategory);
+categoryRouter.get("/:id", getCategory);
+categoryRouter.post("/", validate(addCategoryValidation), addCategory);
+
+categoryRouter.patch("/:id", validate(updateCategoryValidation), updateCategory);
 categoryRouter.post("/deleteCategory", deletCategory);
 
 

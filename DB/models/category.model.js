@@ -1,18 +1,19 @@
-import { Schema, model } from "mongoose";
-
-
+import mongoose , { Schema, model } from "mongoose";
+import slugify from "mongoose-slug-generator";
+mongoose.plugin(slugify)
 const categorySchema = new Schema({
     name: {
         type: String,
         require: true,
         trim: true,
-        unique: true,
+        unique: true
     },
     desc: {
         type: String,
         required: true,
         trim: true
     },
+    slug: {type: String, slug: "name"}
 }, { timestamps: true })
 
 const categoryModel = model('category', categorySchema)

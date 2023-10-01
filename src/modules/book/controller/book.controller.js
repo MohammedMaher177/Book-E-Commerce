@@ -127,3 +127,9 @@ export const updateBook = catchError(async (req, res, next) => {
   } 
   res.json({ message: "success", book });
 });
+export const bookByCategory = catchError(async (req, res) => {
+  let {category} = req.query;
+ 
+  const book = await bookModel.find({category:category});
+  res.json({ massege: "success", book });
+});

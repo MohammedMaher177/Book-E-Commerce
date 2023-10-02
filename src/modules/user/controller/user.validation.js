@@ -1,5 +1,6 @@
 import joi from "joi"
 
+export const idValidation = joi.string().hex().length(24).required()
 
 export const updateProfileValidations = {
     body: joi.object({
@@ -18,6 +19,9 @@ export const updateProfileValidations = {
 
 export const favoritsCatsValidations = {
     body: joi.object({
-        favorits: joi.array().items(joi.string()).min(1)
+        favorits: joi.array().items(joi.object({
+            id: idValidation,
+            name: joi.string().required()
+        })).min(1).required()
     })
 }

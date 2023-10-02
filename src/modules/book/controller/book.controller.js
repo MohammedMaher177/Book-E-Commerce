@@ -3,16 +3,19 @@ import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
+import { getData, getDocById } from "../../../util/model.util.js";
 
 
-export const allBook = catchError(async (req, res, next) => {
-  const books = await bookModel.find();
-  if (books) {
-    res.json({ message: "success", books });
-  } else {
-    throw new AppError("There is no data", 403);
-  }
-});
+// export const allBook = catchError(async (req, res, next) => {
+//   const books = await bookModel.find();
+//   if (books) {
+//     res.json({ message: "success", books });
+//   } else {
+//     throw new AppError("There is no data", 403);
+//   }
+// });
+
+export const allBook = catchError(getData(bookModel))
 
 export const filterBook = catchError(async (req, res) => {
   let filterObj = req.query;
@@ -39,6 +42,7 @@ export const searchBook = catchError(async (req, res, next) => {
   });
   res.json({ massege: "success", book });
 });
+export const getBook = catchError(getDocById(bookModel))
 
 export const addBook = catchError(async (req, res, next) => {
   const { ISBN } = req.body;

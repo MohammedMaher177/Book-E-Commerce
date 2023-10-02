@@ -43,10 +43,14 @@ export class ApiFeatures {
     //4 - search
     search() {
         if (this.queryString.keyword) {
+            // console.log(this.queryString.keyword);
             this.mongooseQuery.find({
                 $or: [
                     { name: { $regex: this.queryString.keyword, $options: "i" } },
                     { desc: { $regex: this.queryString.keyword, $options: "i" } },
+                    { bookName: { $regex: this.queryString.keyword, $options: "i" } },
+                    { author: { $regex: this.queryString.keyword, $options: "i" } },
+                    { publisher: { $regex: this.queryString.keyword, $options: "i" } },
                 ]
             })
         }

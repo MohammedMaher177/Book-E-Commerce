@@ -4,6 +4,7 @@ import userRouter from "./modules/user/user.routes.js";
 import bookRouter from "./modules/book/book.routes.js";
 import categoryRouter from "./modules/categories/category.routs.js";
 import { AppError } from "./util/ErrorHandler/AppError.js";
+import reviewRouter from "./modules/review/review.routes.js";
 
 export const bootstrap = (app) => {
   connectionDb();
@@ -11,6 +12,7 @@ export const bootstrap = (app) => {
   app.use("/api/v1/users", userRouter);
   app.use("/api/v1/books", bookRouter);
   app.use("/api/v1/category", categoryRouter);
+  app.use("/api/v1/reviews", reviewRouter);
 
   app.all("*", (req, res, next) => {
     next(new AppError("Page Not Found", 404));

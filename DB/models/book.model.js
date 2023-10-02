@@ -1,4 +1,3 @@
-import joi from "joi";
 import mongoose, { Schema, Types, model } from "mongoose";
 
 
@@ -25,17 +24,6 @@ const bookSchema = new Schema({
         require: true,
         ref: "category"
     },
-
-    rating:[{
-        type:Number,default:1,min:1,max:5
-    }],
-    reviews:[{
-        review :{
-        type: mongoose.Types.ObjectId,
-        ref:"review"
-    }
-}]
-   
 }, { timestamps: true })
 
 const bookModel = model("book", bookSchema)
@@ -46,5 +34,10 @@ bookSchema.pre("findOne", function () {
         select:"name -_id"
     }])
 })
-
+bookSchema.virtual("reviews", {
+    ref: "review",
+    localField: "_id",
+    foreignField: "book",
+    // justOne: true,
+  });
 export default bookModel;

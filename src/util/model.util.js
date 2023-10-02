@@ -4,7 +4,6 @@ import { AppError } from "./ErrorHandler/AppError.js";
 
 
 export const getData = (model) => {
-  // console.log(n);
   return async (req, res) => {
     // console.log(req.query);
     const apiFeatures = new ApiFeatures(model.find(), req.query)

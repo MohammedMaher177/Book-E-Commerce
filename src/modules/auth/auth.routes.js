@@ -39,7 +39,7 @@ authRouter.post("/verifyEmail", validate(verifyEmailValidation) , authMiddleware
 
 // forget password
 authRouter.post("/forgetPassword", forgetPassword);
-authRouter.post("/varifyPasswordEmail", varifyPasswordEmail);
+authRouter.post("/varifyPasswordEmail", authMiddleware, varifyPasswordEmail);
 authRouter.post("/resetPassword", validate(resetPasswordValidation) , authMiddleware, resetePassword);
 
 // resend code for verifying email or reset password

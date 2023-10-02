@@ -15,3 +15,9 @@ export const updateProfileValidations = {
         city: joi.string()
     })
 };
+
+export const favoritsCatsValidations = {
+    body: joi.object({
+        favorits: joi.array().items(joi.string()).min(1)
+    })
+}

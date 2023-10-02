@@ -21,7 +21,7 @@ const bookSchema = new Schema({
     publisher:{type:String ,require: true , trim:true},
     published:{type:Number ,maxLength:4},
     category:{
-        type: mongoose.ObjectId,
+        type: mongoose.SchemaTypes.ObjectId,
         require: true,
         ref: "category"
     },

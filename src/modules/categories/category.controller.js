@@ -18,11 +18,6 @@ export const viewCategory = catchError(async (req, res, next) => {
 
 export const allCategory = catchError(getData(categoryModel));
 
-// export const allCategory = catchError(async (req,res,next)=>{
-//     const categories = await categoryModel.find();
-//     res.json({massege:"success",categories})
-// })
-
 export const addCategory = catchError(async (req, res, next) => {
   const { name } = req.body;
   const existCategory = await categoryModel.findOne({ name: name });

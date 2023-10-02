@@ -10,7 +10,7 @@ export const bootstrap = (app) => {
   connectionDb();
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/users", userRouter);
-  app.use("/api/v1/books", bookRouter);
+  app.use("/api/v1/book", bookRouter);
   app.use("/api/v1/category", categoryRouter);
   app.use("/api/v1/reviews", reviewRouter);
 

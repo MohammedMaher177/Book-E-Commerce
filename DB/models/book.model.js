@@ -4,7 +4,7 @@ import mongoose, { Schema, Types, model } from "mongoose";
 
 const bookSchema = new Schema({
     ISBN:{type:Number ,unique: true, require: true ,minLength: 10, maxLength: 13 },
-    bookName: { type: String, require: true, trim: true},
+    name: { type: String, require: true, trim: true},
     lang:{type:String ,require: true },
     desc:{type:String },
     pages:{type:Number,require: true},
@@ -40,7 +40,7 @@ const bookSchema = new Schema({
 
 const bookModel = model("book", bookSchema)
 
-bookSchema.pre("findOne", function () {
+bookSchema.pre(/^find/, function () {
     this.populate([{
         path: "category",
         select:"name -_id"

@@ -9,7 +9,7 @@ const bookSchema = new Schema(
       minLength: 10,
       maxLength: 13,
     },
-    bookName: { type: String, require: true, trim: true },
+    bookName: { type: String, trim: true },
     name: { type: String, require: true, trim: true },
     lang: { type: String, require: true },
     desc: { type: String },

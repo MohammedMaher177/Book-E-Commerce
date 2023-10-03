@@ -5,8 +5,7 @@ export const bookValidation = {
     ISBN: joi.number().required(),
 
     bookName: joi
-      .string()
-      .required(),
+      .string(),
     name: joi
       .string()
       .required(),

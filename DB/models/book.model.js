@@ -10,6 +10,7 @@ const bookSchema = new Schema(
       maxLength: 13,
     },
     bookName: { type: String, require: true, trim: true },
+    name: { type: String, require: true, trim: true },
     lang: { type: String, require: true },
     desc: { type: String },
     pages: { type: Number, require: true },

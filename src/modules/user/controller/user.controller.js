@@ -63,7 +63,16 @@ export const profile = catchError(async (req, res, next) => {
     phone: user.phone,
     address: user.defultAddress.address,
     city: user.defultAddress.city,
-    age: user.age
+    age: user.age,
+    fav_cats: await user.fav_cats
   }
   res.status(200).json({ message: "success", user: returnUser});
+})
+
+export const addToFavCat = catchError(async (req, res, next) => {
+  const {user} = req;
+  const {favorits} = req.body;
+  user.fav_cats = favorits.map(el => el.id);
+  await user.save();
+  res.status(201).json({ message: "success"});
 })

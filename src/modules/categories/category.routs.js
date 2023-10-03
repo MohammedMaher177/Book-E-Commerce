@@ -15,10 +15,10 @@ import { uploadImage, uploadValidation } from "../../multer/multer.cloud.js";
 const categoryRouter = Router();
 
 categoryRouter.get("/", allCategory);
-categoryRouter.post("/addCategory", addCategory);
-categoryRouter.patch("/updateCategory",uploadImage(uploadValidation.image).single("image"), updateCategory);
-categoryRouter.post("/deleteCategory", deletCategory);
+categoryRouter.post("/", addCategory);
 categoryRouter.post("/:id", viewCategory);
+categoryRouter.patch("/",uploadImage(uploadValidation.image).single("image"), updateCategory);
+categoryRouter.delete("/", deletCategory);
 
 
 export default categoryRouter;

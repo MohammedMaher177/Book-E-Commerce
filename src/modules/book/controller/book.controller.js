@@ -1,13 +1,39 @@
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
+import { ApiFeatures } from "../../../util/ApiFeatures.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
-import { getData } from "../../../util/model.util.js";
-
+import { getData, getDocById } from "../../../util/model.util.js";
 
 export const allBook = catchError(getData(bookModel))
 
+export const filterBook = catchError(async (req, res) => {
+  let filterObj = req.query;
+  const delObj = ["page", "sort", "fields", "keyword"];
+  delObj.forEach((ele) => {
+    delete filterObj[ele];
+  });
+  filterObj = JSON.stringify(filterObj);
+  filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, (match) => `$${match}`);
+  filterObj = JSON.parse(filterObj);
+  const book = await bookModel.find(filterObj);
+  res.json({ massege: "success", book });
+});
+export const searchBook = catchError(async (req, res, next) => {
+  let filterObj = req.query;
+  const book = await bookModel.find({
+    $or: [
+      { bookName: { $regex: filterObj.keyword, $options: "i" } },
+      { desc: { $regex: filterObj.keyword, $options: "i" } },
+      { author: { $regex: filterObj.keyword, $options: "i" } },
+      { publisher: { $regex: filterObj.keyword, $options: "i" } },
+      
+    ],
+  });
+  res.json({ massege: "success", book });
+});
+export const getBook = catchError(getDocById(bookModel))
 
 export const addBook = catchError(async (req, res, next) => {
   const { ISBN } = req.body;

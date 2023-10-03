@@ -3,6 +3,7 @@
 
 
 export class ApiFeatures {
+
     constructor(mongooseQuery, queryString) {
         this.mongooseQuery = mongooseQuery
         this.queryString = queryString
@@ -27,7 +28,6 @@ export class ApiFeatures {
         filterObj = JSON.stringify(filterObj)
         filterObj = filterObj.replace(/\b(gt|gte|lt|lte)\b/g, match => `$${match}`)
         filterObj = JSON.parse(filterObj)
-        // const mongooseQuery = usersModel.find(filterObj).skip(SKIP).limit(PAGE_LIMIT)
         this.mongooseQuery.find(filterObj)
         return this
     }
@@ -47,6 +47,9 @@ export class ApiFeatures {
                 $or: [
                     { name: { $regex: this.queryString.keyword, $options: "i" } },
                     { desc: { $regex: this.queryString.keyword, $options: "i" } },
+                    { bookName: { $regex: this.queryString.keyword, $options: "i" } },
+                    { author: { $regex: this.queryString.keyword, $options: "i" } },
+                    { publisher: { $regex: this.queryString.keyword, $options: "i" } },
                 ]
             })
         }
@@ -64,4 +67,5 @@ export class ApiFeatures {
         }
         return this
     }
+
 }

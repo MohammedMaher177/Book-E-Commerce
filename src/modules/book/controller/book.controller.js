@@ -72,30 +72,11 @@ export const addBook = catchError(async (req, res, next) => {
 });
 export const updateBook = catchError(async (req, res, next) => {
   const { bookId } = req.params;
-  const {isbn,bookName,lang,desc,pages,stock,
-    price,discount,author, publisher,published,category } = req.body;
   const book = await bookModel.findById(bookId);
   if (!book) {
     throw new AppError("Book Not found", 403);
   }
-  await bookModel.findByIdAndUpdate(
-    book._id,
-    {
-      ISBN:isbn,
-      bookName: bookName,
-      lang: lang,
-      desc: desc,
-      pages: pages,
-      stock: stock,
-      price: price,
-      discount: discount,
-      author: author,
-      publisher: publisher,
-      published: published,
-      category: category,
-    },
-    { new: true }
-  );
+  await bookModel.findByIdAndUpdate(book._id, req.body,{ new: true });
   if (req.file) {
     if (book.image.public_id) {
       const { result } = await cloudinary.uploader.destroy(
@@ -123,8 +104,11 @@ export const updateBook = catchError(async (req, res, next) => {
   res.json({ message: "success", book });
 });
 export const bookByCategory = catchError(async (req, res) => {
-  let {category} = req.query;
- 
-  const book = await bookModel.find({category:category});
+  const {slug} = req.query;
+ const category = await categoryModel.findOne({slug:slug})
+ if (!category) {
+  throw new AppError("category Not Found", 403);
+}
+  const book = await bookModel.find({category:category._id});
   res.json({ massege: "success", book });
 });

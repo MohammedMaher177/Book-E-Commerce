@@ -13,11 +13,13 @@ export const getData = (model) => {
       .fields()
       .search();
 
+      const totalCount = await model.find().countDocuments();
     let result = await apiFeatures.mongooseQuery;
 
     res.status(200).json({
       message: "success",
       page: apiFeatures.queryString.page || 1,
+      totalCount,
       result,
     });
   };

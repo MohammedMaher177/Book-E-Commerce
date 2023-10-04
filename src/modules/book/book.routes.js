@@ -6,7 +6,7 @@ import {
     allBook,
     addBook,
     updateBook,
-    bookByCategory
+    bookByCategory,
     getBook
 } from "./controller/book.controller.js"
 import { validate } from "../../middleware/validate.js";

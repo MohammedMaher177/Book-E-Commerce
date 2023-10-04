@@ -105,7 +105,10 @@ export const updateBook = catchError(async (req, res, next) => {
 });
 export const bookByCategory = catchError(async (req, res) => {
   const {slug} = req.query;
- const category = await categoryModel.findOne({slug:slug})
+  const PAGE_LIMIT = 12;
+  const PAGE_NUMBER = req.query.page || 1
+  const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT
+ const category = await categoryModel.findOne({slug:slug}).skip(SKIP).limit(PAGE_LIMIT);
  if (!category) {
   throw new AppError("category Not Found", 403);
 }

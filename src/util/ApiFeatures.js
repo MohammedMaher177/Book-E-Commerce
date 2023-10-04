@@ -14,7 +14,7 @@ export class ApiFeatures {
         // const PAGE_LIMIT = this.queryString.page ? 10 : true;
         const PAGE_LIMIT = 12;
         const PAGE_NUMBER = this.queryString.page || 1
-        if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1
+        // if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1
         const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT
         this.mongooseQuery.skip(SKIP).limit(PAGE_LIMIT)
         return this

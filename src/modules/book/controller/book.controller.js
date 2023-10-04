@@ -108,7 +108,7 @@ export const bookByCategory = catchError(async (req, res) => {
   const PAGE_LIMIT = 12;
   const PAGE_NUMBER = req.query.page || 1
   const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT
-  const totalCount = await categoryModel.find().countDocuments();
+  const totalCount = await categoryModel.findOne({slug:slug}).countDocuments();
  const category = await categoryModel.findOne({slug:slug}).skip(SKIP).limit(PAGE_LIMIT);
  if (!category) {
   throw new AppError("category Not Found", 403);

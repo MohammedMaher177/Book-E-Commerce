@@ -2,24 +2,23 @@ import cloudinary from "../multer/cloudinary.js";
 import { ApiFeatures } from "./ApiFeatures.js";
 import { AppError } from "./ErrorHandler/AppError.js";
 
-
 export const getData = (model) => {
   return async (req, res) => {
     // console.log(req.query);
     const apiFeatures = new ApiFeatures(model.find(), req.query)
-      .pagination()
       .sort()
       .filter()
       .fields()
-      .search();
+      .search()
+      .pagination();
 
-      const totalCount = await model.find().countDocuments();
-    let result = await apiFeatures.mongooseQuery;
-
+    // const totalCount =  await model.find().countDocuments();
+    // console.log(totalCount);
+    const result = await apiFeatures.mongooseQuery;
     res.status(200).json({
       message: "success",
       page: apiFeatures.queryString.page || 1,
-      totalCount,
+      // totalCount,
       result,
     });
   };
@@ -73,8 +72,6 @@ export const deleteImg = (model) => {
   };
 };
 
-
-
 // export const addToCart = catchError(async (req, res, next) => {
 //     const { _id } = req.user
 //     const { product, qty } = req.body
@@ -91,7 +88,6 @@ export const deleteImg = (model) => {
 //         return res.status(201).json({ message: "success", cart })
 //     }
 
-
 //     let index
 //     cart.products.forEach((el, i) => {
 //         if (el.product._id.toString() === existProduct) {
@@ -106,7 +102,7 @@ export const deleteImg = (model) => {
 //             cart.products[index].qty = qty
 //             cart.products[index].price = req.body.price
 //         } else if (qty == 0) {
-//             cart.products.splice(index, 1)  // to delete the card 
+//             cart.products.splice(index, 1)  // to delete the card
 //         } else {
 //             cart.products[index].qty++
 //             cart.products[index].price = req.body.price
@@ -116,7 +112,6 @@ export const deleteImg = (model) => {
 //             throw new AppError("Bad request", 400)
 //         }
 //         cart.products.push(req.body)
-
 
 //     }
 //     let totatlCartPrice = 0;

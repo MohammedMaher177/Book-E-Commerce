@@ -47,7 +47,6 @@ const passportConfigFacebook = (passport) => {
   },
     async (token, refreshToken, profile, done) => {
       try {
-        console.log(profile);
         let { id, displayName, emails } = profile.emails && profile; //profile object has the user info
         let user = await UserModel.findOne({ email: emails[0].value });
         if (!user) {

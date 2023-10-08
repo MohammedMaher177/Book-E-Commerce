@@ -1,7 +1,6 @@
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
-import { ApiFeatures } from "../../../util/ApiFeatures.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import { getData, getDocById } from "../../../util/model.util.js";
@@ -105,14 +104,11 @@ export const updateBook = catchError(async (req, res, next) => {
 });
 export const bookByCategory = catchError(async (req, res) => {
   const {slug} = req.query;
-  const PAGE_LIMIT = 12;
-  const PAGE_NUMBER = req.query.page || 1
-  const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT
-  const totalCount = await categoryModel.findOne({slug:slug}).countDocuments();
- const category = await categoryModel.findOne({slug:slug}).skip(SKIP).limit(PAGE_LIMIT);
+ const category = await categoryModel.findOne({slug:slug});
  if (!category) {
   throw new AppError("category Not Found", 403);
 }
-  const book = await bookModel.find({category:category._id});
-  res.json({ massege: "success", book, totalCount});
+req.query.category = category._id;
+delete req.query.slug
+getData(bookModel)(req, res);
 });

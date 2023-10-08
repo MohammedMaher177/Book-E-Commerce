@@ -4,21 +4,13 @@ import { AppError } from "./ErrorHandler/AppError.js";
 
 export const getData = (model) => {
   return async (req, res) => {
-    // console.log(req.query);
-    const apiFeatures = new ApiFeatures(model.find(), req.query)
-      .sort()
-      .filter()
-      .fields()
-      .search()
-      .pagination();
-
-    // const totalCount =  await model.find().countDocuments();
-    // console.log(totalCount);
+    const apiFeatures = await new ApiFeatures(model.find(), req.query)
+    .initialize()
     const result = await apiFeatures.mongooseQuery;
     res.status(200).json({
       message: "success",
       page: apiFeatures.queryString.page || 1,
-      // totalCount,
+      totalCount: apiFeatures.totalCount,
       result,
     });
   };

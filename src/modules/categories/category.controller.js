@@ -7,9 +7,7 @@ import categoryModel from "./../../../DB/models/category.model.js";
 
 export const viewCategory = catchError(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
-  const category = await categoryModel.findById("6501b53887c6a156d09cf0d3");
-  console.log(category);
+  const category = await categoryModel.findById(id);
   if (!category) {
     throw new AppError("category not found", 403);
   }

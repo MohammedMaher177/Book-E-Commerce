@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 export class ApiFeatures {
   totalCount;
   constructor(mongooseQuery, queryString) {
@@ -6,22 +8,18 @@ export class ApiFeatures {
     this.totalCount = 0;
   }
 
-  pagination() {
+  #pagination() {
     //1 - pag
     // const PAGE_LIMIT = this.queryString.page ? 10 : true;
     const PAGE_LIMIT = 12;
     const PAGE_NUMBER = this.queryString.page || 1;
     if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1;
     const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT;
-    this.#totalCount().then((count) => {
-        console.log('from paggination ' ,count);
-        this.totalCount = count;
-    });
-    this.mongooseQuery.skip(SKIP).limit(PAGE_LIMIT);
+    this.mongooseQuery.skip(SKIP).limit(PAGE_LIMIT)
     return this;
   }
 
-  filter() {
+  async #filter() {
     let filterObj = { ...this.queryString };
     const delObj = ["page", "sort", "fields", "keyword"];
     delObj.forEach((ele) => {
@@ -33,11 +31,15 @@ export class ApiFeatures {
       (match) => `$${match}`
     );
     filterObj = JSON.parse(filterObj);
+    if(filterObj.category !== null || filterObj.category !== undefined){
+      filterObj.category =  new mongoose.Types.ObjectId(filterObj.category)
+    } 
+    this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
     this.mongooseQuery.find(filterObj);
     return this;
   }
 
-  sort() {
+  #sort() {
     if (this.queryString.sort) {
       let sortedQery = this.queryString.sort.split(",").join(" ");
       this.mongooseQuery.sort(sortedQery);
@@ -46,23 +48,30 @@ export class ApiFeatures {
   }
 
   //4 - search
-  search() {
+ async #search() {
     if (this.queryString.keyword) {
+      this.totalCount = await this.mongooseQuery.find({
+        $or: [
+          { name: { $regex: this.queryString.keyword, $options: "i" } },
+          { desc: { $regex: this.queryString.keyword, $options: "i" } },
+          { author: { $regex: this.queryString.keyword, $options: "i" } },
+          { publisher: { $regex: this.queryString.keyword, $options: "i" } },
+        ],
+      }).count().clone();
       this.mongooseQuery.find({
         $or: [
           { name: { $regex: this.queryString.keyword, $options: "i" } },
           { desc: { $regex: this.queryString.keyword, $options: "i" } },
-          { bookName: { $regex: this.queryString.keyword, $options: "i" } },
           { author: { $regex: this.queryString.keyword, $options: "i" } },
           { publisher: { $regex: this.queryString.keyword, $options: "i" } },
         ],
-      });
+      }).clone();
     }
     return this;
   }
 
   //5 - fields
-  fields() {
+  #fields() {
     if (this.queryString.fields) {
       let fields = this.queryString.fields.split(",").join(" ");
       fields = fields.replace("password", "");
@@ -72,8 +81,13 @@ export class ApiFeatures {
     }
     return this;
   }
-  async #totalCount() {
-    console.log(11111);
-    return await this.mongooseQuery.countDocuments();
+
+  async initialize(){
+    await this.#filter();
+    this.#sort();
+    await this.#search();
+    this.#fields();
+    this.#pagination();
+    return this;
   }
 }

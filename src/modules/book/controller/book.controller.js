@@ -19,6 +19,7 @@ export const filterBook = catchError(async (req, res) => {
   const book = await bookModel.find(filterObj);
   res.json({ massege: "success", book });
 });
+
 export const searchBook = catchError(async (req, res, next) => {
   let filterObj = req.query;
   const book = await bookModel.find({
@@ -32,6 +33,7 @@ export const searchBook = catchError(async (req, res, next) => {
   });
   res.json({ massege: "success", book });
 });
+
 export const getBook = catchError(getDocById(bookModel))
 
 export const addBook = catchError(async (req, res, next) => {
@@ -69,6 +71,7 @@ export const addBook = catchError(async (req, res, next) => {
   }
   res.json({ message: "success",book });
 });
+
 export const updateBook = catchError(async (req, res, next) => {
   const { bookId } = req.params;
   const book = await bookModel.findById(bookId);
@@ -102,13 +105,17 @@ export const updateBook = catchError(async (req, res, next) => {
   } 
   res.json({ message: "success", book });
 });
+
 export const bookByCategory = catchError(async (req, res) => {
   const {slug} = req.query;
  const category = await categoryModel.findOne({slug:slug});
  if (!category) {
   throw new AppError("category Not Found", 403);
 }
-req.query.category = category._id;
+req.query._id = {
+  name: 'category',
+  value: category._id
+};
 delete req.query.slug
 getData(bookModel)(req, res);
 });

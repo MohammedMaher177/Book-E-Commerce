@@ -31,9 +31,14 @@ export class ApiFeatures {
       (match) => `$${match}`
     );
     filterObj = JSON.parse(filterObj);
-    if(filterObj.category !== null || filterObj.category !== undefined){
-      filterObj.category =  new mongoose.Types.ObjectId(filterObj.category)
-    } 
+    if(filterObj._id !== undefined){
+      const {name, value} = filterObj._id;
+      filterObj[name] =  new mongoose.Types.ObjectId(value);
+      delete filterObj._id;
+    }
+    else{
+      delete filterObj._id;
+    }
     this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
     this.mongooseQuery.find(filterObj);
     return this;
@@ -84,9 +89,9 @@ export class ApiFeatures {
 
   async initialize(){
     await this.#filter();
-    this.#sort();
     await this.#search();
     this.#fields();
+    this.#sort();
     this.#pagination();
     return this;
   }

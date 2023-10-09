@@ -2,9 +2,10 @@ import mongoose from "mongoose";
 
 export class ApiFeatures {
   totalCount;
-  constructor(mongooseQuery, queryString) {
+  constructor(mongooseQuery, queryString = {}, args = {}) {
     this.mongooseQuery = mongooseQuery;
     this.queryString = queryString;
+    this.args = args;
     this.totalCount = 0;
   }
 
@@ -31,12 +32,12 @@ export class ApiFeatures {
       (match) => `$${match}`
     );
     filterObj = JSON.parse(filterObj);
-    if(filterObj._id !== undefined){
-      const {name, value} = filterObj._id;
-      filterObj[name] =  new mongoose.Types.ObjectId(value);
+    if (filterObj._id !== undefined) {
+      const { name, value } = filterObj._id;
+      filterObj[name] = new mongoose.Types.ObjectId(value);
       delete filterObj._id;
     }
-    else{
+    else {
       delete filterObj._id;
     }
     this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
@@ -53,22 +54,24 @@ export class ApiFeatures {
   }
 
   //4 - search
- async #search() {
+  async #search() {
     if (this.queryString.keyword) {
       this.totalCount = await this.mongooseQuery.find({
         $or: [
           { name: { $regex: this.queryString.keyword, $options: "i" } },
-          { desc: { $regex: this.queryString.keyword, $options: "i" } },
-          { author: { $regex: this.queryString.keyword, $options: "i" } },
-          { publisher: { $regex: this.queryString.keyword, $options: "i" } },
+          { slug: { $regex: this.queryString.keyword, $options: "i" } }
+          // { desc: { $regex: this.queryString.keyword, $options: "i" } },
+          // { author: { $regex: this.queryString.keyword, $options: "i" } },
+          // { publisher: { $regex: this.queryString.keyword, $options: "i" } },
         ],
       }).count().clone();
       this.mongooseQuery.find({
         $or: [
           { name: { $regex: this.queryString.keyword, $options: "i" } },
-          { desc: { $regex: this.queryString.keyword, $options: "i" } },
-          { author: { $regex: this.queryString.keyword, $options: "i" } },
-          { publisher: { $regex: this.queryString.keyword, $options: "i" } },
+          { slug: { $regex: this.queryString.keyword, $options: "i" } }
+          // { desc: { $regex: this.queryString.keyword, $options: "i" } },
+          // { author: { $regex: this.queryString.keyword, $options: "i" } },
+          // { publisher: { $regex: this.queryString.keyword, $options: "i" } },
         ],
       }).clone();
     }
@@ -87,12 +90,25 @@ export class ApiFeatures {
     return this;
   }
 
-  async initialize(){
+  async #byArrOfIDs(){
+    const {name, value} = this.args
+    this.totalCount = await this.mongooseQuery.find({[name]: {$in: value}}).count().clone();
+    this.mongooseQuery.find({[name]: {$in: value}})
+    return this
+  }
+
+  async initialize() {
     await this.#filter();
     await this.#search();
     this.#fields();
     this.#sort();
     this.#pagination();
+    return this;
+  }
+
+  async getByArrOfIDs() {
+    await this.#byArrOfIDs();
+    this.#pagination()
     return this;
   }
 }

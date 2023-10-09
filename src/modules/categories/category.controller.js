@@ -2,17 +2,10 @@ import cloudinary from "../../multer/cloudinary.js";
 import { ApiFeatures } from "../../util/ApiFeatures.js";
 import { AppError } from "../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../util/ErrorHandler/catchError.js";
-import { getData } from "../../util/model.util.js";
+import { getData, getDocById } from "../../util/model.util.js";
 import categoryModel from "./../../../DB/models/category.model.js";
 
-export const viewCategory = catchError(async (req, res, next) => {
-  const { id } = req.params;
-  const category = await categoryModel.findById(id);
-  if (!category) {
-    throw new AppError("category not found", 403);
-  }
-  res.json({ massege: "success", category });
-});
+export const viewCategory = catchError(getDocById(categoryModel))
 
 export const allCategory = catchError(getData(categoryModel));
 

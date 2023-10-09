@@ -1,3 +1,6 @@
+import mongoose from "mongoose";
+import bookModel from "../../DB/models/book.model.js";
+import categoryModel from "../../DB/models/category.model.js";
 import cloudinary from "../multer/cloudinary.js";
 import { ApiFeatures } from "./ApiFeatures.js";
 import { AppError } from "./ErrorHandler/AppError.js";
@@ -5,7 +8,7 @@ import { AppError } from "./ErrorHandler/AppError.js";
 export const getData = (model) => {
   return async (req, res) => {
     const apiFeatures = await new ApiFeatures(model.find(), req.query)
-    .initialize()
+      .initialize()
     const result = await apiFeatures.mongooseQuery;
     res.status(200).json({
       message: "success",
@@ -35,13 +38,28 @@ export const deleteData = (model) => {
 export const getDocById = (model) => {
   return async (req, res, next) => {
     const { id } = req.params;
+    const { user } = req;
     const result = await model.findById(id);
-
-    if (result) {
-      return res.status(200).json({ message: "success", result });
-    } else {
+    if (!result) {
       return next(new AppError("Not Found", 404));
     }
+    if (user) {
+      const id = new mongoose.Types.ObjectId(result._id)
+      if (model === bookModel) {
+        if (!user.searchedBooks.includes(id)) {
+          user.searchedBooks.push(id);
+          await user.save();
+        }
+      }
+      if (model === categoryModel) {
+        if (!user.searchedCats.includes(id)) {
+          user.searchedCats.push(id);
+          await user.save();
+        }
+      }
+
+    }
+    res.status(200).json({ message: "success", result });
   };
 };
 

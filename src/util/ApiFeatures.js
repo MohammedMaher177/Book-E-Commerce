@@ -11,8 +11,8 @@ export class ApiFeatures {
 
   #pagination() {
     //1 - pag
-    // const PAGE_LIMIT = this.queryString.page ? 10 : true;
-    const PAGE_LIMIT = 12;
+    const PAGE_LIMIT = this.queryString.page ? 12 : true;
+    // const PAGE_LIMIT = 12;
     const PAGE_NUMBER = this.queryString.page || 1;
     if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1;
     const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT;

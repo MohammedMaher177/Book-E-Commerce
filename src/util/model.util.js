@@ -7,13 +7,19 @@ import { AppError } from "./ErrorHandler/AppError.js";
 
 export const getData = (model) => {
   return async (req, res) => {
-    const apiFeatures = await new ApiFeatures(model.find(), req.query)
-      .initialize()
+    const apiFeatures = await new ApiFeatures(
+      model.find(),
+      req.query
+    ).initialize();
     const result = await apiFeatures.mongooseQuery;
     res.status(200).json({
       message: "success",
-      page: apiFeatures.queryString.page || 1,
-      totalCount: apiFeatures.totalCount,
+      ...(apiFeatures.queryString.page !== undefined
+        ? {
+            page: apiFeatures.queryString.page || 1,
+            totalCount: apiFeatures.totalCount,
+          }
+        : ""),
       result,
     });
   };
@@ -44,7 +50,7 @@ export const getDocById = (model) => {
       return next(new AppError("Not Found", 404));
     }
     if (user) {
-      const id = new mongoose.Types.ObjectId(result._id)
+      const id = new mongoose.Types.ObjectId(result._id);
       if (model === bookModel) {
         if (!user.searchedBooks.includes(id)) {
           user.searchedBooks.push(id);
@@ -57,7 +63,6 @@ export const getDocById = (model) => {
           await user.save();
         }
       }
-
     }
     res.status(200).json({ message: "success", result });
   };

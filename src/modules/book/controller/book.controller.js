@@ -6,7 +6,7 @@ import { ApiFeatures } from "../../../util/ApiFeatures.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import { getData, getDocById } from "../../../util/model.util.js";
-import { shuffle } from "../../../util/helper-functions.js";
+import { shuffle, suggestCategory } from "../../../util/helper-functions.js";
 
 export const allBook = catchError(getData(bookModel));
 
@@ -193,28 +193,17 @@ export const searchedBooks = catchError(async (req, res, next) => {
 });
 export const forYou = catchError(async (req, res, next) => {
   const { searchedCats, fav_cats } = req.user;
-  const fav = fav_cats.map((ele) => ele._id);
-  const categories = fav.concat(searchedCats);
-  const args = {
-    name: "category",
-    value: categories,
-  };
-  const apiFeatures = await new ApiFeatures(
-    bookModel.find(),
-    {},
-    args
-  ).getByArrOfIDs();
-  let result = await apiFeatures.mongooseQuery;
- 
-  result = shuffle(result).slice(0,5);
+  let fav = fav_cats.map((ele) => ele._id);
+  fav =fav.concat(searchedCats);
+  console.log(fav);
+  fav = fav.map((el) => el.toString());
+  const categories = new Set(fav);
+  console.log(categories);
+
+let result = await suggestCategory(categories)
+  result = shuffle(result);
   res.status(200).json({
     message: "success",
-    ...(apiFeatures.queryString.page !== undefined
-      ? {
-          page: apiFeatures.queryString.page || 1,
-          totalCount: apiFeatures.totalCount,
-        }
-      : ""),
     result,
   });
 });

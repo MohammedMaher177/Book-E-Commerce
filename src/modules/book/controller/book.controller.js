@@ -180,7 +180,6 @@ export const searchedBooks = catchError(async (req, res, next) => {
     args
   ).getByArrOfIDs();
   let result = await apiFeatures.mongooseQuery;
-  result = result.slice(-5)
   res.status(200).json({
     message: "success",
     ...(apiFeatures.queryString.page !== undefined

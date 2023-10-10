@@ -6,8 +6,9 @@ import { ApiFeatures } from "../../../util/ApiFeatures.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import { getData, getDocById } from "../../../util/model.util.js";
+import { shuffle } from "../../../util/helper-functions.js";
 
-export const allBook = catchError(getData(bookModel))
+export const allBook = catchError(getData(bookModel));
 
 export const filterBook = catchError(async (req, res) => {
   let filterObj = req.query;
@@ -30,13 +31,12 @@ export const searchBook = catchError(async (req, res, next) => {
       { desc: { $regex: filterObj.keyword, $options: "i" } },
       { author: { $regex: filterObj.keyword, $options: "i" } },
       { publisher: { $regex: filterObj.keyword, $options: "i" } },
-
     ],
   });
   res.json({ massege: "success", book });
 });
 
-export const getBook = catchError(getDocById(bookModel))
+export const getBook = catchError(getDocById(bookModel));
 
 export const addBook = catchError(async (req, res, next) => {
   const { ISBN } = req.body;
@@ -52,7 +52,6 @@ export const addBook = catchError(async (req, res, next) => {
         (result) => {
           return result;
         }
-
       );
     }
     const { public_id, secure_url } = await cloudinary.uploader.upload(
@@ -88,7 +87,6 @@ export const updateBook = catchError(async (req, res, next) => {
         (result) => {
           return result;
         }
-
       );
     }
     const { public_id, secure_url } = await cloudinary.uploader.upload(
@@ -115,69 +113,109 @@ export const bookByCategory = catchError(async (req, res) => {
     throw new AppError("category Not Found", 403);
   }
   req.query._id = {
-    name: 'category',
-    value: category._id
+    name: "category",
+    value: category._id,
   };
-  delete req.query.slug
+  delete req.query.slug;
   getData(bookModel)(req, res);
 });
 
 export const booksByFavCats = catchError(async (req, res, next) => {
   const fav_cats = req.user.fav_cats.map((ele) => ele._id);
   const args = {
-    name: 'category',
-    value: fav_cats
-  }
-  const apiFeatures = await new ApiFeatures(bookModel.find(),req.query,args).getByArrOfIDs()
+    name: "category",
+    value: fav_cats,
+  };
+  const apiFeatures = await new ApiFeatures(
+    bookModel.find(),
+    req.query,
+    args
+  ).getByArrOfIDs();
   const result = await apiFeatures.mongooseQuery;
-  res.status(200)
-  .json({
+  res.status(200).json({
     message: "success",
-    ...(apiFeatures.queryString.page !== undefined ? {
-      page: apiFeatures.queryString.page || 1,
-      totalCount: apiFeatures.totalCount,
-
-    }: ''),
-    result
-  })
+    ...(apiFeatures.queryString.page !== undefined
+      ? {
+          page: apiFeatures.queryString.page || 1,
+          totalCount: apiFeatures.totalCount,
+        }
+      : ""),
+    result,
+  });
 });
 
 export const booksBySearchedCats = catchError(async (req, res, next) => {
-  const {searchedCats} = req.user;
+  const { searchedCats } = req.user;
   const args = {
-    name: 'category',
-    value: searchedCats
-  }
-  const apiFeatures = await new ApiFeatures(bookModel.find(),{},args).getByArrOfIDs()
+    name: "category",
+    value: searchedCats,
+  };
+  const apiFeatures = await new ApiFeatures(
+    bookModel.find(),
+    {},
+    args
+  ).getByArrOfIDs();
   const result = await apiFeatures.mongooseQuery;
-  res.status(200)
-  .json({
+  res.status(200).json({
     message: "success",
-    ...(apiFeatures.queryString.page !== undefined ? {
-      page: apiFeatures.queryString.page || 1,
-      totalCount: apiFeatures.totalCount,
-
-    }: ''),
-    result
-  })
+    ...(apiFeatures.queryString.page !== undefined
+      ? {
+          page: apiFeatures.queryString.page || 1,
+          totalCount: apiFeatures.totalCount,
+        }
+      : ""),
+    result,
+  });
 });
 
 export const searchedBooks = catchError(async (req, res, next) => {
-  const {searchedBooks} = req.user;
+  const { searchedBooks } = req.user;
   const args = {
-    name: '_id',
-    value: searchedBooks
-  }
-  const apiFeatures = await new ApiFeatures(bookModel.find(),{},args).getByArrOfIDs()
-  const result = await apiFeatures.mongooseQuery;
-  res.status(200)
-  .json({
+    name: "_id",
+    value: searchedBooks,
+  };
+  const apiFeatures = await new ApiFeatures(
+    bookModel.find(),
+    {},
+    args
+  ).getByArrOfIDs();
+  let result = await apiFeatures.mongooseQuery;
+  result = result.slice(-5)
+  res.status(200).json({
     message: "success",
-    ...(apiFeatures.queryString.page !== undefined ? {
-      page: apiFeatures.queryString.page || 1,
-      totalCount: apiFeatures.totalCount,
-
-    }: ''),
-    result
-  })
+    ...(apiFeatures.queryString.page !== undefined
+      ? {
+          page: apiFeatures.queryString.page || 1,
+          totalCount: apiFeatures.totalCount,
+        }
+      : ""),
+    result,
+  });
+});
+export const forYou = catchError(async (req, res, next) => {
+  const { searchedCats, fav_cats } = req.user;
+  const fav = fav_cats.map((ele) => ele._id);
+  const categories = fav.concat(searchedCats);
+  const args = {
+    name: "category",
+    value: categories,
+  };
+  const apiFeatures = await new ApiFeatures(
+    bookModel.find(),
+    {},
+    args
+  ).getByArrOfIDs();
+  let result = await apiFeatures.mongooseQuery;
+ 
+  result = shuffle(result).slice(0,5);
+  res.status(200).json({
+    message: "success",
+    ...(apiFeatures.queryString.page !== undefined
+      ? {
+          page: apiFeatures.queryString.page || 1,
+          totalCount: apiFeatures.totalCount,
+        }
+      : ""),
+    result,
+  });
 });

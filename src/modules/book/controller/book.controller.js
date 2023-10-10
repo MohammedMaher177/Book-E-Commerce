@@ -133,8 +133,11 @@ export const booksByFavCats = catchError(async (req, res, next) => {
   res.status(200)
   .json({
     message: "success",
-    page: apiFeatures.queryString.page || 1,
-    totalCount: apiFeatures.totalCount,
+    ...(apiFeatures.queryString.page !== undefined ? {
+      page: apiFeatures.queryString.page || 1,
+      totalCount: apiFeatures.totalCount,
+
+    }: ''),
     result
   })
 });
@@ -150,8 +153,11 @@ export const booksBySearchedCats = catchError(async (req, res, next) => {
   res.status(200)
   .json({
     message: "success",
-    page: apiFeatures.queryString.page || 1,
-    totalCount: apiFeatures.totalCount,
+    ...(apiFeatures.queryString.page !== undefined ? {
+      page: apiFeatures.queryString.page || 1,
+      totalCount: apiFeatures.totalCount,
+
+    }: ''),
     result
   })
 });
@@ -167,8 +173,11 @@ export const searchedBooks = catchError(async (req, res, next) => {
   res.status(200)
   .json({
     message: "success",
-    page: apiFeatures.queryString.page || 1,
-    totalCount: apiFeatures.totalCount,
+    ...(apiFeatures.queryString.page !== undefined ? {
+      page: apiFeatures.queryString.page || 1,
+      totalCount: apiFeatures.totalCount,
+
+    }: ''),
     result
   })
 });

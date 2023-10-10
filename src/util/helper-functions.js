@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import Token from "../../DB/models/token.model.js";
 import cloudinary from "../multer/cloudinary.js";
 import { v4 as uuidv4 } from "uuid";
+import bookModel from "../../DB/models/book.model.js";
 export const getTokens = async (id, role) => {
   const token = jwt.sign(
     {
@@ -55,7 +56,7 @@ export const deleteImg = (model) => {
 export const generateCode = () => {
   let n = uuidv4();
   n = n.split("-")[0].substring(0, 4);
-  return {code :n };
+  return { code: n };
 };
 export const shuffle = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -63,4 +64,14 @@ export const shuffle = (array) => {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+};
+
+export const suggestCategory = async (categories) => {
+  let result = [];
+  for (const category of categories) {
+    const cat = await bookModel.find({ category }).limit(5);
+    result.push(cat);
+  }
+  result=result[0].concat(result[1])
+  return result;
 };

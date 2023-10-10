@@ -57,3 +57,10 @@ export const generateCode = () => {
   n = n.split("-")[0].substring(0, 4);
   return {code :n };
 };
+export const shuffle = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};

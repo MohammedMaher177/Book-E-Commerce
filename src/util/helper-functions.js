@@ -67,11 +67,10 @@ export const shuffle = (array) => {
 };
 
 export const suggestCategory = async (categories) => {
-  let result = [];
+  let result = [] , i = 0;
   for (const category of categories) {
     const cat = await bookModel.find({ category }).limit(5);
-    result.push(cat);
+    result=result.concat(cat)
   }
-  result=result[0].concat(result[1])
   return result;
 };

@@ -31,6 +31,9 @@ export class ApiFeatures {
       /\b(gt|gte|lt|lte)\b/g,
       (match) => `$${match}`
     );
+    filterObj = filterObj.replace(
+      /\W/g," "
+    );
     filterObj = JSON.parse(filterObj);
     if (filterObj._id !== undefined) {
       const { name, value } = filterObj._id;

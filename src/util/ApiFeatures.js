@@ -56,7 +56,7 @@ export class ApiFeatures {
   //4 - search
   async #search() {
     if (this.queryString.keyword) {
-      let key = this.queryString.keyword.replace(/[^\w\s\'\,\:\"]/gi, '');
+      let key = this.queryString.keyword.replace(/[^\w\s\'\,\:\"\.]/gi, '');
       this.totalCount = await this.mongooseQuery
         .find({
           $or: [

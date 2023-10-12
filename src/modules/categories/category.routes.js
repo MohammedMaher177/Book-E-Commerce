@@ -16,10 +16,10 @@ import { isLoggedIn } from "../../middleware/isLoggedIn.js";
 const categoryRouter = Router();
 
 categoryRouter.get("/", allCategory);
-categoryRouter.get("/:id", isLoggedIn, viewCategory);
 categoryRouter.post("/", addCategory);
 categoryRouter.patch("/", uploadImage(uploadValidation.image).single("image"), updateCategory);
 categoryRouter.delete("/", deletCategory);
+categoryRouter.get("/:slug", isLoggedIn, viewCategory);
 
 
 export default categoryRouter;

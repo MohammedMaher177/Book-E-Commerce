@@ -45,7 +45,7 @@ export const getDocById = (model) => {
   return async (req, res, next) => {
     const { slug } = req.params;
     const { user } = req;
-    const result = await model.find({slug:slug});
+    const result = await model.findOne({slug:slug});
     if (!result) {
       return next(new AppError("Not Found", 404));
     }
@@ -64,9 +64,14 @@ export const getDocById = (model) => {
         }
       }
     }
-    const catOfBook= await categoryModel.find({slug:result[0].category.slug})
-    const bookCategory = await bookModel.find({category:catOfBook[0]._id}).limit(10)
-    res.status(200).json({ message: "success", result,bookCategory });
+    if (model=== bookModel) {
+      const catOfBook= await categoryModel.findOne({slug:result.category.slug})
+      const bookCategory = await bookModel.find({category:catOfBook._id}).limit(10)
+      res.status(200).json({ message: "success", result,bookCategory });
+   }
+
+    
+    res.status(200).json({ message: "success", result });
   };
 };
 

@@ -43,9 +43,9 @@ export const deleteData = (model) => {
 
 export const getDocById = (model) => {
   return async (req, res, next) => {
-    const { id } = req.params;
+    const { slug } = req.params;
     const { user } = req;
-    const result = await model.findById(id);
+    const result = await model.find({slug:slug});
     if (!result) {
       return next(new AppError("Not Found", 404));
     }
@@ -64,7 +64,9 @@ export const getDocById = (model) => {
         }
       }
     }
-    res.status(200).json({ message: "success", result });
+    const catOfBook= await categoryModel.find({slug:result[0].category.slug})
+    const bookCategory = await bookModel.find({category:catOfBook[0]._id}).limit(10)
+    res.status(200).json({ message: "success", result,bookCategory });
   };
 };
 

@@ -7,6 +7,8 @@ import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import { getData, getDocById } from "../../../util/model.util.js";
 import { shuffle, suggestCategory } from "../../../util/helper-functions.js";
+import slugify from "slugify";
+import { v4 as uuidv4 } from "uuid";
 
 export const allBook = catchError(getData(bookModel));
 
@@ -194,16 +196,36 @@ export const searchedBooks = catchError(async (req, res, next) => {
 export const forYou = catchError(async (req, res, next) => {
   const { searchedCats, fav_cats } = req.user;
   let fav = fav_cats.map((ele) => ele._id);
-  fav =fav.concat(searchedCats);
+  fav = fav.concat(searchedCats);
   console.log(fav);
   fav = fav.map((el) => el.toString());
   const categories = new Set(fav);
   console.log(categories);
 
-let result = await suggestCategory(categories)
+  let result = await suggestCategory(categories);
   result = shuffle(result);
   res.status(200).json({
     message: "success",
     result,
   });
+});
+
+export const updateData = catchError(async (req, res) => {
+  let result = await bookModel.find();
+  result = result.map((el) => {
+    let n = uuidv4();
+    n = n.split("-")[0].substring(0, 6);
+    el.slug = slugify(el.name)+"-"+ n;
+    return el;
+  });
+  const option = {
+    slug : slugify()
+  }
+  await result.save()
+  // result.bulkWrite({
+  //   updateOne{
+  //     flter:{$exis}
+  //   }
+  // })
+  res.json(result);
 });

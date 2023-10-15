@@ -67,7 +67,8 @@ export const getDocById = (model) => {
     if (model=== bookModel) {
       const catOfBook= await categoryModel.findOne({slug:result.category.slug})
       const bookCategory = await bookModel.find({category:catOfBook._id}).limit(10)
-      res.status(200).json({ message: "success", result,bookCategory });
+      const books = await bookModel.find().limit(10)
+      res.status(200).json({ message: "success", result,bookCategory,books });
    }
 
     

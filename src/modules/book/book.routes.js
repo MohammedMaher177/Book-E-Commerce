@@ -9,7 +9,9 @@ import {
     filterBook,
     searchBook,
     bookByCategory,
-    getBook
+    getBook,
+    updateMan,
+    updateData
 } from "./controller/book.controller.js"
 import { validate } from "../../middleware/validate.js";
 
@@ -22,6 +24,8 @@ bookRouter.get("/search",searchBook);
 bookRouter.get("/:id",getBook);
 bookRouter.post("/addBook",validate(bookValidation),uploadImage(uploadValidation.image).single("image"),addBook);
 bookRouter.patch("/:bookId",validate(bookValidation),updateBook);
+
+bookRouter.put("/updateMany", updateData)
 
 
 export default bookRouter;

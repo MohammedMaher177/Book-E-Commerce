@@ -53,6 +53,10 @@ userSchema.pre(["save", /^update/, /^create/], async function () {
         this.password = await bcryptjs.hash(this.password, parseInt(process.env.SALT_ROUNDS))
     }
 })
+userSchema.pre(/^find/, async function () {
+    // console.log(this);
+    this.populate("fav_cats")
+})
 
 const UserModel = model("User", userSchema)
 

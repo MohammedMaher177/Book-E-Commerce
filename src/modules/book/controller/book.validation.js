@@ -5,6 +5,8 @@ export const bookValidation = {
     ISBN: joi.number().required(),
 
     bookName: joi
+      .string(),
+    name: joi
       .string()
       .required(),
       // .pattern(new RegExp(/^[a-zA-Z]{3,8}([_ -]?[a-zA-Z0-9]{3,8})*$/)),

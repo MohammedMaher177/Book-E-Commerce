@@ -21,7 +21,7 @@ export class ApiFeatures {
 
     filter() {
         let filterObj = { ...this.queryString }
-        const delObj = ['page', 'sort', 'fields', 'keyword']
+        const delObj = ['page', 'sort', 'fields', 'keyword', 'author']
         delObj.forEach(ele => {
             delete filterObj[ele]
         })
@@ -36,6 +36,18 @@ export class ApiFeatures {
         if (this.queryString.sort) {
             let sortedQery = this.queryString.sort.split(",").join(" ")
             this.mongooseQuery.sort(sortedQery)
+        }
+        return this
+    }
+
+    //authoer
+    author(){
+        if (this.queryString.author) {
+            this.mongooseQuery.find({
+                $or: [
+                    { author: { $regex: this.queryString.author, $options: "i" } },
+                ]
+            })
         }
         return this
     }
@@ -55,6 +67,8 @@ export class ApiFeatures {
         }
         return this
     }
+
+
 
     //5 - fields
     fields() {

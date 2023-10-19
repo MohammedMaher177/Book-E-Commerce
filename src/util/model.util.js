@@ -11,11 +11,11 @@ export const getData = (model) => {
       .sort()
       .filter()
       .fields()
-      .search();
+      .search().author();
 
     let result = await apiFeatures.mongooseQuery;
 
-    res.json({
+    res.status(200).json({
       message: "success",
       page: apiFeatures.queryString.page || 1,
       result,

@@ -99,7 +99,7 @@ export class ApiFeatures {
       this.totalCount = await this.mongooseQuery
         .find({
           $or: [
-            { author: { $regex: this.queryString.keyword, $options: "i" } },
+            { author: { $regex: this.queryString.author, $options: "i" } },
           ],
         })
         .count()
@@ -107,7 +107,7 @@ export class ApiFeatures {
       this.mongooseQuery
         .find({
           $or: [
-            { author: { $regex: this.queryString.keyword, $options: "i" } },
+            { author: { $regex: this.queryString.author, $options: "i" } },
           ],
         })
         .clone();

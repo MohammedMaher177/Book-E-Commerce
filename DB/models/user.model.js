@@ -30,7 +30,7 @@ const userSchema = new Schema({
         type: Types.ObjectId, ref: "category"
     }],
     whish_list: [{
-        type: Types.ObjectId, ref: "Book"
+        type: Types.ObjectId, ref: "book"
     }],
     confirmedEmail: {
         type: Boolean, default: false
@@ -41,7 +41,19 @@ const userSchema = new Schema({
     },
     status:{
         type:String, enum: ['active','deactive','reseting password','not confirmed'], default:'not confirmed'
-    }
+    },
+    searchedBooks:[
+        {
+            type: Types.ObjectId, ref: "book",
+            default: []
+        }
+    ],
+    searchedCats:[
+        {
+            type: Types.ObjectId, ref: "category",
+            default: []
+        }
+    ],
     // registerway:{type: String, enum: ['form', 'facebook', 'google'], default: "form"}
 
 

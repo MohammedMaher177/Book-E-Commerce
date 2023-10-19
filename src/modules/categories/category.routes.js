@@ -10,15 +10,16 @@ import {
 import { validate } from "../../middleware/validate.js";
 import { addCategoryValidation, updateCategoryValidation } from "./caategory.validation.js";
 import { uploadImage, uploadValidation } from "../../multer/multer.cloud.js";
+import { isLoggedIn } from "../../middleware/isLoggedIn.js";
 
 
 const categoryRouter = Router();
 
 categoryRouter.get("/", allCategory);
 categoryRouter.post("/", addCategory);
-categoryRouter.post("/:id", viewCategory);
-categoryRouter.patch("/",uploadImage(uploadValidation.image).single("image"), updateCategory);
+categoryRouter.patch("/", uploadImage(uploadValidation.image).single("image"), updateCategory);
 categoryRouter.delete("/", deletCategory);
+categoryRouter.get("/:slug", isLoggedIn, viewCategory);
 
 
 export default categoryRouter;

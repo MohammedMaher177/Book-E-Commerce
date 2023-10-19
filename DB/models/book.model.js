@@ -1,19 +1,14 @@
 import mongoose, { Schema, Types, model } from "mongoose";
 
-const bookSchema = new Schema(
-  {
-    ISBN: {
-      type: Number,
-      unique: true,
-      require: true,
-      minLength: 10,
-      maxLength: 13,
-    },
-    bookName: { type: String, trim: true },
-    name: { type: String, require: true, trim: true },
-    lang: { type: String, require: true },
-    desc: { type: String },
-    pages: { type: Number, require: true },
+
+const bookSchema = new Schema({
+    ISBN:{type:Number ,unique: true, require: true ,minLength: 10, maxLength: 13 },
+    name: { type: String, require: true, trim: true},
+    slug: { type: String, require: true, trim: true, unique: true},
+    lang:{type:String ,require: true },
+    desc:{type:String },
+    pages:{type:Number,require: true},
+
     image: { public_id: String, secure_url: String },
 
     stock: { type: Number, default: 0 },
@@ -40,6 +35,7 @@ bookSchema.pre(/^find/, function () {
       path: "category",
       select: "name slug -_id",
     },
+
   ]);
 });
 
@@ -52,3 +48,4 @@ bookSchema.virtual("reviews", {
 const bookModel = model("book", bookSchema);
 
 export default bookModel;
+

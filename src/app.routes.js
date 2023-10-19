@@ -2,7 +2,7 @@ import connectionDb from "../DB/dbConnection.js";
 import authRouter from "./modules/auth/auth.routes.js";
 import userRouter from "./modules/user/user.routes.js";
 import bookRouter from "./modules/book/book.routes.js";
-import categoryRouter from "./modules/categories/category.routs.js";
+import categoryRouter from "./modules/categories/category.routes.js";
 import { AppError } from "./util/ErrorHandler/AppError.js";
 import reviewRouter from "./modules/review/review.routes.js";
 import cartRouter from "./modules/cart/cart.routes.js";

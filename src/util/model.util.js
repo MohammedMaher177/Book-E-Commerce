@@ -1,23 +1,25 @@
+import mongoose from "mongoose";
+import bookModel from "../../DB/models/book.model.js";
+import categoryModel from "../../DB/models/category.model.js";
 import cloudinary from "../multer/cloudinary.js";
 import { ApiFeatures } from "./ApiFeatures.js";
 import { AppError } from "./ErrorHandler/AppError.js";
 
-
 export const getData = (model) => {
   return async (req, res) => {
-    // console.log(req.query);
-    const apiFeatures = new ApiFeatures(model.find(), req.query)
-      .pagination()
-      .sort()
-      .filter()
-      .fields()
-      .search().author();
-
-    let result = await apiFeatures.mongooseQuery;
-
+    const apiFeatures = await new ApiFeatures(
+      model.find(),
+      req.query
+    ).initialize();
+    const result = await apiFeatures.mongooseQuery;
     res.status(200).json({
       message: "success",
-      page: apiFeatures.queryString.page || 1,
+      ...(apiFeatures.queryString.page !== undefined
+        ? {
+            page: apiFeatures.queryString.page || 1,
+            totalCount: apiFeatures.totalCount,
+          }
+        : ""),
       result,
     });
   };
@@ -41,14 +43,44 @@ export const deleteData = (model) => {
 
 export const getDocById = (model) => {
   return async (req, res, next) => {
-    const { id } = req.params;
-    const result = await model.findById(id);
-
-    if (result) {
-      return res.status(200).json({ message: "success", result });
-    } else {
+    const { slug } = req.params;
+    const { user } = req;
+    const result = await model.findOne({slug:slug});
+    if (!result) {
       return next(new AppError("Not Found", 404));
     }
+    if (user) {
+      console.log(user.searchedBooks);
+      const id = new mongoose.Types.ObjectId(result._id);
+      if (model === bookModel) {
+        if (!user.searchedBooks.includes(id)) {
+          user.searchedBooks.push(id);
+          await user.save();
+        }
+        else{
+          const index = user.searchedBooks.findIndex((ele) => ele.toString()===id.toJSON())
+          user.searchedBooks.splice(index,1)
+          user.searchedBooks.push(id);
+          await user.save();
+          console.log(user.searchedBooks);
+        }
+      }
+      if (model === categoryModel) {
+        if (!user.searchedCats.includes(id)) {
+          user.searchedCats.push(id);
+          await user.save();
+        }
+      }
+    }
+    if (model=== bookModel) {
+      const catOfBook= await categoryModel.findOne({slug:result.category.slug})
+      const bookCategory = await bookModel.find({category:catOfBook._id}).limit(10)
+      const books = await bookModel.find().limit(10)
+      res.status(200).json({ message: "success", result,bookCategory,books });
+   }
+
+    
+    res.status(200).json({ message: "success", result });
   };
 };
 
@@ -71,8 +103,6 @@ export const deleteImg = (model) => {
   };
 };
 
-
-
 // export const addToCart = catchError(async (req, res, next) => {
 //     const { _id } = req.user
 //     const { product, qty } = req.body
@@ -89,7 +119,6 @@ export const deleteImg = (model) => {
 //         return res.status(201).json({ message: "success", cart })
 //     }
 
-
 //     let index
 //     cart.products.forEach((el, i) => {
 //         if (el.product._id.toString() === existProduct) {
@@ -104,7 +133,7 @@ export const deleteImg = (model) => {
 //             cart.products[index].qty = qty
 //             cart.products[index].price = req.body.price
 //         } else if (qty == 0) {
-//             cart.products.splice(index, 1)  // to delete the card 
+//             cart.products.splice(index, 1)  // to delete the card
 //         } else {
 //             cart.products[index].qty++
 //             cart.products[index].price = req.body.price
@@ -114,7 +143,6 @@ export const deleteImg = (model) => {
 //             throw new AppError("Bad request", 400)
 //         }
 //         cart.products.push(req.body)
-
 
 //     }
 //     let totatlCartPrice = 0;

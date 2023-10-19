@@ -4,8 +4,8 @@ export const bookValidation = {
   body: joi.object({
     ISBN: joi.number().required(),
 
-    bookName: joi
-      .string(),
+    // bookName: joi
+    //   .string(),
     name: joi
       .string()
       .required(),

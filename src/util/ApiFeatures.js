@@ -95,20 +95,15 @@ export class ApiFeatures {
         /[^\w\s]/gi,
         (match) => `\\${match}`
       );
-      console.log(key);
       this.totalCount = await this.mongooseQuery
         .find({
-          $or: [
-            { author: { $regex: this.queryString.author, $options: "i" } },
-          ],
+          author: { $regex: key, $options: "i" },
         })
         .count()
         .clone();
       this.mongooseQuery
         .find({
-          $or: [
-            { author: { $regex: this.queryString.author, $options: "i" } },
-          ],
+          $or: [{ author: { $regex: key, $options: "i" } }],
         })
         .clone();
     }

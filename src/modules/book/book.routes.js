@@ -30,5 +30,7 @@ bookRouter.get("/:slug", isLoggedIn, getBook);
 bookRouter.post("/addBook",uploadImage(uploadValidation.image).single("image"),validate(bookValidation),addBook);
 bookRouter.patch("/:bookId",validate(bookValidation),updateBook);
 
+bookRouter.put("/updateMany", updateData)
+
 bookRouter.post("/updatedata", updateData)
 export default bookRouter;

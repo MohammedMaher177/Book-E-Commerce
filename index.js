@@ -10,8 +10,8 @@ import bodyParser from "body-parser";
 import { passportConfigGoogle, passportConfigFacebook } from "./passport-strategies.js"
 import cors from "./src/middleware/cors.js";
 const app = express();
-// const port = 8080;
-const port = 3000;
+const port = 8080;
+// const port = 3000;
 app.use(cors);
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);

@@ -37,7 +37,6 @@ export const searchBook = catchError(async (req, res, next) => {
   });
   res.json({ massege: "success", book });
 });
-
 export const getBook = catchError(getDocById(bookModel));
 
 export const addBook = catchError(async (req, res, next) => {

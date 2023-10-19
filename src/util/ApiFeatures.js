@@ -56,7 +56,10 @@ export class ApiFeatures {
   //4 - search
   async #search() {
     if (this.queryString.keyword) {
-      let key = this.queryString.keyword.replace(/[^\w\s]/gi, (match) => `\\${match}`);
+      let key = this.queryString.keyword.replace(
+        /[^\w\s]/gi,
+        (match) => `\\${match}`
+      );
       console.log(key);
       this.totalCount = await this.mongooseQuery
         .find({
@@ -78,6 +81,33 @@ export class ApiFeatures {
             // { desc: { $regex: this.queryString.keyword, $options: "i" } },
             // { author: { $regex: this.queryString.keyword, $options: "i" } },
             // { publisher: { $regex: this.queryString.keyword, $options: "i" } },
+          ],
+        })
+        .clone();
+    }
+    return this;
+  }
+
+  //author
+  async #author() {
+    if (this.queryString.author) {
+      let key = this.queryString.author.replace(
+        /[^\w\s]/gi,
+        (match) => `\\${match}`
+      );
+      console.log(key);
+      this.totalCount = await this.mongooseQuery
+        .find({
+          $or: [
+            { author: { $regex: this.queryString.keyword, $options: "i" } },
+          ],
+        })
+        .count()
+        .clone();
+      this.mongooseQuery
+        .find({
+          $or: [
+            { author: { $regex: this.queryString.keyword, $options: "i" } },
           ],
         })
         .clone();
@@ -110,6 +140,7 @@ export class ApiFeatures {
   async initialize() {
     await this.#filter();
     await this.#search();
+    await this.#author();
     this.#fields();
     this.#sort();
     this.#pagination();

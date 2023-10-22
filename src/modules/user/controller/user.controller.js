@@ -1,7 +1,10 @@
+import mongoose from "mongoose";
+import bookModel from "../../../../DB/models/book.model.js";
 import UserModel from "../../../../DB/models/user.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
+import { bookByCategory } from "../../book/controller/book.controller.js";
 
 export const getAllUsers = catchError(async (req, res, next) => {
   const users = await UserModel.find();
@@ -48,15 +51,15 @@ export const updateProfile = catchError(async (req, res, next) => {
   user.defultAddress = {
     address,
     city,
-  }
+  };
   await user.save();
 
-  res.status(201).json({ message: "success"});
-}) 
+  res.status(201).json({ message: "success" });
+});
 
 export const profile = catchError(async (req, res, next) => {
   const user = req.user;
-  
+
   const returnUser = {
     userName: user.userName,
     gender: user.gender,
@@ -64,15 +67,45 @@ export const profile = catchError(async (req, res, next) => {
     address: user.defultAddress.address,
     city: user.defultAddress.city,
     age: user.age,
-    fav_cats: await user.fav_cats
-  }
-  res.status(200).json({ message: "success", user: returnUser});
-})
+    fav_cats: await user.fav_cats,
+  };
+  res.status(200).json({ message: "success", user: returnUser });
+});
 
 export const addToFavCat = catchError(async (req, res, next) => {
-  const {user} = req;
-  const {favorits} = req.body;
-  user.fav_cats = favorits.map(el => el.id);
+  const { user } = req;
+  const { favorits } = req.body;
+  user.fav_cats = favorits.map((el) => el.id);
   await user.save();
-  res.status(201).json({ message: "success"});
-})
+  res.status(201).json({ message: "success" });
+});
+
+export const addWhishList = catchError(async (req, res, next) => {
+  const { user } = req;
+  const { book } = req.body;
+  // let _user;
+  if (user.whish_list.includes(book)) {
+    user.whish_list.splice(book, 1);
+    await user.save();
+    return res.status(202).json({ message: "success", wish_List:user.whish_list });
+  }
+   user.whish_list.push(book);
+  await user.save();
+  return res.status(201).json({ message: "success", wish_List:user.whish_list });
+
+  // if (user.whish_list.includes(wishBook)) {
+  //   _user = await UserModel.findByIdAndUpdate(user._id, {
+  //     $pull:{
+  //       whish_list: wishBook
+  //     }
+  //   }, {new: true})
+  // }
+  // else {
+  //   _user = await UserModel.findByIdAndUpdate(user._id, {
+  //     $push:{
+  //       whish_list: wishBook
+  //     }
+  //   }, {new: true})
+  // }
+
+});

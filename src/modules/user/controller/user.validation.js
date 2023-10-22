@@ -25,3 +25,8 @@ export const favoritsCatsValidations = {
         })).min(1).required()
     })
 }
+export const wishListValidations = {
+    body: joi.object({
+        book: joi.string().required()
+    })
+}

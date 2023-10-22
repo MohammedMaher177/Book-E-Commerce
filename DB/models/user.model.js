@@ -68,6 +68,9 @@ userSchema.pre(["save", /^update/, /^create/], async function () {
 userSchema.pre(/^find/, async function () {
     this.populate("fav_cats")
 })
+// userSchema.pre(/^find/, async function () {
+//     this.populate("whish_list")
+// })
 
 const UserModel = model("User", userSchema)
 

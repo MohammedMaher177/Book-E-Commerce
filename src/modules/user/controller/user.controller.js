@@ -68,6 +68,7 @@ export const profile = catchError(async (req, res, next) => {
     city: user.defultAddress.city,
     age: user.age,
     fav_cats: await user.fav_cats,
+    wish_List:await user.wish_List,
   };
   res.status(200).json({ message: "success", user: returnUser });
 });
@@ -85,8 +86,11 @@ export const addWhishList = catchError(async (req, res, next) => {
   const { book } = req.body;
   // let _user;
   if (user.whish_list.includes(book)) {
-    user.whish_list.splice(book, 1);
+    console.log(user.whish_list);
+    const index= user.whish_list.indexOf(book)
+    user.whish_list.splice(index, 1);
     await user.save();
+    console.log(user.whish_list);
     return res.status(202).json({ message: "success", wish_List:user.whish_list });
   }
    user.whish_list.push(book);

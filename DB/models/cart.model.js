@@ -32,18 +32,9 @@ cartSchema.method("addToCart", async function (prodId) {
   await this.save();
 });
 
-cartSchema.pre([/^find/, "save"], function () {
-  this.populate("books.book", "name price")
-//   this.populate(
-    // {
-    //   path: "books.book",
-    //   select: "name price",
-    // },
-//     {
-//       path: "user",
-//       select: "name email -fav_cats",
-//     }
-//   );
+cartSchema.pre([/^find/, 'save'], function () {
+  console.log(this);
+  this.populate("books.book", "image name price")
 });
 
 export const cartModel = model("cart", cartSchema);

@@ -33,7 +33,7 @@ cartSchema.method("addToCart", async function (prodId) {
 });
 
 cartSchema.pre([/^find/, 'save'], function () {
-  console.log(this);
+  // console.log(this);
   this.populate("books.book", "image name price")
 });
 

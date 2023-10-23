@@ -15,7 +15,9 @@ const bookSchema = new Schema({
 
     price: { type: Number, require: true },
     discount: { type: Number, default: 0 },
-
+    format : {
+      type :[String], enums:["hardcover", "paperback", "e-book", "audiobook"], default: ['e-book']
+    },
     author: { type: String, require: true, trim: true },
     publisher: { type: String, require: true, trim: true },
     published: { type: Number, maxLength: 4 },

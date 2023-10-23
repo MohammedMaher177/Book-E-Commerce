@@ -4,6 +4,7 @@ import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
 function calcPrice(cart) {
+  // console.log(cart);
   return cart.totalAmount = cart.books.reduce(
     (partialSum, book) => partialSum + book.totalPrice, 0
   );
@@ -62,9 +63,10 @@ export const addToCart = catchError(async (req, res, next) => {
   if (index === -1) {
     cart.books.push(req.body);
   } else {
-    req.body.qty = cart.books[index].qty;
+    req.body.qty += cart.books[index].qty;
     req.body.totalPrice = req.body.qty * cart.books[index].price;
-    cart.books[index] = req.body;
+    console.log(cart.books[index]);
+    cart.books[index] = {...req.body};
   }
   calcPrice(cart)
 

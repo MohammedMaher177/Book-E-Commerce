@@ -33,7 +33,7 @@ bookSchema.pre(/^find/, function () {
   this.populate([
     {
       path: "category",
-      select: "name slug -_id",
+      select: "name slug",
     },
 
   ]);

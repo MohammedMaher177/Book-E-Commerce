@@ -97,7 +97,7 @@ export class ApiFeatures {
       );
       this.totalCount = await this.mongooseQuery
         .find({
-          author: { $regex: key, $options: "i" },
+          author: { $regex: key, $options: "i",  },
         })
         .count()
         .clone();

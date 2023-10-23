@@ -78,7 +78,7 @@ export const updateBook = catchError(async (req, res, next) => {
   const { bookId } = req.params;
   const book = await bookModel.findById(bookId);
   if (!book) {
-    throw new AppError("Book Not found", 403);
+    throw new AppError("Book Not found", 404);
   }
   await bookModel.findByIdAndUpdate(book._id, req.body, { new: true });
   if (req.file) {
@@ -228,3 +228,17 @@ export const updateData = catchError(async (req, res) => {
   // })
   res.json(result);
 });
+
+export const getAuthors = catchError(async (req, res) => {
+  req.query.fields = "author"
+  const authors = []
+  const existAuthors = await new ApiFeatures( bookModel.find(), req.query).initialize() 
+  const result = await existAuthors.mongooseQuery;
+  result.map(el => {
+    if (!authors.includes(el.author)){
+      authors.push(el.author)
+    }
+  })
+    console.log(result);
+  res.json({message: "success", authors})
+})

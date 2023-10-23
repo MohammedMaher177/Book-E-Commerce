@@ -72,7 +72,8 @@ export const addToCart = catchError(async (req, res, next) => {
 
   calcDiscount(cart)
   await cart.save();
-  return res.status(201).json({ message: "success", cart });
+  const existCart = await cartModel.findOne({ user: _id });
+  return res.status(201).json({ message: "success", cart:existCart });
 });
 
 export const updateCartQty = catchError(async (req, res, next) => {

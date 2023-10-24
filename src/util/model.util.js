@@ -58,11 +58,10 @@ export const getDocById = (model) => {
           await user.save();
         }
         else{
-          const index = user.searchedBooks.findIndex((ele) => ele.toString()===id.toJSON())
+          const index = user.searchedBooks.findIndex((ele) => ele.toString()===id.toString())
           user.searchedBooks.splice(index,1)
           user.searchedBooks.push(id);
           await user.save();
-          console.log(user.searchedBooks);
         }
       }
       if (model === categoryModel) {

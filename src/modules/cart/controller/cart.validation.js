@@ -7,18 +7,18 @@ export const addToCartValidation = {
     body: joi.object({
         book: joi.string().hex().length(24).required(),
         qty: joi.number().positive()
-    })
+    }).required()
 }
 
 export const updateCartQtyValidation = {
     body: joi.object({
         book: joi.string().hex().length(24).required(),
         qty: joi.number().positive().required()
-    })
+    }).required()
 }
 
 export const removeCartItemValidation = {
     params: joi.object({
         id: idValidation
-    })
+    }).required()
 }

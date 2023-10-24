@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
@@ -214,13 +213,13 @@ export const updateData = catchError(async (req, res) => {
   result = result.map((el) => {
     let n = uuidv4();
     n = n.split("-")[0].substring(0, 6);
-    el.slug = slugify(el.name)+"-"+ n;
+    el.slug = slugify(el.name) + "-" + n;
     return el;
   });
   const option = {
-    slug : slugify()
-  }
-  await result.save()
+    slug: slugify(),
+  };
+  await result.save();
   // result.bulkWrite({
   //   updateOne{
   //     flter:{$exis}
@@ -230,15 +229,7 @@ export const updateData = catchError(async (req, res) => {
 });
 
 export const getAuthors = catchError(async (req, res) => {
-  req.query.fields = "author"
-  const authors = []
-  const existAuthors = await new ApiFeatures( bookModel.find(), req.query).initialize() 
-  const result = await existAuthors.mongooseQuery;
-  result.map(el => {
-    if (!authors.includes(el.author)){
-      authors.push(el.author)
-    }
-  })
-    console.log(result);
-  res.json({message: "success", authors})
-})
+  const authors = await bookModel.find().distinct("author");
+  res.json({ message: "success", authors });
+});
+

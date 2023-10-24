@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
@@ -230,15 +229,7 @@ export const updateData = catchError(async (req, res) => {
 });
 
 export const getAuthors = catchError(async (req, res) => {
-  req.query.fields = "author"
-  const authors = []
-  const existAuthors = await new ApiFeatures( bookModel.find(), req.query).initialize() 
-  const result = await existAuthors.mongooseQuery;
-  result.map(el => {
-    if (!authors.includes(el.author)){
-      authors.push(el.author)
-    }
-  })
-    console.log(result);
+  const authors =  await bookModel.find().distinct("author")
   res.json({message: "success", authors})
 })
+

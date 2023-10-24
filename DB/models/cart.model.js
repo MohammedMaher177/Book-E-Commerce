@@ -34,7 +34,7 @@ cartSchema.method("addToCart", async function (prodId) {
 
 cartSchema.pre([/^find/, 'save'], function () {
   // console.log(this);
-  this.populate("books.book", "image name price")
+  this.populate("books.book", "image name price slug")
 });
 
 export const cartModel = model("cart", cartSchema);

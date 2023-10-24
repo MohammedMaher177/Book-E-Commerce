@@ -213,13 +213,13 @@ export const updateData = catchError(async (req, res) => {
   result = result.map((el) => {
     let n = uuidv4();
     n = n.split("-")[0].substring(0, 6);
-    el.slug = slugify(el.name)+"-"+ n;
+    el.slug = slugify(el.name) + "-" + n;
     return el;
   });
   const option = {
-    slug : slugify()
-  }
-  await result.save()
+    slug: slugify(),
+  };
+  await result.save();
   // result.bulkWrite({
   //   updateOne{
   //     flter:{$exis}
@@ -229,7 +229,7 @@ export const updateData = catchError(async (req, res) => {
 });
 
 export const getAuthors = catchError(async (req, res) => {
-  const authors =  await bookModel.find().distinct("author")
-  res.json({message: "success", authors})
-})
+  const authors = await bookModel.find().distinct("author");
+  res.json({ message: "success", authors });
+});
 

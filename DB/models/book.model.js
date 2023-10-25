@@ -31,7 +31,7 @@ const bookSchema = new Schema({
 );
 
 
-bookSchema.pre(/^find/, function () {
+bookSchema.pre(/^find/, {document: false, query: true},function () {
   this.populate([
     {
       path: "category",
@@ -47,6 +47,14 @@ bookSchema.virtual("reviews", {
   foreignField: "book",
   // justOne: true,
 });
+
+bookSchema.static("getCategoryName", async function (data)  {
+  console.log(this);
+  console.log(data);
+  const x = await this.find({"category.name": "Children’s Fiction"})
+  console.log(x);
+})
+
 const bookModel = model("book", bookSchema);
 
 export default bookModel;

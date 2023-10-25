@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bookModel from "../../DB/models/book.model.js";
 
 export class ApiFeatures {
   totalCount;
@@ -22,7 +23,7 @@ export class ApiFeatures {
 
   async #filter() {
     let filterObj = { ...this.queryString };
-    const delObj = ["page", "sort", "fields", "keyword"];
+    const delObj = ["page", "sort", "fields", "keyword", "author", "category"];
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
@@ -91,21 +92,34 @@ export class ApiFeatures {
   //author
   async #author() {
     if (this.queryString.author) {
-      let key = this.queryString.author.replace(
-        /[^\w\s]/gi,
-        (match) => `\\${match}`
-      );
+      let key = this.queryString.author.split(",");
+      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+      const options = key.map((el) => {
+        return {
+          author: { $regex: el, $options: "i" },
+        };
+      });
       this.totalCount = await this.mongooseQuery
         .find({
-          author: { $regex: key, $options: "i",  },
+          $or: options,
         })
         .count()
         .clone();
       this.mongooseQuery
         .find({
-          $or: [{ author: { $regex: key, $options: "i" } }],
+          $or: options,
         })
         .clone();
+    }
+    return this;
+  }
+
+  //category
+  async #category() {
+    if (this.queryString.category) {
+      const { category: c } = this.queryString;
+      console.log(c);
+      // await this.mongooseQuery.find()
     }
     return this;
   }
@@ -136,6 +150,7 @@ export class ApiFeatures {
     await this.#filter();
     await this.#search();
     await this.#author();
+    await this.#category();
     this.#fields();
     this.#sort();
     this.#pagination();

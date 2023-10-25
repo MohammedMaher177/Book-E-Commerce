@@ -1,5 +1,4 @@
 import mongoose, { Schema, Types, model } from "mongoose";
-import categoryModel from "./category.model.js";
 
 
 const bookSchema = new Schema({
@@ -28,11 +27,11 @@ const bookSchema = new Schema({
       ref: "category",
     },
   },
-  { timestamps: true , toJSON: true, toObject: true}
+  { timestamps: true }
 );
 
 
-bookSchema.pre(/^find/, function () {
+bookSchema.pre(/^find/, {document: false, query: true},function () {
   this.populate([
     {
       path: "category",
@@ -48,6 +47,13 @@ bookSchema.virtual("reviews", {
   foreignField: "book",
   // justOne: true,
 });
+
+bookSchema.static("getCategoryName", async function (data)  {
+  console.log(this);
+  console.log(data);
+  const x = await this.find({"category.name": "Children’s Fiction"})
+  console.log(x);
+})
 
 const bookModel = model("book", bookSchema);
 

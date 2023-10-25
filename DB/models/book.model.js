@@ -1,4 +1,5 @@
 import mongoose, { Schema, Types, model } from "mongoose";
+import categoryModel from "./category.model.js";
 
 
 const bookSchema = new Schema({
@@ -27,7 +28,7 @@ const bookSchema = new Schema({
       ref: "category",
     },
   },
-  { timestamps: true }
+  { timestamps: true , toJSON: true, toObject: true}
 );
 
 
@@ -47,6 +48,7 @@ bookSchema.virtual("reviews", {
   foreignField: "book",
   // justOne: true,
 });
+
 const bookModel = model("book", bookSchema);
 
 export default bookModel;

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bookModel from "../../DB/models/book.model.js";
 
 export class ApiFeatures {
   totalCount;
@@ -22,7 +23,7 @@ export class ApiFeatures {
 
   async #filter() {
     let filterObj = { ...this.queryString };
-    const delObj = ["page", "sort", "fields", "keyword"];
+    const delObj = ["page", "sort", "fields", "keyword", "author", "category"];
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
@@ -60,15 +61,11 @@ export class ApiFeatures {
         /[^\w\s]/gi,
         (match) => `\\${match}`
       );
-      console.log(key);
       this.totalCount = await this.mongooseQuery
         .find({
           $or: [
             { name: { $regex: key, $options: "i" } },
             { slug: { $regex: key, $options: "i" } },
-            // { desc: { $regex: this.queryString.keyword, $options: "i" } },
-            // { author: { $regex: this.queryString.keyword, $options: "i" } },
-            // { publisher: { $regex: this.queryString.keyword, $options: "i" } },
           ],
         })
         .count()
@@ -78,9 +75,6 @@ export class ApiFeatures {
           $or: [
             { name: { $regex: key, $options: "i" } },
             { slug: { $regex: key, $options: "i" } },
-            // { desc: { $regex: this.queryString.keyword, $options: "i" } },
-            // { author: { $regex: this.queryString.keyword, $options: "i" } },
-            // { publisher: { $regex: this.queryString.keyword, $options: "i" } },
           ],
         })
         .clone();
@@ -91,19 +85,20 @@ export class ApiFeatures {
   //author
   async #author() {
     if (this.queryString.author) {
-      let key = this.queryString.author.replace(
-        /[^\w\s]/gi,
-        (match) => `\\${match}`
-      );
+      let key = this.queryString.author;
+      // .replace(
+      //   /[^\w\s]/gi,
+      //   (match) => `\\${match}`
+      // );
       this.totalCount = await this.mongooseQuery
         .find({
-          author: { $regex: key, $options: "i",  },
+          author: { $regex: key, $options: "i" },
         })
         .count()
         .clone();
       this.mongooseQuery
         .find({
-          $or: [{ author: { $regex: key, $options: "i" } }],
+          author: { $regex: key, $options: "i" },
         })
         .clone();
     }
@@ -136,6 +131,7 @@ export class ApiFeatures {
     await this.#filter();
     await this.#search();
     await this.#author();
+    // await this.#category();
     this.#fields();
     this.#sort();
     this.#pagination();

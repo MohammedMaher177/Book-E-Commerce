@@ -1,13 +1,19 @@
 import mongoose, { Schema, Types, model } from "mongoose";
 
-
-const bookSchema = new Schema({
-    ISBN:{type:Number ,unique: true, require: true ,minLength: 10, maxLength: 13 },
-    name: { type: String, require: true, trim: true},
-    slug: { type: String, require: true, trim: true, unique: true},
-    lang:{type:String ,require: true },
-    desc:{type:String },
-    pages:{type:Number,require: true},
+const bookSchema = new Schema(
+  {
+    ISBN: {
+      type: Number,
+      unique: true,
+      require: true,
+      minLength: 10,
+      maxLength: 13,
+    },
+    name: { type: String, require: true, trim: true },
+    slug: { type: String, require: true, trim: true, unique: true },
+    lang: { type: String, require: true },
+    desc: { type: String },
+    pages: { type: Number, require: true },
 
     image: { public_id: String, secure_url: String },
 
@@ -15,8 +21,10 @@ const bookSchema = new Schema({
 
     price: { type: Number, require: true },
     discount: { type: Number, default: 0 },
-    format : {
-      type :[String], enums:["hardcover", "paperback", "e-book", "audiobook"], default: ['e-book']
+    format: {
+      type: [String],
+      enums: ["hardcover", "paperback", "e-book", "audiobook"],
+      default: ["e-book"],
     },
     author: { type: String, require: true, trim: true },
     publisher: { type: String, require: true, trim: true },
@@ -27,17 +35,15 @@ const bookSchema = new Schema({
       ref: "category",
     },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true } }
 );
 
-
-bookSchema.pre(/^find/, {document: false, query: true},function () {
+bookSchema.pre(/^find/, { document: false, query: true }, function () {
   this.populate([
     {
       path: "category",
       select: "name slug",
     },
-
   ]);
 });
 
@@ -48,14 +54,13 @@ bookSchema.virtual("reviews", {
   // justOne: true,
 });
 
-bookSchema.static("getCategoryName", async function (data)  {
+bookSchema.static("getCategoryName", async function (data) {
   console.log(this);
   console.log(data);
-  const x = await this.find({"category.name": "Children’s Fiction"})
+  const x = await this.find({ "category.name": {$regex: data} });
   console.log(x);
-})
+});
 
 const bookModel = model("book", bookSchema);
 
 export default bookModel;
-

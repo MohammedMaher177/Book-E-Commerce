@@ -1,22 +1,25 @@
-import mongoose , { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 import slugify from "mongoose-slug-generator";
-mongoose.plugin(slugify)
-const categorySchema = new Schema({
+mongoose.plugin(slugify);
+const categorySchema = new Schema(
+  {
     name: {
-        type: String,
-        require: true,
-        trim: true,
-        unique: true
+      type: String,
+      require: true,
+      trim: true,
+      unique: true,
     },
-    image: { public_id: String, secure_url: String },
+    image: { public_id: String, secure_url: String }, 
     desc: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
-    slug: {type: String, slug: "name"}
-}, { timestamps: true })
+    slug: { type: String, slug: "name" },
+  },
+  { timestamps: true, toJSON: { virtuals: true } }
+);
 
-const categoryModel = model('category', categorySchema)
+const categoryModel = model("category", categorySchema);
 
-export default categoryModel
+export default categoryModel;

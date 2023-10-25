@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bookModel from "../../DB/models/book.model.js";
+import categoryModel from "../../DB/models/category.model.js";
 
 export class ApiFeatures {
   totalCount;
@@ -32,7 +33,7 @@ export class ApiFeatures {
       /\b(gt|gte|lt|lte)\b/g,
       (match) => `$${match}`
     );
-
+      
     filterObj = JSON.parse(filterObj);
     if (filterObj._id !== undefined) {
       const { name, value } = filterObj._id;
@@ -41,6 +42,7 @@ export class ApiFeatures {
     } else {
       delete filterObj._id;
     }
+    console.log(filterObj);
     this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
     this.mongooseQuery.find(filterObj);
     return this;
@@ -117,9 +119,19 @@ export class ApiFeatures {
   //category
   async #category() {
     if (this.queryString.category) {
-      const { category: c } = this.queryString;
-      console.log(c);
-      // await this.mongooseQuery.find()
+      const c = await categoryModel.findOne({name:this.queryString.category }).select("_id")
+      this.totalCount = await this.mongooseQuery
+        .find({
+          category: c
+        })
+        .count()
+        .clone();
+      this.mongooseQuery
+        .find({
+          category: c
+        })
+        .clone();
+
     }
     return this;
   }

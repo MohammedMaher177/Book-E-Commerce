@@ -119,16 +119,36 @@ export class ApiFeatures {
   //category
   async #category() {
     if (this.queryString.category) {
-      const c = await categoryModel.findOne({name:this.queryString.category }).select("_id")
+      
+      let key = this.queryString.category.split(",");
+     
+      // key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+      
+      key = key.map((el) => el.replace(/[^\w\s]/gi, (match) => '&'));
+      const options = key.map((el) => {
+        return {
+          name: el,
+        };
+      });
+      console.log(key);
+      let c = await categoryModel.find({
+        $or: options,
+      }).select("_id")
+      c = c.map(el=>{
+        return {
+          category: el._id
+        }
+      })
+      // console.log(c);
       this.totalCount = await this.mongooseQuery
         .find({
-          category: c
+          $or: c,
         })
         .count()
         .clone();
       this.mongooseQuery
         .find({
-          category: c
+          $or: c,
         })
         .clone();
 

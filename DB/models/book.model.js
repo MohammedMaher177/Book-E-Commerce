@@ -34,6 +34,7 @@ const bookSchema = new Schema(
       require: true,
       ref: "category",
     },
+    
   },
   { timestamps: true, toJSON: { virtuals: true } }
 );

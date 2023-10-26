@@ -96,6 +96,7 @@ export class ApiFeatures {
     if (this.queryString.author) {
       let key = this.queryString.author.split(",");
       key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+      console.log(key);
       const options = key.map((el) => {
         return {
           author: { $regex: el, $options: "i" },
@@ -122,9 +123,10 @@ export class ApiFeatures {
       
       let key = this.queryString.category.split(",");
      
-      // key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
       
-      key = key.map((el) => el.replace(/[^\w\s]/gi, (match) => '&'));
+      key = key.map((el) => el.replace(/[.]/gi, (match) => '&'));
+      key = key.map((el) => el.replace(/[@]/gi, (match) => ','));
       const options = key.map((el) => {
         return {
           name: el,

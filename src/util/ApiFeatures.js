@@ -28,23 +28,37 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    filterObj = JSON.stringify(filterObj);
-    filterObj = filterObj.replace(
-      /\b(gt|gte|lt|lte)\b/g,
-      (match) => `$${match}`
-    );
-      
-    filterObj = JSON.parse(filterObj);
-    if (filterObj._id !== undefined) {
-      const { name, value } = filterObj._id;
-      filterObj[name] = new mongoose.Types.ObjectId(value);
-      delete filterObj._id;
-    } else {
-      delete filterObj._id;
-    }
     console.log(filterObj);
-    this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
-    this.mongooseQuery.find(filterObj);
+    let val;
+    let arr = [];
+    Object.keys(filterObj).forEach(async (key) => {
+      if (typeof filterObj[key] == "string") {
+        filterObj = JSON.stringify(filterObj);
+        filterObj = filterObj.split(":");
+        filterObj[1] = filterObj[1].replace(/["]/g, (match) => (match = ""));
+        val = filterObj[1].split("-");
+        val = `{"$gte":${val[0]},"$lte":${val[1]}}`;
+        filterObj[1] = val;
+        filterObj = JSON.parse(filterObj.join(":"));
+        console.log(filterObj);
+        // this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
+        this.mongooseQuery.find(filterObj);
+      } else {
+        filterObj[key].map((el) => {
+          el = JSON.stringify(el);
+          el = el.replace(/["]/g, (match) => (match = ""));
+          val = el.split("-");
+          val = `{"$gte":${val[0]},"$lte":${val[1]}}`;
+          console.log(val);
+          arr.push(`{"${key}":${val}}`);
+        });
+        arr = arr.map((el) => JSON.parse(el));
+        console.log(arr);
+        // this.totalCount = await this.mongooseQuery.find({$or: arr}).count().clone();
+        this.mongooseQuery.find({$or: arr});
+      }
+    });
+
     return this;
   }
 
@@ -120,40 +134,47 @@ export class ApiFeatures {
   //category
   async #category() {
     if (this.queryString.category) {
-      
       let key = this.queryString.category.split(",");
-     
+
       key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      
-      key = key.map((el) => el.replace(/[.]/gi, (match) => '&'));
-      key = key.map((el) => el.replace(/[@]/gi, (match) => ','));
+
+      key = key.map((el) => el.replace(/[.]/gi, (match) => "&"));
+      key = key.map((el) => el.replace(/[@]/gi, (match) => ","));
       const options = key.map((el) => {
         return {
           name: el,
         };
       });
-      console.log(key);
-      let c = await categoryModel.find({
-        $or: options,
-      }).select("_id")
-      c = c.map(el=>{
+      // console.log(options);
+      let c = await categoryModel
+        .find({
+          $or: options,
+        })
+        .select("_id");
+      c = c.map((el) => {
         return {
-          category: el._id
-        }
-      })
-      // console.log(c);
-      this.totalCount = await this.mongooseQuery
-        .find({
-          $or: c,
-        })
-        .count()
-        .clone();
-      this.mongooseQuery
-        .find({
-          $or: c,
-        })
-        .clone();
-
+          category: el._id,
+        };
+      });
+      console.log(c);
+      if (c.length > 0) {
+        this.totalCount = await this.mongooseQuery
+          .find({
+            $or: c,
+          })
+          .count()
+          .clone();
+        this.mongooseQuery
+          .find({
+            $or: c,
+          })
+          .clone();
+      } else {
+        // this.mongooseQuery
+        //   .find().limit(5)
+        //   .clone();
+        //   this.totalCount = 5
+      }
     }
     return this;
   }
@@ -184,10 +205,10 @@ export class ApiFeatures {
     await this.#filter();
     await this.#search();
     await this.#author();
-    await this.#category();
     this.#fields();
     this.#sort();
     this.#pagination();
+    await this.#category();
     return this;
   }
 

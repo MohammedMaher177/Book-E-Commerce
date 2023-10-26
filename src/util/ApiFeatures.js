@@ -28,23 +28,37 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    filterObj = JSON.stringify(filterObj);
-    filterObj = filterObj.replace(
-      /\b(gt|gte|lt|lte)\b/g,
-      (match) => `$${match}`
-    );
-
-    filterObj = JSON.parse(filterObj);
-    if (filterObj._id !== undefined) {
-      const { name, value } = filterObj._id;
-      filterObj[name] = new mongoose.Types.ObjectId(value);
-      delete filterObj._id;
-    } else {
-      delete filterObj._id;
-    }
     console.log(filterObj);
-    this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
-    this.mongooseQuery.find(filterObj);
+    let val;
+    let arr = [];
+    Object.keys(filterObj).forEach(async (key) => {
+      if (typeof filterObj[key] == "string") {
+        filterObj = JSON.stringify(filterObj);
+        filterObj = filterObj.split(":");
+        filterObj[1] = filterObj[1].replace(/["]/g, (match) => (match = ""));
+        val = filterObj[1].split("-");
+        val = `{"$gte":${val[0]},"$lte":${val[1]}}`;
+        filterObj[1] = val;
+        filterObj = JSON.parse(filterObj.join(":"));
+        console.log(filterObj);
+        // this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
+        this.mongooseQuery.find(filterObj);
+      } else {
+        filterObj[key].map((el) => {
+          el = JSON.stringify(el);
+          el = el.replace(/["]/g, (match) => (match = ""));
+          val = el.split("-");
+          val = `{"$gte":${val[0]},"$lte":${val[1]}}`;
+          console.log(val);
+          arr.push(`{"${key}":${val}}`);
+        });
+        arr = arr.map((el) => JSON.parse(el));
+        console.log(arr);
+        // this.totalCount = await this.mongooseQuery.find({$or: arr}).count().clone();
+        this.mongooseQuery.find({$or: arr});
+      }
+    });
+
     return this;
   }
 

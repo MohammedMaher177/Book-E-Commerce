@@ -29,11 +29,7 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    if (filterObj) {
-      this.totalCount = await  this.mongooseQuery.find().count().clone();
-        this.mongooseQuery.find();
-        return this;
-    }
+   
     let val;
     let reg = [];
     if (filterObj["price"]) {
@@ -67,7 +63,6 @@ export class ApiFeatures {
     }
     if (filterObj["category"]) {
       let key = filterObj["category"].split(",");
-      console.log(key);
       key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
       key = key.map((el) => el.replace(/[.]/gi, (match) => "&"));
       key = key.map((el) => el.replace(/[@]/gi, (match) => ","));
@@ -139,8 +134,13 @@ export class ApiFeatures {
       });
     }
     console.log("reg :  ", reg);
+    if (!filterObj) {
+      this.totalCount = await  this.mongooseQuery.find().count().clone();
+        this.mongooseQuery.find();
+    }else{
     this.totalCount = await  this.mongooseQuery.find({ $or: reg }).count().clone();
         this.mongooseQuery.find({ $or: reg });
+    }
         return this;
   }
 

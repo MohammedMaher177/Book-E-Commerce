@@ -133,11 +133,13 @@ export class ApiFeatures {
         reg.push(el);
       });
     }
+    console.log(filterObj);
     console.log("reg :  ", reg);
-    if (!filterObj) {
+    if (Object.keys(filterObj).length==0) {
       this.totalCount = await  this.mongooseQuery.find().count().clone();
         this.mongooseQuery.find();
     }else{
+
     this.totalCount = await  this.mongooseQuery.find({ $or: reg }).count().clone();
         this.mongooseQuery.find({ $or: reg });
     }

@@ -29,124 +29,39 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-   
-    let val;
-    let reg = [];
-    if (filterObj["price"]) {
-      let ele = filterObj["price"];
-      ele = JSON.stringify(ele);
-      val = ele.split("-");
-      val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
-      val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
-      ele = { price: {"$gte":val[0],"$lte":val[1]} };
-      console.log(ele);
-      reg.push(ele);
-    }
-    if (filterObj["published"]) {
-      let ele = filterObj["published"];
-      ele = JSON.stringify(ele);
-      val = ele.split("-");
-      val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
-      val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
-      ele = { published: {"$gte":val[0],"$lte":val[1]} };
-      console.log(ele);
-      reg.push(ele);
-    }
-    if (filterObj["author"]) {
-      console.log(filterObj["author"]);
-      let key = filterObj["author"].split(",");
-      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      const options = key.map((el) => {
-        el = { author: { $regex: el, $options: "i" } };
-        reg.push(el);
-      });
-    }
-    if (filterObj["category"]) {
-      let key = filterObj["category"].split(",");
-      // category by name 
-      // key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      // key = key.map((el) => el.replace(/[.]/gi, (match) => "&"));
-      // key = key.map((el) => el.replace(/[@]/gi, (match) => ","));
-      // console.log(key);
-      // category by slug
-      const options = key.map((el) => {
-        return {
-           slug: el,
-        };
-      });
-      console.log(options);
-      let c = await categoryModel
-        .find({
-          $or: options,
-        })
-        .select("_id");
-      c = c.map((el) => {
-        return {
-          category: el._id,
-        };
-      });
-      console.log("c : ",c);
-      if (c.length > 0) {
-        c.map((el)=>{
-
-          reg.push(el);
-        })
+    let finalFilter = {};
+    for (const key in filterObj) {
+      if (key === "price" || key === "published") {
+        let val = filterObj[key].split("-");
+        val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+        val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+        finalFilter[key] = { $gte: val[0], $lte: val[1] };
+      }
+      if (
+        key === "author" ||
+        key === "publisher" ||
+        key === "lang" ||
+        key === "format"
+      ) {
+        let elements = filterObj[key].split(",");
+        elements.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+        const options = elements.map((el) => new RegExp(el, "i"));
+        finalFilter[key] = { $in: options };
+      }
+      if (key === "category") {
+        let elements = filterObj[key].split(",");
+        let c = await categoryModel
+          .find({
+            slug: { $in: elements },
+          })
+          .select("_id");
+        finalFilter.category = { $in: c.map((ele) => ele._id) };
       }
     }
-    if (filterObj["lang"]) {
-      console.log(filterObj["lang"]);
-      let key = filterObj["lang"].split(",");
-      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      const options = key.map((el) => {
-        el = { lang: { $regex: el, $options: "i" } };
-        reg.push(el);
-      });
-    }
-    if (filterObj["publisher"]) {
-      console.log(filterObj["publisher"]);
-      let key = filterObj["publisher"].split(",");
-      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      const options = key.map((el) => {
-        el = { publisher: { $regex: el, $options: "i" } };
-        reg.push(el);
-      });
-    }
-    if (filterObj["pages"]) {
-      let ele = filterObj["pages"];
-      ele = JSON.stringify(ele);
-      val = ele.split("-");
-      val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
-      val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
-      ele = { pages: {"$gte":val[0],"$lte":val[1]} };
-      console.log(ele);
-      reg.push(ele);
-    }
-    if (filterObj["format"]) {
-      let ele = filterObj["format"];
-      ele = { format: ele };
-      console.log(ele);
-      reg.push(ele);
-    }
-    if (filterObj["name"]) {
-      console.log(filterObj["name"]);
-      let key = filterObj["name"].split(",");
-      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      const options = key.map((el) => {
-        el = { name: { $regex: el, $options: "i" } };
-        reg.push(el);
-      });
-    }
-    console.log(filterObj);
-    console.log("reg :  ", reg);
-    if (Object.keys(filterObj).length==0) {
-      this.totalCount = await  this.mongooseQuery.find().count().clone();
-        this.mongooseQuery.find();
-    }else{
+    this.totalCount = await this.mongooseQuery.find(finalFilter).count().clone();
+    this.mongooseQuery.find(finalFilter);
 
-    this.totalCount = await  this.mongooseQuery.find({ $or: reg }).count().clone();
-        this.mongooseQuery.find({ $or: reg });
-    }
-        return this;
+    return this;
   }
 
   #sort() {
@@ -230,5 +145,19 @@ export class ApiFeatures {
   }
 }
 
-
-
+/*
+filterObj = {
+  name: [],
+  price: {$gt:22, $lt:33},
+  category: [],
+  author: [],
+  publisher: [],
+  publishe:{$gt:22, $lt:33}
+}
+filterObj = {
+  category: [],
+  author: [],
+  publisher: [],
+  publishe:{$gt:22, $lt:33}
+}
+*/

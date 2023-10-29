@@ -29,13 +29,27 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
+    console.log(filterObj);
     let finalFilter = {};
     for (const key in filterObj) {
-      if (key === "price" || key === "published") {
+      if (key === "price") {
         let val = filterObj[key].split("-");
         val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
         val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
         finalFilter[key] = { $gte: val[0], $lte: val[1] };
+      }
+      if (key === "published") {
+        let published = filterObj[key];
+        published.forEach((ele) => {
+          let val = ele.split("-");
+          val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+          val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+          const old = finalFilter["$or"] || [];
+          finalFilter["$or"] = [
+            ...old,
+            { [key]: { $gte: val[0], $lte: val[1] } },
+          ];
+        });
       }
       if (
         key === "author" ||
@@ -58,7 +72,11 @@ export class ApiFeatures {
         finalFilter.category = { $in: c.map((ele) => ele._id) };
       }
     }
-    this.totalCount = await this.mongooseQuery.find(finalFilter).count().clone();
+    console.log(finalFilter);
+    this.totalCount = await this.mongooseQuery
+      .find(finalFilter)
+      .count()
+      .clone();
     this.mongooseQuery.find(finalFilter);
 
     return this;

@@ -3,6 +3,7 @@ import { authMiddleware } from "../../middleware/authentication.js";
 import { addCouponToCart, addToCart, getCartDetails, removeCart, removeCouponFromCart, removeItem, updateCartQty } from "./controller/cart.controller.js";
 import { validate } from "../../middleware/validate.js";
 import { addToCartValidation, removeCartItemValidation, updateCartQtyValidation } from "./controller/cart.validation.js";
+import { isLoggedIn } from "../../middleware/isLoggedIn.js";
 
 
 const cartRouter = Router()
@@ -15,6 +16,6 @@ cartRouter.route("/")
 
 cartRouter.delete("/:id", authMiddleware, validate(removeCartItemValidation), removeItem)
 
-cartRouter.put("/coupon", addCouponToCart)
-cartRouter.put("/coupon/:code", removeCouponFromCart)
+cartRouter.put("/coupon", isLoggedIn, addCouponToCart)
+cartRouter.put("/coupon/:code", isLoggedIn, removeCouponFromCart)
 export default cartRouter

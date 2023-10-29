@@ -6,6 +6,7 @@ import categoryRouter from "./modules/categories/category.routes.js";
 import { AppError } from "./util/ErrorHandler/AppError.js";
 import reviewRouter from "./modules/review/review.routes.js";
 import cartRouter from "./modules/cart/cart.routes.js";
+import couponRouter from "./modules/coupon/coupon.routes.js";
 
 export const bootstrap = (app) => {
   connectionDb();
@@ -15,6 +16,7 @@ export const bootstrap = (app) => {
   app.use("/api/v1/category", categoryRouter);
   app.use("/api/v1/reviews", reviewRouter);
   app.use("/api/v1/cart", cartRouter);
+  app.use("/api/v1/coupon", couponRouter);
 
   app.all("*", (req, res, next) => {
     next(new AppError("Page Not Found", 404));

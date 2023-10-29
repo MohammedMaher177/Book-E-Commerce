@@ -63,15 +63,18 @@ export class ApiFeatures {
     }
     if (filterObj["category"]) {
       let key = filterObj["category"].split(",");
-      key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
-      key = key.map((el) => el.replace(/[.]/gi, (match) => "&"));
-      key = key.map((el) => el.replace(/[@]/gi, (match) => ","));
+      // category by name 
+      // key.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+      // key = key.map((el) => el.replace(/[.]/gi, (match) => "&"));
+      // key = key.map((el) => el.replace(/[@]/gi, (match) => ","));
+      // console.log(key);
+      // category by slug
       const options = key.map((el) => {
         return {
-          name: el,
+           slug: el,
         };
       });
-      // console.log(options);
+      console.log(options);
       let c = await categoryModel
         .find({
           $or: options,

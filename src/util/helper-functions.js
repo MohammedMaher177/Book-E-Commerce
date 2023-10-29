@@ -3,6 +3,7 @@ import Token from "../../DB/models/token.model.js";
 import cloudinary from "../multer/cloudinary.js";
 import { v4 as uuidv4 } from "uuid";
 import bookModel from "../../DB/models/book.model.js";
+import reviewModel from "../../DB/models/review.model.js";
 export const getTokens = async (id, role) => {
   const token = jwt.sign(
     {
@@ -74,3 +75,13 @@ export const suggestCategory = async (categories) => {
   }
   return result;
 };
+export const getRating=async(book)=>{
+  let reviews = await reviewModel.find({book:book});
+  reviews = reviews.map((el)=>el.rating)
+  var total = 0;
+  for(var i = 0; i < reviews.length; i++) {
+      total += reviews[i];
+  }
+  var avg = total / reviews.length;
+ return avg;
+}

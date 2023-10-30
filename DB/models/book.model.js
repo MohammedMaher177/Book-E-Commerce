@@ -56,10 +56,7 @@ bookSchema.virtual("reviews", {
 });
 
 bookSchema.static("getCategoryName", async function (data) {
-  console.log(this);
-  console.log(data);
   const x = await this.find({ "category.name": {$regex: data} });
-  console.log(x);
 });
 
 const bookModel = model("book", bookSchema);

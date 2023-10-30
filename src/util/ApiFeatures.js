@@ -19,7 +19,6 @@ export class ApiFeatures {
     if (PAGE_NUMBER <= 0) PAGE_NUMBER = 1;
     const SKIP = (PAGE_NUMBER - 1) * PAGE_LIMIT;
     this.mongooseQuery.skip(SKIP).limit(PAGE_LIMIT);
-    console.log(this.totalCount);
     return this;
   }
 
@@ -29,7 +28,6 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    console.log(filterObj);
     let finalFilter = {};
     for (const key in filterObj) {
       if (key === "price") {
@@ -40,16 +38,23 @@ export class ApiFeatures {
       }
       if (key === "published") {
         let published = filterObj[key];
-        published.forEach((ele) => {
-          let val = ele.split("-");
+        if (typeof published === "string") {
+          let val = filterObj[key].split("-");
           val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
           val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
-          const old = finalFilter["$or"] || [];
-          finalFilter["$or"] = [
-            ...old,
-            { [key]: { $gte: val[0], $lte: val[1] } },
-          ];
-        });
+          finalFilter[key] = { $gte: val[0], $lte: val[1] };
+        } else {
+          published.forEach((ele) => {
+            let val = ele.split("-");
+            val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+            val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+            const old = finalFilter["$or"] || [];
+            finalFilter["$or"] = [
+              ...old,
+              { [key]: { $gte: val[0], $lte: val[1] } },
+            ];
+          });
+        }
       }
       if (
         key === "author" ||
@@ -72,7 +77,6 @@ export class ApiFeatures {
         finalFilter.category = { $in: c.map((ele) => ele._id) };
       }
     }
-    console.log(finalFilter);
     this.totalCount = await this.mongooseQuery
       .find(finalFilter)
       .count()
@@ -97,7 +101,6 @@ export class ApiFeatures {
         /[^\w\s]/gi,
         (match) => `\\${match}`
       );
-      // console.log(key);
       this.totalCount = await this.mongooseQuery
         .find({
           $or: [

@@ -1,11 +1,10 @@
 import bookModel from "../../../../DB/models/book.model.js";
 import { cartModel } from "../../../../DB/models/cart.model.js";
-import Coupon from "../../../../DB/models/coupon.js";
+import Coupon from "../../../../DB/models/coupon.model.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
 function calcPrice(cart) {
-  // console.log(cart);
   return (cart.totalAmount = cart.books.reduce(
     (partialSum, book) => partialSum + book.totalPrice,
     0
@@ -60,7 +59,6 @@ export const addToCart = catchError(async (req, res, next) => {
   } else {
     req.body.qty += cart.books[index].qty;
     req.body.totalPrice = req.body.qty * cart.books[index].price;
-    console.log(cart.books[index]);
     cart.books[index] = { ...req.body };
   }
   calcPrice(cart);
@@ -128,24 +126,20 @@ export const addCouponToCart = catchError(async (req, res, next) => {
   if (!coupon) {
     throw new AppError("Coupon not found", 404);
   }
-  if(coupon.max_use < 0){
+  if (coupon.max_use < 0) {
     throw new AppError("This code is not available anymore", 440);
   }
-  if(_id){
-    const isUsed = coupon.checkIfUsedByUser(_id);
-    if(isUsed) {
-      throw new AppError("You used this code before", 440);
-    }
-    await coupon.addToUsedBy(_id);
-  }else{
-    await coupon.decreaseMaxUse();
+  const isUsed = coupon.checkIfUsedByUser(_id);
+  if (isUsed) {
+    throw new AppError("You used this code before", 440);
   }
+  await coupon.addToUsedBy(_id);
   const cart = await cartModel.findOne({ user: _id });
   cart.coupun_code = coupon.code;
   cart.discount = coupon.amount;
   calcDiscount(cart);
   await cart.save();
-  return res.status(201).json({ message: "success", cart });
+  res.status(201).json({ message: "success", cart, coupon });
 });
 
 export const removeCouponFromCart = catchError(async (req, res, next) => {
@@ -155,17 +149,13 @@ export const removeCouponFromCart = catchError(async (req, res, next) => {
   if (!coupon) {
     throw new AppError("Coupon not found", 404);
   }
-  if(_id){
-    await coupon.removeFromUsedBy(_id);
-  }else{
-    await coupon.increaseMaxUse();
-  }
+  await coupon.removeFromUsedBy(_id);
   const cart = await cartModel.findOne({ user: _id });
-  cart.coupun_code = '';
+  cart.coupun_code = "";
   cart.discount = 0;
   calcDiscount(cart);
   await cart.save();
-  return res.status(201).json({ message: "success", cart });
+  res.status(201).json({ message: "success", cart, coupon });
 });
 
 // export const applayCoupon = catchError(async (req, res, next) => {

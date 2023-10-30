@@ -86,11 +86,9 @@ export const addWhishList = catchError(async (req, res, next) => {
   const { book } = req.body;
   // let _user;
   if (user.whish_list.includes(book)) {
-    console.log(user.whish_list);
     const index= user.whish_list.indexOf(book)
     user.whish_list.splice(index, 1);
     await user.save();
-    console.log(user.whish_list);
     return res.status(202).json({ message: "success", wish_List:user.whish_list });
   }
    user.whish_list.push(book);

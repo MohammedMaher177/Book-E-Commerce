@@ -1,4 +1,4 @@
-import Coupon from "../../../../DB/models/coupon.js";
+import Coupon from "../../../../DB/models/coupon.model.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 import { getData } from "../../../util/model.util.js";
 

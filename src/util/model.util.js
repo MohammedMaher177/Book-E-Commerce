@@ -50,7 +50,6 @@ export const getDocById = (model) => {
       return next(new AppError("Not Found", 404));
     }
     if (user) {
-      console.log(user.searchedBooks);
       const id = new mongoose.Types.ObjectId(result._id);
       if (model === bookModel) {
         if (!user.searchedBooks.includes(id)) {

@@ -66,7 +66,6 @@ userSchema.pre(["save", /^update/, /^create/], async function () {
     }
 })
 userSchema.pre(/^find/, async function () {
-    // console.log(this);
     this.populate("fav_cats")
 })
 // userSchema.pre(/^find/, async function () {

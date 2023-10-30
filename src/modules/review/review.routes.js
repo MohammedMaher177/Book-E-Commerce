@@ -11,13 +11,13 @@ const reviewRouter = Router();
 /**Get All Categories && Add */
 reviewRouter.route("/")
     .get(getAllReviews)
-    .post(authMiddleware, validate(addReviewValidation), allowedTo("user"), addReview)
+    .post(authMiddleware, validate(addReviewValidation), allowedTo("User"), addReview)
 
 /**Update && delete brand */
 reviewRouter.route("/:id")
     .get(getReview)
-    .put(authMiddleware, allowedTo("user"), validate(updateReviewValidation) , UpdateReview)
-    .delete(authMiddleware, allowedTo("admin", "user"), deleteReview)
+    .put(authMiddleware, allowedTo("User"), validate(updateReviewValidation) , UpdateReview)
+    .delete(authMiddleware, allowedTo("Admin", "User"), deleteReview)
 
 
 export default reviewRouter;

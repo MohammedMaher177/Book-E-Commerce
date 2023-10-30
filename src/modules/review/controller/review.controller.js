@@ -2,6 +2,7 @@ import bookModel from "../../../../DB/models/book.model.js";
 import reviewModel from "../../../../DB/models/review.model.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
+import { getRating } from "../../../util/helper-functions.js";
 import { deleteData, getData, getDocById } from "../../../util/model.util.js";
 
 
@@ -24,24 +25,29 @@ export const addReview = catchError(async (req, res, next) => {
     return next(new AppError("You Created review before", 409));
   }
   const result = await reviewModel.create(req.body);
+  existBook.reviews.push(result._id);
+  existBook.rating =await getRating(existBook._id);
+  existBook.save();
   return res.json({ message: "success", result });
 });
 
 export const UpdateReview = catchError(async (req, res, next) => {
-  req.body.user = req.user._id.toHexString();
+  const userId = req.user._id.toHexString();
   const { id } = req.params;
   const review = await reviewModel.findById(id);
 
   if (!review) {
     return next(new AppError("Not Found", 404));
   }
-
-  if (review.user !== req.user._id) {
+  if (review.user._id.toHexString() !== userId) {
     return next(new AppError("Not Authorized", 401));
   }
   review.content = req.body.content || review.content;
   review.rating = req.body.rating || review.content;
   await review.save();
+  const existBook = await bookModel.findById(review.book);
+  existBook.rating =await getRating(review.book);
+  existBook.save();
   res.status(201).json({ message: "success", review });
 });
 

@@ -28,6 +28,7 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
+    console.log(filterObj);
     let finalFilter = {};
     for (const key in filterObj) {
       if (key === "price") {
@@ -56,6 +57,7 @@ export class ApiFeatures {
           });
         }
       }
+      
       if (
         key === "author" ||
         key === "publisher" ||

@@ -34,6 +34,17 @@ const bookSchema = new Schema(
       require: true,
       ref: "category",
     },
+    reviews:[{
+      type: mongoose.ObjectId,
+      ref: "review",
+      default:[]
+    }],
+    rating:{
+    
+      type:Number,
+      maxLength:1,
+      default:0
+     }
     
   },
   { timestamps: true, toJSON: { virtuals: true } }
@@ -47,13 +58,20 @@ bookSchema.pre(/^find/, { document: false, query: true }, function () {
     },
   ]);
 });
-
-bookSchema.virtual("reviews", {
-  ref: "review",
-  localField: "_id",
-  foreignField: "book",
-  // justOne: true,
+bookSchema.pre(/^find/, { document: false, query: true }, function () {
+  this.populate([
+    {
+      path: "reviews",
+      select: "user content rating",
+    },
+  ]);
 });
+// bookSchema.virtual("reviews", {
+//   ref: "review",
+//   localField: "_id",
+//   foreignField: "book",
+//   // justOne: true,
+// });
 
 bookSchema.static("getCategoryName", async function (data) {
   const x = await this.find({ "category.name": {$regex: data} });

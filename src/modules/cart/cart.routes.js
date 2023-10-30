@@ -15,6 +15,6 @@ cartRouter.route("/")
 
 cartRouter.delete("/:id", authMiddleware, validate(removeCartItemValidation), removeItem)
 
-cartRouter.put("/coupon", addCouponToCart)
-cartRouter.put("/coupon/:code", removeCouponFromCart)
+cartRouter.patch("/coupon", authMiddleware, addCouponToCart)
+cartRouter.delete("/coupon/:code", authMiddleware, removeCouponFromCart)
 export default cartRouter

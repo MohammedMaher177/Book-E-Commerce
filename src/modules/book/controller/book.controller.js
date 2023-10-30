@@ -195,11 +195,8 @@ export const forYou = catchError(async (req, res, next) => {
   const { searchedCats, fav_cats } = req.user;
   let fav = fav_cats.map((ele) => ele._id);
   fav = fav.concat(searchedCats);
-  console.log(fav);
   fav = fav.map((el) => el.toString());
   const categories = new Set(fav);
-  console.log(categories);
-
   let result = await suggestCategory(categories);
   result = shuffle(result);
   res.status(200).json({

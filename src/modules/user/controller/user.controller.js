@@ -76,7 +76,7 @@ export const profile = catchError(async (req, res, next) => {
 export const addToFavCat = catchError(async (req, res, next) => {
   const { user } = req;
   const { favorits } = req.body;
-  user.fav_cats = favorits.map((el) => el.id);
+  user.fav_cats = favorits;
   await user.save();
   res.status(201).json({ message: "success" });
 });

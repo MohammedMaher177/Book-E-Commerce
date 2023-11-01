@@ -75,11 +75,11 @@ export const creatUserCart = catchError(async (req, res, next) => {
         } else {
           // let arr = cart.books.map((ele)=> JSON.stringify(ele.book._id))
           // if (arr.includes(JSON.stringify(el.book))) {
-            console.log("done2");
-            cart.books[i].qty += el.qty;
-            cart.books[i].totalPrice += el.totalPrice;
-            total2 += cart.books[i].totalPrice;
-            break;
+          console.log("done2");
+          cart.books[i].qty += el.qty;
+          cart.books[i].totalPrice += el.totalPrice;
+          total2 += cart.books[i].totalPrice;
+          break;
           // }
         }
       }
@@ -87,7 +87,7 @@ export const creatUserCart = catchError(async (req, res, next) => {
     cart.totalAmount = total2;
     console.log(cart.books);
     console.log(cart.totalAmount);
-    await cart.save()
+    await cart.save();
   } else {
     const cart = await cartModel.create({
       user: _id,
@@ -157,6 +157,9 @@ export const updateCartQty = catchError(async (req, res, next) => {
 
   calcDiscount(cart);
   await cart.save();
+  const existCart = await cartModel.findOne({ user: _id })//.populate("book", "price ");
+  // await cart.populate("book", "price image");
+  console.log(existCart);
   return res.status(202).json({ message: "success", cart });
 });
 

@@ -32,6 +32,66 @@ export const getCartDetails = catchError(async (req, res, next) => {
   return res.status(201).json({ message: "success", cart });
 });
 
+export const creatUserCart = catchError(async (req, res, next) => {
+  const { _id } = req.user;
+ var { cartDetails }=req.body;
+ 
+ const books = [];
+ let total = 0;
+ for (var el of cartDetails.books) {
+   var existBook = await bookModel.findById(el.book);
+
+   if (!existBook) throw new AppError("In-Valid book ID", 404);
+   el.qty = el.qty || 1;
+   el.totalPrice = el.qty * existBook.price;
+   el.price = existBook.price;
+   books.push({
+     book: existBook._id,
+     qty: el.qty || 1,
+     price: existBook.price,
+     totalPrice: el.qty * existBook.price,
+   });
+   total += el.totalPrice;
+ }
+ var cart = await cartModel.findOne({ user: _id });
+
+if (cart) {
+  let total2=0;
+    var finalCart=[];
+    for (const el of cart.books) {
+      for (let i = 0; i < books.length; i++) {
+        if (el.book._id == books[i].book) {
+          el.qty+=books[i].qty;
+          el.totalPrice +=books[i].totalPrice
+          finalCart.push(el);
+          total += el.totalPrice
+        } else {
+          finalCart.push(books[i]);
+          total2 += books[i].totalPrice
+        }
+      }
+    }
+  console.log(total2);
+  console.log(finalCart);
+  cart.books = [];
+  cart.books=finalCart;
+  cart.totalAmount=total2;
+  await cart.save()
+}else{
+ 
+  const cart = await cartModel.create({
+    user: _id,
+    books: books,
+    totalAmount: total,
+  });
+}
+cart = await cartModel.findOne({ user: _id });
+  // calcPrice(cart);
+  // calcDiscount(cart);
+  // await cart.save();
+  const existCart = await cartModel.findOne({ user: _id });
+  return res.status(201).json({ message: "success", cart: existCart });
+});
 export const addToCart = catchError(async (req, res, next) => {
   const { _id } = req.user;
 

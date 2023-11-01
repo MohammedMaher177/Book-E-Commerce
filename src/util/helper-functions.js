@@ -68,20 +68,22 @@ export const shuffle = (array) => {
 };
 
 export const suggestCategory = async (categories) => {
-  let result = [] , i = 0;
+  let result = [],
+    i = 0;
   for (const category of categories) {
     const cat = await bookModel.find({ category }).limit(5);
-    result=result.concat(cat)
+    result = result.concat(cat);
   }
   return result;
 };
-export const getRating=async(book)=>{
-  let reviews = await reviewModel.find({book:book});
-  reviews = reviews.map((el)=>el.rating)
+export const getRating = async (book) => {
+  let reviews = await reviewModel.find({ book: book });
+  reviews = reviews.map((el) => el.rating);
   var total = 0;
-  for(var i = 0; i < reviews.length; i++) {
-      total += reviews[i];
+  for (var i = 0; i < reviews.length; i++) {
+    total += reviews[i];
   }
   var avg = total / reviews.length;
- return avg;
-}
+  return avg;
+};
+

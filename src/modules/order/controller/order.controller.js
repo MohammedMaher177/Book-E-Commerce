@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { catchError } from '../../../util/ErrorHandler/catchError.js';
 import UserModel from '../../../../DB/models/user.model.js';
 import { cartModel } from '../../../../DB/models/cart.model.js';
+import { AppError } from '../../../util/ErrorHandler/AppError.js';
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 

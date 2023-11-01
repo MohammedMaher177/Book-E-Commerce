@@ -20,8 +20,7 @@ export const updateProfileValidations = {
 export const favoritsCatsValidations = {
     body: joi.object({
         favorits: joi.array().items(joi.object({
-            id: idValidation,
-            name: joi.string().required()
+            id: idValidation
         })).min(1).required()
     })
 }

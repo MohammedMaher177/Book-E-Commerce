@@ -29,7 +29,7 @@ let session = await stripe.checkout.sessions.create({
     success_url:"https://bookstore-front.codecraftsportfolio.online/",
     cancel_url:"https://bookstore-front.codecraftsportfolio.online/cart",
     customer_email:email,
-    client_reference_id:"6502c6866fbcdcefafe2d943",
+    client_reference_id:user._id,
     // metadata:{
     //     //shipping address 
     // }

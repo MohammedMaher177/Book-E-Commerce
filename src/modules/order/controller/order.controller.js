@@ -7,6 +7,12 @@ import { cartModel } from '../../../../DB/models/cart.model.js';
 import { AppError } from '../../../util/ErrorHandler/AppError.js';
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
+export const creatCashOrder = catchError(async(req,res,next)=>{
+    const {_id}= req.user
+    const cart = await cartModel.find({user:_id});
+
+    const totalOrderPrice= cart.t
+})
 
 export const checkOutSession = catchError(async(req,res,next)=>{
     const {_id , email }= req.user

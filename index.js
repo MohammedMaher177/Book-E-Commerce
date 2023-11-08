@@ -9,9 +9,14 @@ import passport from "passport";
 import bodyParser from "body-parser";
 import { passportConfigGoogle, passportConfigFacebook } from "./passport-strategies.js"
 import cors from "./src/middleware/cors.js";
+import { successCheckOut } from "./src/modules/order/controller/order.controller.js";
 const app = express();
 const port = 8080;
 // const port = 3000;
+
+app.post('https://bookstore-api.codecraftsportfolio.online/api/v1/order/webhook',
+ express.raw({type: 'application/json'}),successCheckOut)
+
 app.use(cors);
 passportConfigGoogle(passport);
 passportConfigFacebook(passport);

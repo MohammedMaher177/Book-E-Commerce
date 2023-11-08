@@ -18,6 +18,7 @@ const bookSchema = new Schema(
     image: { public_id: String, secure_url: String },
 
     stock: { type: Number, default: 0 },
+    sold: { type: Number, default: 0 },
 
     price: { type: Number, require: true },
     discount: { type: Number, default: 0 },

@@ -23,7 +23,7 @@ const orderSchema = new Schema({
   },
   paymentMethod:{
    type:String,
-   enum:['card','cash'],
+   enum:['online','cash'],
    default:'cash'
   },
   isPaid :{
@@ -41,10 +41,8 @@ const orderSchema = new Schema({
     type:Date
   },
   totalAmountAfterDisc: { type: Number, default: 0 },
-  discount: { type: Number},
   coupon_code: {
     type: Types.ObjectId,
-    required: true,
     ref: "copon",
   }
 });

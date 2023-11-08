@@ -17,7 +17,7 @@ const cartSchema = new Schema({
   totalAmount: { type: Number, default: 0 },
   totalAmountAfterDisc: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
-  coupon_code: String
+  coupon_code:{ type:String}
 });
 
 cartSchema.method("addToCart", async function (prodId) {

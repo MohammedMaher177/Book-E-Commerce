@@ -60,14 +60,14 @@ bookSchema.pre(/^find/, { document: false, query: true }, function () {
   ]);
 });
 
-// bookSchema.pre(/^find/, { document: false, query: true }, function () {
-//   this.populate([
-//     {
-//       path: "reviews",
-//       select: "user content rating",
-//     },
-//   ]);
-// });
+bookSchema.pre(/^find/, { document: false, query: true }, function () {
+  this.populate([
+    {
+      path: "reviews",
+      select: "user content rating",
+    },
+  ]);
+});
 // bookSchema.virtual("reviews", {
 //   ref: "review",
 //   localField: "_id",

@@ -199,7 +199,7 @@ export const addCouponToCart = catchError(async (req, res, next) => {
   if (!coupon) {
     throw new AppError("Coupon not found", 404);
   }
-  if (coupon.max_use < 0) {
+  if (coupon.max_use === 0) {
     throw new AppError("This code is not available anymore", 440);
   }
   const isUsed = coupon.checkIfUsedByUser(_id);
@@ -208,7 +208,7 @@ export const addCouponToCart = catchError(async (req, res, next) => {
   }
   await coupon.addToUsedBy(_id);
   const cart = await cartModel.findOne({ user: _id });
-  cart.coupun_code = coupon.code;
+  cart.coupon_code = coupon.code;
   cart.discount = coupon.amount;
   calcDiscount(cart);
   await cart.save();
@@ -224,7 +224,7 @@ export const removeCouponFromCart = catchError(async (req, res, next) => {
   }
   await coupon.removeFromUsedBy(_id);
   const cart = await cartModel.findOne({ user: _id });
-  cart.coupun_code = "";
+  cart.coupon_code = "";
   cart.discount = 0;
   calcDiscount(cart);
   await cart.save();

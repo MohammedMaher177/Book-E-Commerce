@@ -65,7 +65,7 @@ export const checkout = catchError(async (req, res, next) => {
 })
 
 export const successCheckOut =catchError(async(request, response) => {
-  const sig = request.headers['stripe-signature'].toString();
+  const sig = request.headers['stripe-signature'];
   let event;
   try {
     event = stripe.webhooks.constructEvent(request.body, sig, process.env.COMPLETE_SESSION_SIGNING_SECRET);

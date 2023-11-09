@@ -15,7 +15,7 @@ const port = 8080;
 // const port = 3000;
 
 app.post('https://bookstore-api.codecraftsportfolio.online/api/v1/order/webhook',
- express.raw({type: 'application/json'}),successCheckOut)
+ express.raw({type: 'application/json'}),successCheckOut);
 
 app.use(cors);
 passportConfigGoogle(passport);

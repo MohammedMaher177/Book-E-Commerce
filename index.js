@@ -14,7 +14,7 @@ const app = express();
 const port = 8080;
 // const port = 3000;
 
-app.post('https://bookstore-api.codecraftsportfolio.online/webhook',
+app.post('/webhook',
  express.raw({type: 'application/json'}),successCheckOut);
 
 app.use(cors);

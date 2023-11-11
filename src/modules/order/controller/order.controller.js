@@ -65,10 +65,11 @@ export const checkout = catchError(async (req, res, next) => {
 })
 
 export const successCheckOut =catchError(async(request, response) => {
-  console.log("done");
+ 
   const sig = request.headers['stripe-signature'].toString();
   let event;
   try {
+    console.log(request);
     event = stripe.webhooks.constructEvent(request.body, sig, process.env.COMPLETE_SESSION_SIGNING_SECRET);
   } catch (err) {
     return response.status(400).send(`Webhook Error: ${err.message}`);

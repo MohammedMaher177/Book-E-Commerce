@@ -65,6 +65,7 @@ export const checkout = catchError(async (req, res, next) => {
 })
 
 export const successCheckOut =catchError(async(request, response) => {
+  console.log("done");
   const sig = request.headers['stripe-signature'].toString();
   let event;
   try {

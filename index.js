@@ -14,6 +14,8 @@ const app = express();
 const port = 8080;
 // const port = 3000;
 
+app.post('/webhook',
+ express.raw({type: 'application/json'}),successCheckOut);
 
 
 app.use(cors);
@@ -23,8 +25,6 @@ app.use(passport.initialize());
 app.use(cookie_parser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.post('/webhook',
- express.raw({type: 'application/json'}),successCheckOut);
 bootstrap(app);
  
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

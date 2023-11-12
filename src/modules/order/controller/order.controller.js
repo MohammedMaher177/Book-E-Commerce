@@ -71,16 +71,13 @@ export const successCheckOut =catchError(async(request, response) => {
   const sig = request.headers['stripe-signature'].toString();
   let event;
   try {
-    console.log( "headers : ",request.headers);
-    console.log("sig : ",sig);
-    console.log("stripe-signature : ",request.headers['stripe-signature']);
     event = stripe.webhooks.constructEvent(request.body, sig, process.env.COMPLETE_SESSION_SIGNING_SECRET);
   } catch (err) {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 if (event.type=="checkout.session.completed") {
   const checkoutSessionCompleted = event.data.object;
-  console.log("create order here ......");
+  console.log(request.customer_details.email);
 }else{
   console.log(`Unhandled event type ${event.type}`);
 }

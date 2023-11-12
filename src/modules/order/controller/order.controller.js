@@ -51,6 +51,9 @@ export const checkout = catchError(async (req, res, next) => {
     order.totalAmountAfterDisc = cart.totalAmountAfterDisc;
     order.coupon_code = coupon_code;
   }
+  user.orders.push(order._id)
+  user.save();
+  user = await UserModel.findOne({ email });
   let books = cart.books.map((el) => ({
     updateOne: {
       filter: { _id: el.book._id },
@@ -61,7 +64,7 @@ export const checkout = catchError(async (req, res, next) => {
   // await bookModel.bulkWrite(books);
   // await cartModel.findByIdAndDelete(cart._id)
 
-  res.json({ message: "success" , order});
+  res.json({ message: "success" , order , user});
 })
 
 export const successCheckOut =catchError(async(request, response) => {

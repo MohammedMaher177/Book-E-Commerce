@@ -76,11 +76,12 @@ export const successCheckOut =catchError(async(request, response) => {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
 if (event.type=="checkout.session.completed") {
-  const checkoutSessionCompleted = event.data.object;
-  console.log("request.body : ",request.body);
-  console.log("request body customer_email : ",request.body.customer_email);
+  const data = event.data.object;
+  console.log("clinte id  : ",data.client_reference_id);
+  console.log("clinte email  : ",data.customer_email);
+  
 }else{
   console.log(`Unhandled event type ${event.type}`);
 }
-  response.send(request.body.customer_email);
+  response.send(data.client_reference_id,data.customer_email);
 })

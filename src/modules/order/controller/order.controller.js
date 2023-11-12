@@ -77,7 +77,7 @@ export const successCheckOut =catchError(async(request, response) => {
   }
 if (event.type=="checkout.session.completed") {
   const checkoutSessionCompleted = event.data.object;
-  console.log(request.customer_details.email);
+  console.log(request);
 }else{
   console.log(`Unhandled event type ${event.type}`);
 }

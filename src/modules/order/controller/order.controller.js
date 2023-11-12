@@ -53,7 +53,6 @@ export const checkout = catchError(async (req, res, next) => {
   }
   user.orders.push(order._id)
   user.save();
-  user = await UserModel.findOne({ email });
   let books = cart.books.map((el) => ({
     updateOne: {
       filter: { _id: el.book._id },

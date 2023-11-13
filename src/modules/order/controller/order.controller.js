@@ -96,12 +96,12 @@ const email = data.customer_email
   order.paidAt = Date.now();
   order.isPaid = true;
   order.save();
-  let books = cart.books.map((el) => ({
-    updateOne: {
-      filter: { _id: el.book._id },
-      update: { $inc: { stock: -el.qty, sold: el.qty } },
-    },
-  }));
+  // let books = cart.books.map((el) => ({
+  //   updateOne: {
+  //     filter: { _id: el.book._id },
+  //     update: { $inc: { stock: -el.qty, sold: el.qty } },
+  //   },
+  // }));
 
   // await bookModel.bulkWrite(books);
   // const cart = await cartModel.findOne({ user: user._id });

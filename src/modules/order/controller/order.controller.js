@@ -88,8 +88,8 @@ export const successCheckOut =catchError(async(request, response) => {
   } catch (err) {
     return response.status(400).send(`Webhook Error: ${err.message}`);
   }
-if (event.type=="checkout.session.completed") {
   const data = event.data.object;
+if (event.type=="checkout.session.completed") {
 const email = data.customer_email
   const user = await UserModel.findOne({ email });
   const order = await orderModel.findById(data.client_reference_id);

@@ -22,7 +22,18 @@ async function existingBook(id) {
   const existBook = await bookModel.findById(id).select("price");
   return existBook;
 }
-
+async function addNewBook(cart, el) {
+  const product = await bookModel.findById(el.book._id).select("price");
+  if (!product) {
+    throw new AppError(`In-Valid Book Id ${el.book._id}`);
+  }
+  return cart.books.push({
+    book: el.book._id,
+    qty: el.qty,
+    price: product.price,
+    totalPrice: el.qty * product.price,
+  });
+}
 export const getCartDetails = catchError(async (req, res, next) => {
   const { _id } = req.user;
   let cart = await cartModel.findOne({ user: _id });
@@ -32,68 +43,20 @@ export const getCartDetails = catchError(async (req, res, next) => {
   return res.status(201).json({ message: "success", cart });
 });
 
-export const creatUserCart = catchError(async (req, res, next) => {
-  const { _id } = req.user;
-  var { books } = req.body;
-
-  const allBooks = [];
-  let total = 0;
-  for (var el of books) {
-    var existBook = await bookModel.findById(el.book._id);
-
-    if (!existBook) throw new AppError("In-Valid book ID", 404);
-    el.qty = el.qty || 1;
-    el.totalPrice = el.qty * existBook.price;
-    el.price = existBook.price;
-    allBooks.push({
-      book: existBook._id,
-      qty: el.qty || 1,
-      price: existBook.price,
-      totalPrice: el.qty * existBook.price,
-    });
-    total += el.totalPrice;
-  }
-  var cart = await cartModel.findOne({ user: _id });
-
-  if (cart) {
-    const options = cart.books.map()
-    cart = await cartModel.findOneAndUpdate({ user: _id },{
-      $push:{
-        books: allBooks,
-      },
-      $inc:{
-        totalAmount: total,
-      },
-      totalAmountAfterDisc: calcDiscount(cart)
-    });
-  } else {
-    const cart = await cartModel.create({
-      user: _id,
-      books: allBooks,
-      totalAmount: total,
-    });
-  }
-  cart = await cartModel.findOne({ user: _id });
-  calcPrice(cart);
-  calcDiscount(cart);
-  await cart.save();
-  const existCart = await cartModel.findOne({ user: _id });
-  return res.status(201).json({ message: "success", cart: existCart });
-});
 // export const creatUserCart = catchError(async (req, res, next) => {
 //   const { _id } = req.user;
-//   var { cartDetails } = req.body;
+//   var { books } = req.body;
 
-//   const books = [];
+//   const allBooks = [];
 //   let total = 0;
-//   for (var el of cartDetails.books) {
-//     var existBook = await bookModel.findById(el.book);
+//   for (var el of books) {
+//     var existBook = await bookModel.findById(el.book._id);
 
 //     if (!existBook) throw new AppError("In-Valid book ID", 404);
 //     el.qty = el.qty || 1;
 //     el.totalPrice = el.qty * existBook.price;
 //     el.price = existBook.price;
-//     books.push({
+//     allBooks.push({
 //       book: existBook._id,
 //       qty: el.qty || 1,
 //       price: existBook.price,
@@ -104,42 +67,14 @@ export const creatUserCart = catchError(async (req, res, next) => {
 //   var cart = await cartModel.findOne({ user: _id });
 
 //   if (cart) {
-//     let total2 = 0;
-//     var finalCart = [];
-//     let arr = cart.books.map((ele) => JSON.stringify(ele.book._id));
-//     for (const el of books) {
-//       for (let i = 0; i < cart.books.length; i++) {
-//         console.log("here");
-//         console.log(JSON.stringify(cart.books[i].book._id));
-//         console.log(JSON.stringify(el.book));
-//         if (JSON.stringify(cart.books[i].book._id) != JSON.stringify(el.book)) {
-//           if (!arr.includes(JSON.stringify(el.book))) {
-//             console.log("done1");
-//             finalCart.push(el);
-//             cart.books.push(el);
-//             total2 += el.totalPrice;
-//             break;
-//           }
-//         } else {
-//           // let arr = cart.books.map((ele)=> JSON.stringify(ele.book._id))
-//           // if (arr.includes(JSON.stringify(el.book))) {
-//           console.log("done2");
-//           cart.books[i].qty += el.qty;
-//           cart.books[i].totalPrice += el.totalPrice;
-//           total2 += cart.books[i].totalPrice;
-//           break;
-//           // }
-//         }
-//       }
-//     }
-//     cart.totalAmount = total2;
-//     console.log(cart.books);
-//     console.log(cart.totalAmount);
-//     await cart.save();
+//     cart = await cartModel.findOneAndUpdate({ user: _id },{
+//       books: allBooks,
+//       totalAmount: total,
+//     });
 //   } else {
 //     const cart = await cartModel.create({
 //       user: _id,
-//       books: books,
+//       books: allBooks,
 //       totalAmount: total,
 //     });
 //   }
@@ -150,6 +85,38 @@ export const creatUserCart = catchError(async (req, res, next) => {
 //   const existCart = await cartModel.findOne({ user: _id });
 //   return res.status(201).json({ message: "success", cart: existCart });
 // });
+export const creatUserCart = catchError(async (req, res, next) => {
+  const { books } = req.body;
+  const { _id } = req.user;
+  const existCart = await cartModel.findOne({ user: _id });
+  if (existCart.books.length > 0) {
+    for (const el of books) {
+      let flag = true;
+
+      existCart.books.map((existBook) => {
+        if (el.book._id.toString() === existBook.book._id.toString()) {
+          flag = false;
+          existBook.qty += el.qty;
+          existBook.totalPrice = existBook.qty * existBook.price;
+        }
+      });
+
+      if (!flag) {
+        continue;
+      }
+      await addNewBook(existCart, el);
+    }
+  } else {
+    for (let i = 0; i < books.length; i++) {
+      await addNewBook(existCart, books[i]);
+    }
+  }
+  calcPrice(existCart);
+  calcDiscount(existCart);
+  await existCart.save();
+  const realCart = await cartModel.findOne({user: _id})
+  res.json({ cart: realCart, message: "success" });
+});
 export const addToCart = catchError(async (req, res, next) => {
   const { _id } = req.user;
 
@@ -205,9 +172,8 @@ export const updateCartQty = catchError(async (req, res, next) => {
 
   calcDiscount(cart);
   await cart.save();
-  const existCart = await cartModel.findOne({ user: _id })//.populate("book", "price ");
+  const existCart = await cartModel.findOne({ user: _id }); //.populate("book", "price ");
   // await cart.populate("book", "price image");
-  console.log(existCart);
   return res.status(202).json({ message: "success", cart });
 });
 
@@ -291,3 +257,66 @@ export const removeCouponFromCart = catchError(async (req, res, next) => {
 //   await cart.save();
 //   res.status(202).json({ message: "success", cart });
 // });
+
+// const { _id } = req.user;
+//   var { books } = req.body;
+//   // console.log(books);
+//   const allBooks = [];
+//   let total = 0;
+//   for (var el of books) {
+//     var existBook = await bookModel.findById(el.book);
+
+//     if (!existBook) throw new AppError("In-Valid book ID", 404);
+//     el.qty = el.qty || 1;
+//     el.totalPrice = el.qty * existBook.price;
+//     el.price = existBook.price;
+//     allBooks.push({
+//       book: existBook._id,
+//       qty: el.qty || 1,
+//       price: existBook.price,
+//       totalPrice: el.qty * existBook.price,
+//     });
+//     total += el.totalPrice;
+//   }
+//   console.log(allBooks);
+//   var cart = await cartModel.findOne({ user: _id });
+
+//   if (cart) {
+//     let total2 = 0;
+//     var finalCart = [];
+//     let arr = cart.books.map((ele) => JSON.stringify(ele.book._id));
+//     for (const el of books) {
+//       for (let i = 0; i < cart.books.length; i++) {
+//         if (JSON.stringify(cart.books[i].book._id) != JSON.stringify(el.book)) {
+//           if (!arr.includes(JSON.stringify(el.book))) {
+//             finalCart.push(el);
+//             cart.books.push(el);
+//             total2 += el.totalPrice;
+//             break;
+//           }
+//         } else {
+//           // let arr = cart.books.map((ele)=> JSON.stringify(ele.book._id))
+//           // if (arr.includes(JSON.stringify(el.book))) {
+//           cart.books[i].qty += el.qty;
+//           cart.books[i].totalPrice += el.totalPrice;
+//           total2 += cart.books[i].totalPrice;
+//           break;
+//           // }
+//         }
+//       }
+//     }
+//     cart.totalAmount = total2;
+//     await cart.save();
+//   } else {
+//     const newCart = await cartModel.create({
+//       user: _id,
+//       books: allBooks,
+//       totalAmount: total,
+//     });
+//   }
+//   cart = await cartModel.findOne({ user: _id });
+//   calcPrice(cart);
+//   calcDiscount(cart);
+//   await cart.save();
+//   const existCart = await cartModel.findOne({ user: _id });
+//   return res.status(201).json({ message: "success", cart: existCart });

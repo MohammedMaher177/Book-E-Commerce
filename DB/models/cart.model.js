@@ -11,7 +11,8 @@ const cartSchema = new Schema({
       book: { type: Types.ObjectId, ref: "book", required: true },
       qty: { type: Number, default: 1 },
       price: Number,
-      totalPrice:Number
+      totalPrice:Number,
+      _id: false
     },
   ],
   totalAmount: { type: Number, default: 0 },

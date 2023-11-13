@@ -56,9 +56,15 @@ export const creatUserCart = catchError(async (req, res, next) => {
   var cart = await cartModel.findOne({ user: _id });
 
   if (cart) {
+    const options = cart.books.map()
     cart = await cartModel.findOneAndUpdate({ user: _id },{
-      books: allBooks,
-      totalAmount: total,
+      $push:{
+        books: allBooks,
+      },
+      $inc:{
+        totalAmount: total,
+      },
+      totalAmountAfterDisc: calcDiscount(cart)
     });
   } else {
     const cart = await cartModel.create({

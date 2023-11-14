@@ -41,7 +41,6 @@ const bookSchema = new Schema(
       default:[]
     }],
     rating:{
-    
       type:Number,
       maxLength:1,
       default:0

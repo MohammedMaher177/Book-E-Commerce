@@ -54,6 +54,12 @@ const userSchema = new Schema({
             default: []
         }
     ],
+    orders:[
+        {
+            type: Types.ObjectId, ref: "order",
+            default: []
+        }
+    ]
     // registerway:{type: String, enum: ['form', 'facebook', 'google'], default: "form"}
 
 
@@ -67,6 +73,9 @@ userSchema.pre(["save", /^update/, /^create/], async function () {
 })
 userSchema.pre(/^find/, async function () {
     this.populate("fav_cats")
+})
+userSchema.pre(/^find/, async function () {
+    this.populate("orders")
 })
 // userSchema.pre(/^find/, async function () {
 //     this.populate("whish_list")

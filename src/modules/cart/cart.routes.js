@@ -13,7 +13,7 @@ cartRouter.route("/")
     .patch(authMiddleware, validate(updateCartQtyValidation), updateCartQty)
     .delete(authMiddleware, removeCart)
 
- cartRouter.post("/creatCart",authMiddleware,creatUserCart)   
+ cartRouter.post("/createCart",authMiddleware,creatUserCart)   
 cartRouter.delete("/:id", authMiddleware, validate(removeCartItemValidation), removeItem)
 
 cartRouter.patch("/coupon", authMiddleware, addCouponToCart)

@@ -77,9 +77,9 @@ export class ApiFeatures {
           filterObj["format"].toLowerCase() === "hard cover"
         ) {
           finalFilter["variations.variation_qty"] = { $gt: 0 };
-          continue;
+          // continue;
         }
-        finalFilter["variations.variation_is_available"] = false;
+        // finalFilter["variations.variation_is_available"] = false;
       }
       if (key === "category") {
         let elements = filterObj[key].split(",");

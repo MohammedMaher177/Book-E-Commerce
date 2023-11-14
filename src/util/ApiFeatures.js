@@ -28,7 +28,6 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    console.log(filterObj);
     let finalFilter = {};
     for (const key in filterObj) {
       if (key === "price") {
@@ -72,9 +71,10 @@ export class ApiFeatures {
       }
       if (key === "stock") {
         let element = filterObj[key];
+        console.log(filterObj);
         if (
           element === "true" &&
-          filterObj["format"].toLowerCase() === "hardcover"
+          filterObj[key].toLowerCase() === "hardcover"
         ) {
           finalFilter["variations.variation_qty"] = { $gt: 0 };
           // continue;
@@ -91,7 +91,6 @@ export class ApiFeatures {
         finalFilter.category = { $in: c.map((ele) => ele._id) };
       }
     }
-    console.log(finalFilter);
     this.totalCount = await this.mongooseQuery
       .find(finalFilter)
       .count()

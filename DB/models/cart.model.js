@@ -9,6 +9,9 @@ const cartSchema = new Schema({
   books: [
     {
       book: { type: Types.ObjectId, ref: "book", required: true },
+      variation_name: {
+        
+      },
       qty: { type: Number, default: 1 },
       price: Number,
       totalPrice:Number,

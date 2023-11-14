@@ -44,7 +44,7 @@ const bookSchema = new Schema(
           variation_name: {
             type: String,
             required: true,
-            enum: ["hard cover", "pdf", "e-book", "audio"],
+            enum: ["hardcover", "pdf", "e-book", "audio"],
             default: "pdf",
           },
           variation_price: { type: Number, required: true },

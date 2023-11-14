@@ -5,10 +5,10 @@ import { Schema, Types, model } from "mongoose";
 
 const userSchema = new Schema({
     userName: {
-        type: String, trim: true, require: true, maxLength: 20, minLength: 4
+        type: String, trim: true, required: true, maxLength: 20, minLength: 4
     },
     email: {
-        type: String, trim: true, require: true,  unique: true
+        type: String, trim: true, required: true,  unique: true
     },
     password: {
         type: String, trim: true

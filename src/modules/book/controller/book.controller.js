@@ -206,27 +206,35 @@ export const forYou = catchError(async (req, res, next) => {
 });
 
 export const updateData = catchError(async (req, res) => {
-  let result = await bookModel.find();
-  result = result.map((el) => {
-    let n = uuidv4();
-    n = n.split("-")[0].substring(0, 6);
-    el.slug = slugify(el.name) + "-" + n;
-    return el;
-  });
-  const option = {
-    slug: slugify(),
-  };
-  await result.save();
-  // result.bulkWrite({
-  //   updateOne{
-  //     flter:{$exis}
-  //   }
-  // })
-  res.json(result);
+  // const allBooks = await bookModel.find({});
+  // console.log(allBooks.length);
+  // for (const book of allBooks) {
+  //   const price = book.variations[0].variation_price
+  //   console.log(price);
+  //   book.price = price
+  //   await book.save();
+  // }
+  // res.status(201).json({ message: "success", allBooks });
+  // let result = await bookModel.find();
+  // result = result.map((el) => {
+  //   let n = uuidv4();
+  //   n = n.split("-")[0].substring(0, 6);
+  //   el.slug = slugify(el.name) + "-" + n;
+  //   return el;
+  // });
+  // const option = {
+  //   slug: slugify(),
+  // };
+  // await result.save();
+  // // result.bulkWrite({
+  // //   updateOne{
+  // //     flter:{$exis}
+  // //   }
+  // // })
+  // res.json(result);
 });
 
 export const getAuthors = catchError(async (req, res) => {
   const authors = await bookModel.find().distinct("author");
   res.json({ message: "success", authors });
 });
-

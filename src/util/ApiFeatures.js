@@ -57,17 +57,29 @@ export class ApiFeatures {
           });
         }
       }
-      
-      if (
-        key === "author" ||
-        key === "publisher" ||
-        key === "lang" ||
-        key === "format"
-      ) {
+
+      if (key === "author" || key === "publisher" || key === "lang") {
         let elements = filterObj[key].split(",");
         elements.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
         const options = elements.map((el) => new RegExp(el, "i"));
         finalFilter[key] = { $in: options };
+      }
+      if (key === "format") {
+        let elements = filterObj[key].split(",");
+        elements.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+        const options = elements.map((el) => new RegExp(el, "i"));
+        finalFilter["variations.variation_name"] = { $in: options };
+      }
+      if (key === "stock") {
+        let element = filterObj[key];
+        if (
+          element === "true" &&
+          filterObj["format"].toLowerCase() === "hard cover"
+        ) {
+          finalFilter["variations.variation_qty"] = { $gt: 0 };
+          // continue;
+        }
+        // finalFilter["variations.variation_is_available"] = false;
       }
       if (key === "category") {
         let elements = filterObj[key].split(",");
@@ -79,6 +91,7 @@ export class ApiFeatures {
         finalFilter.category = { $in: c.map((ele) => ele._id) };
       }
     }
+    console.log(finalFilter);
     this.totalCount = await this.mongooseQuery
       .find(finalFilter)
       .count()

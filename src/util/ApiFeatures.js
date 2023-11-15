@@ -74,7 +74,7 @@ export class ApiFeatures {
         console.log(filterObj);
         if (
           element === "true" &&
-          filterObj[key].toLowerCase() === "hardcover"
+          filterObj["format"].toLowerCase() === "hardcover"
         ) {
           finalFilter["variations.variation_qty"] = { $gt: 0 };
           // continue;

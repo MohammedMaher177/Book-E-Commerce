@@ -16,6 +16,13 @@ const bookSchema = new Schema(
     pages: { type: Number, required: true },
     image: { public_id: String, secure_url: String },
     sold: { type: Number, default: 0 },
+    // sold: {
+    //   type: {
+    //     pdf: { type: Number, default: 0 },
+    //     ebook: { type: Number, default: 0 },
+    //     hardcover: { type: Number, default: 0 },
+    //   },
+    // },
     price: { type: Number, required: true },
     discount: { type: Number, default: 0 },
     author: { type: String, required: true, trim: true },

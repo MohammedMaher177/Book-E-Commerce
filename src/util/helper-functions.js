@@ -78,12 +78,17 @@ export const suggestCategory = async (categories) => {
 };
 export const getRating = async (book) => {
   let reviews = await reviewModel.find({ book: book });
+  var avg;
+  if (!reviews) {
+    avg =0
+    return avg;
+  }
   reviews = reviews.map((el) => el.rating);
   var total = 0;
   for (var i = 0; i < reviews.length; i++) {
     total += reviews[i];
   }
-  var avg = total / reviews.length;
+  avg = total / reviews.length;
   return avg;
 };
 

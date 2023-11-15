@@ -42,7 +42,13 @@ export const deleteData = (model) => {
     if (model == reviewModel) {
       const existBook = await bookModel.findById(result.book);
       existBook.reviews = await reviewModel.find({book:existBook._id})
-      existBook.rating = await getRating(existBook._id);
+      if (!(await getRating(existBook._id))) {
+        existBook.rating=0
+      }else{
+
+        existBook.rating = await getRating(existBook._id);
+      }
+  
       existBook.save();
     }
     res.status(201).json({ message: "success", result });

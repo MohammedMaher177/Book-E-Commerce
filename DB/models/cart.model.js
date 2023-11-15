@@ -10,18 +10,20 @@ const cartSchema = new Schema({
     {
       book: { type: Types.ObjectId, ref: "book", required: true },
       variation_name: {
-        
+        type: String,
+        required: true,
+        enum: ["hardcover", "pdf", "e-book", "audio"],
       },
       qty: { type: Number, default: 1 },
       price: Number,
-      totalPrice:Number,
-      _id: false
+      totalPrice: Number,
+      _id: false,
     },
   ],
   totalAmount: { type: Number, default: 0 },
   totalAmountAfterDisc: { type: Number, default: 0 },
   discount: { type: Number, default: 0 },
-  coupon_code:{ type:String}
+  coupon_code: { type: String },
 });
 
 cartSchema.method("addToCart", async function (prodId) {
@@ -37,8 +39,8 @@ cartSchema.method("addToCart", async function (prodId) {
   await this.save();
 });
 
-cartSchema.pre([/^find/, 'save'], function () {
-  this.populate("books.book", "image name price slug")
+cartSchema.pre([/^find/, "save"], function () {
+  this.populate("books.book", "image name price slug");
 });
 
 export const cartModel = model("cart", cartSchema);

@@ -8,7 +8,11 @@ import { deleteData, getData, getDocById } from "../../../util/model.util.js";
 
 export const getAllReviews = catchError(getData(reviewModel));
 
-export const getReview = catchError(getDocById(reviewModel));
+export const getReview = catchError(async(req,res,next)=>{
+  const {id}= req.params;
+  const review = await reviewModel.findById(id)
+  return res.status(200).json({ message: "success", review });
+});
 
 export const addReview = catchError(async (req, res, next) => {
   req.body.user = req.user._id.toHexString();

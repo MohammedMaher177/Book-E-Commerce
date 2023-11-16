@@ -32,7 +32,11 @@ export const addReview = catchError(async (req, res, next) => {
   existBook.reviews.push(result._id);
   existBook.rating =await getRating(existBook._id);
   existBook.save();
-  return res.json({ message: "success", result });
+  const newReview = await reviewModel.findOne({
+    user: req.user._id,
+    book: req.body.book,
+  });
+  return res.json({ message: "success", newReview });
 });
 
 export const UpdateReview = catchError(async (req, res, next) => {

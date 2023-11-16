@@ -4,7 +4,7 @@ import { idValidation } from "../../user/controller/user.validation.js";
 export const addToCartValidation = {
   body: joi
     .object({
-      book: joi.string().hex().length(24).required(),
+      book: idValidation,
       qty: joi.number().positive(),
       type: joi
         .string()
@@ -17,18 +17,21 @@ export const addToCartValidation = {
 export const createCartValidation = {
   body: joi
     .object({
-      books: joi.array().items({
-        book: joi
-          .object({
-            _id: idValidation,
-          })
-          .required(),
-        qty: joi.number().positive().required(),
-        type: joi
-          .string()
-          .valid("hardcover", "pdf", "e-book", "audio")
-          .required(),
-      }).required(),
+      books: joi
+        .array()
+        .items({
+          book: joi
+            .object({
+              _id: idValidation,
+            })
+            .required(),
+          qty: joi.number().positive().required(),
+          type: joi
+            .string()
+            .valid("hardcover", "pdf", "e-book", "audio")
+            .required(),
+        })
+        .required(),
     })
     .required(),
 };
@@ -36,7 +39,7 @@ export const createCartValidation = {
 export const updateCartQtyValidation = {
   body: joi
     .object({
-      book: joi.string().hex().length(24).required(),
+      book: idValidation,
       qty: joi.number().positive().required(),
     })
     .required(),
@@ -46,7 +49,7 @@ export const removeCartItemValidation = {
   params: joi
     .object({
       id: idValidation,
-      variation_name: joi.string().valid()
+      variation_name: joi.string().valid("hardcover", "pdf", "e-book", "audio"),
     })
     .required(),
 };

@@ -22,6 +22,7 @@ async function existingBook(id) {
   const existBook = await bookModel.findById(id).select("price");
   return existBook;
 }
+
 async function addNewBook(cart, el) {
   const product = await bookModel.findById(el.book._id).select("price");
   if (!product) {
@@ -34,6 +35,7 @@ async function addNewBook(cart, el) {
     totalPrice: el.qty * product.price,
   });
 }
+
 export const getCartDetails = catchError(async (req, res, next) => {
   const { _id } = req.user;
   let cart = await cartModel.findOne({ user: _id });
@@ -76,6 +78,7 @@ export const creatUserCart = catchError(async (req, res, next) => {
   const realCart = await cartModel.findOne({user: _id})
   res.json({ cart: existCart, message: "success" });
 });
+
 export const addToCart = catchError(async (req, res, next) => {
   const { _id } = req.user;
   console.log(req.body);
@@ -121,35 +124,37 @@ export const updateCartQty = catchError(async (req, res, next) => {
 
   if (!cart) return new AppError("Cart Not Found", 404);
   if (!req.body.qty) throw new AppError("In-Valid book QTY", 403);
-
-  let index = cart.books.findIndex((el) => el.book.id == book && el.variation_name === "hardcover");
+  console.log(cart);
+  let index = cart.books.findIndex((el) => el.book.id == book && el.variation_name == "hardcover");
   if (index == -1) throw new AppError("In-Valid book ID", 404);
 
   req.body.totalPrice = req.body.qty * cart.books[index].book.price;
   req.body.price = cart.books[index].book.price;
+  req.body.variation_name = "hardcover"
   cart.books[index] = req.body;
 
   calcPrice(cart);
-
   calcDiscount(cart);
+  
   await cart.save();
-  const existCart = await cartModel.findOne({ user: _id }); //.populate("book", "price ");
+  // const existCart = await cartModel.findOne({ user: _id }); //.populate("book", "price ");
   // await cart.populate("book", "price image");
   return res.status(202).json({ message: "success", cart });
 });
 
 export const removeItem = catchError(async (req, res, next) => {
   const { _id } = req.user;
-  const { id } = req.params;
+  const { id, variation_name } = req.params;
   let cart = await cartModel.findOne({ user: _id });
   if (!cart) return new AppError("Cart Not Found", 404);
-  let index = cart.books.findIndex((el) => el.book.id == id);
+  let index = cart.books.findIndex((el) => el.book.id == id && el.variation_name == variation_name);
   if (index == -1) throw new AppError("In-Valid Product ID", 404);
   cart.books.splice(index, 1);
+  
   calcPrice(cart);
-
   calcDiscount(cart);
   await cart.save();
+
   return res.json({ message: "success", cart });
 });
 

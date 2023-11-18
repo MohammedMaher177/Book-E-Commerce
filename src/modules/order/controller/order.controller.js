@@ -6,6 +6,7 @@ import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { orderModel } from "../../../../DB/models/order.model.js";
 import bookModel from "../../../../DB/models/book.model.js";
 import { use } from "chai";
+import Feedback from "../../../../DB/models/feedBack.model.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
@@ -108,6 +109,11 @@ export const successCheckOut = catchError(async (request, response) => {
     }
     const cart = await cartModel.findOne({ user: user._id });
     await cartModel.findByIdAndDelete(cart._id)
+    //-------------------------------------------
+    const alreadySubmitted = await Feedback.alreadySubmittedFeedback(user._id);
+    if(!alreadySubmitted){
+      // add the email
+    }
   } else {
     console.log(`Unhandled event type ${event.type}`);
     await orderModel.findByIdAndDelete(data.client_reference_id);

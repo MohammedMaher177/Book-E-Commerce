@@ -6,6 +6,10 @@ const orderSchema = new Schema({
     required: true,
     ref: "User",
   },
+  name:{
+    type:String,
+    required:true,
+  },
   books: [
     {
       book: { type: Types.ObjectId, ref: "book", required: true },
@@ -16,7 +20,7 @@ const orderSchema = new Schema({
   ],
   totalOrderPrice: { type: Number},
   shippingAdress:{
-   street:{type:String},
+   adress:{type:String},
    city:{type:String},
    country:{type:String},
    phone:{type:Number},

@@ -6,7 +6,7 @@ export const checkoutValidation = {
     .object({
       shippingAdress: joi
         .object().required(),
-      coupon_code: joi.string(),
+      name: joi.string(),
       paymentMethod:joi.string(),
     })
     .required(),

@@ -1,7 +1,7 @@
-import Feedback from "../../../../DB/models/feedBack.model";
-import { orderModel } from "../../../../DB/models/order.model";
-import { AppError } from "../../../util/ErrorHandler/AppError";
-import { catchError } from "../../../util/ErrorHandler/catchError";
+import Feedback from "../../../../DB/models/feedBack.model.js";
+import { orderModel } from "../../../../DB/models/order.model.js";
+import { AppError } from "../../../util/ErrorHandler/AppError.js";
+import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
 export const createFeedback = catchError(async (req, res, next) => {
     const {user_id, testimonial, website_rating, delivery_rating, delivery_packing_rating, notes} = req.body;

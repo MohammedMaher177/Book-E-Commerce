@@ -16,16 +16,17 @@ export const checkout = catchError(async (req, res, next) => {
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
   if (!cart) throw new AppError("this user dosen't have cart", 404);
-  if (cart.books.length == 0)
-  {throw new AppError("there are no books in the cart", 404);}
+  if (cart.books.length == 0) {
+    throw new AppError("there are no books in the cart", 404);
+  }
   const order = await orderModel.create({
     user: user._id,
-    name : name || user.userName,
+    name: name || user.userName,
     books: cart.books,
     totalOrderPrice: cart.totalOrderPrice,
-    totalAmountAfterDisc : cart.totalAmountAfterDisc,
+    totalAmountAfterDisc: cart.totalAmountAfterDisc,
     shippingAdress: shippingAdress,
-    coupon_code : cart.coupon_code,
+    coupon_code: cart.coupon_code,
     paymentMethod: paymentMethod,
   });
   user.orders.push(order._id);
@@ -67,16 +68,16 @@ export const checkout = catchError(async (req, res, next) => {
     return res.json({ message: "success", session, order });
   }
   for (const el of cart.books) {
-    let book= await bookModel.findById(el.book._id)
+    let book = await bookModel.findById(el.book._id);
     book.sold += el.qty;
     if (el.variation_name == "hardcover") {
-       book.variations[1].variation_qty -= el.qty;
+      book.variations[1].variation_qty -= el.qty;
     }
     book.save();
   }
-  await cartModel.findByIdAndDelete(cart._id)
+  await cartModel.findByIdAndDelete(cart._id);
 
-  res.json({ message: "success" , order});
+  res.json({ message: "success", order });
 });
 
 export const successCheckOut = catchError(async (request, response) => {
@@ -100,18 +101,18 @@ export const successCheckOut = catchError(async (request, response) => {
     order.isPaid = true;
     order.save();
     for (const el of order.books) {
-      let book= await bookModel.findById(el.book._id)
+      let book = await bookModel.findById(el.book._id);
       book.sold += el.qty;
       if (el.variation_name == "hardcover") {
-         book.variations[1].variation_qty -= el.qty;
+        book.variations[1].variation_qty -= el.qty;
       }
       book.save();
     }
     const cart = await cartModel.findOne({ user: user._id });
-    await cartModel.findByIdAndDelete(cart._id)
+    await cartModel.findByIdAndDelete(cart._id);
     //-------------------------------------------
     const alreadySubmitted = await Feedback.alreadySubmittedFeedback(user._id);
-    if(!alreadySubmitted){
+    if (!alreadySubmitted) {
       // add the email
     }
   } else {
@@ -119,4 +120,21 @@ export const successCheckOut = catchError(async (request, response) => {
     await orderModel.findByIdAndDelete(data.client_reference_id);
   }
   response.send();
+});
+
+export const getPdf = catchError(async (req, res, next) => {
+  const { _id } = req.user;
+  const user = await UserModel.findById(_id);
+  if (!user) throw new AppError("this email doesn't exist", 404);
+  const orders = await orderModel.find({ user: user._id });
+  let pdfBooks = [];
+  for (const el of orders) {
+    for (const book of el.books) {
+      if (book.variation_name == "pdf") {
+        pdfBooks.push(book.book._id);
+      }
+    }
+  }
+
+  res.json({ message: "success", pdfBooks, orders });
 });

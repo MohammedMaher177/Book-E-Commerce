@@ -6,28 +6,29 @@ import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { orderModel } from "../../../../DB/models/order.model.js";
 import bookModel from "../../../../DB/models/book.model.js";
 import { use } from "chai";
+import Feedback from "../../../../DB/models/feedBack.model.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
   const { email } = req.user;
-  const { shippingAdress, coupon_code, paymentMethod } = req.body;
+  const { shippingAdress, name, paymentMethod } = req.body;
   const user = await UserModel.findOne({ email });
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
   if (!cart) throw new AppError("this user dosen't have cart", 404);
-  if (cart.books == [])
+  if (cart.books.length == 0) {
     throw new AppError("there are no books in the cart", 404);
+  }
   const order = await orderModel.create({
     user: user._id,
+    name: name || user.userName,
     books: cart.books,
-    totalOrderPrice: cart.totalAmount,
+    totalOrderPrice: cart.totalOrderPrice,
+    totalAmountAfterDisc: cart.totalAmountAfterDisc,
     shippingAdress: shippingAdress,
+    coupon_code: cart.coupon_code,
     paymentMethod: paymentMethod,
   });
-  if (cart.totalAmountAfterDisc) {
-    order.totalAmountAfterDisc = cart.totalAmountAfterDisc;
-    order.coupon_code = coupon_code;
-  }
   user.orders.push(order._id);
   user.save();
   if (paymentMethod == "online") {
@@ -66,17 +67,17 @@ export const checkout = catchError(async (req, res, next) => {
 
     return res.json({ message: "success", session, order });
   }
-  let books = cart.books.map((el) => ({
-    updateOne: {
-      filter: { _id: el.book._id },
-      update: { $inc: { stock: -el.qty, sold: el.qty } },
-    },
-  }));
+  for (const el of cart.books) {
+    let book = await bookModel.findById(el.book._id);
+    book.sold += el.qty;
+    if (el.variation_name == "hardcover") {
+      book.variations[1].variation_qty -= el.qty;
+    }
+    book.save();
+  }
+  await cartModel.findByIdAndDelete(cart._id);
 
-  // await bookModel.bulkWrite(books);
-  // await cartModel.findByIdAndDelete(cart._id)
-
-  res.json({ message: "success", order, user });
+  res.json({ message: "success", order });
 });
 
 export const successCheckOut = catchError(async (request, response) => {
@@ -99,19 +100,41 @@ export const successCheckOut = catchError(async (request, response) => {
     order.paidAt = Date.now();
     order.isPaid = true;
     order.save();
-    // let books = cart.books.map((el) => ({
-    //   updateOne: {
-    //     filter: { _id: el.book._id },
-    //     update: { $inc: { stock: -el.qty, sold: el.qty } },
-    //   },
-    // }));
-
-    // await bookModel.bulkWrite(books);
-    // const cart = await cartModel.findOne({ user: user._id });
-    // await cartModel.findByIdAndDelete(cart._id)
+    for (const el of order.books) {
+      let book = await bookModel.findById(el.book._id);
+      book.sold += el.qty;
+      if (el.variation_name == "hardcover") {
+        book.variations[1].variation_qty -= el.qty;
+      }
+      book.save();
+    }
+    const cart = await cartModel.findOne({ user: user._id });
+    await cartModel.findByIdAndDelete(cart._id);
+    //-------------------------------------------
+    const alreadySubmitted = await Feedback.alreadySubmittedFeedback(user._id);
+    if (!alreadySubmitted) {
+      // add the email
+    }
   } else {
     console.log(`Unhandled event type ${event.type}`);
     await orderModel.findByIdAndDelete(data.client_reference_id);
   }
   response.send();
+});
+
+export const getPdf = catchError(async (req, res, next) => {
+  const { _id } = req.user;
+  const user = await UserModel.findById(_id);
+  if (!user) throw new AppError("this email doesn't exist", 404);
+  const orders = await orderModel.find({ user: user._id });
+  let pdfBooks = [];
+  for (const el of orders) {
+    for (const book of el.books) {
+      if (book.variation_name == "pdf") {
+        pdfBooks.push(book.book._id);
+      }
+    }
+  }
+
+  res.json({ message: "success", pdfBooks, orders });
 });

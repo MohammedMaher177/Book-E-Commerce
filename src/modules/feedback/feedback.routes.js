@@ -1,9 +1,9 @@
 import { Router } from "express";
-import checkRole from "../../middleware/roles";
-import { authMiddleware } from "../../middleware/authentication";
-import { validate } from "../../middleware/validate";
-import { createFeedbackValidation } from "./controller/feedback.validation";
-import { createFeedback } from "./controller/feedback.controller";
+import checkRole from "../../middleware/roles.js";
+import { authMiddleware } from "../../middleware/authentication.js";
+import { validate } from "../../middleware/validate.js";
+import { createFeedbackValidation } from "./controller/feedback.validation.js";
+import { createFeedback } from "./controller/feedback.controller.js";
 
 const feedbackRouter = Router();
 

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import bookModel from "../../../../DB/models/book.model.js";
 import categoryModel from "../../../../DB/models/category.model.js";
 import cloudinary from "../../../multer/cloudinary.js";
@@ -37,7 +36,6 @@ export const searchBook = catchError(async (req, res, next) => {
   });
   res.json({ massege: "success", book });
 });
-
 export const getBook = catchError(getDocById(bookModel));
 
 export const addBook = catchError(async (req, res, next) => {
@@ -79,7 +77,7 @@ export const updateBook = catchError(async (req, res, next) => {
   const { bookId } = req.params;
   const book = await bookModel.findById(bookId);
   if (!book) {
-    throw new AppError("Book Not found", 403);
+    throw new AppError("Book Not found", 404);
   }
   await bookModel.findByIdAndUpdate(book._id, req.body, { new: true });
   if (req.file) {
@@ -197,11 +195,8 @@ export const forYou = catchError(async (req, res, next) => {
   const { searchedCats, fav_cats } = req.user;
   let fav = fav_cats.map((ele) => ele._id);
   fav = fav.concat(searchedCats);
-  console.log(fav);
   fav = fav.map((el) => el.toString());
   const categories = new Set(fav);
-  console.log(categories);
-
   let result = await suggestCategory(categories);
   result = shuffle(result);
   res.status(200).json({
@@ -211,21 +206,39 @@ export const forYou = catchError(async (req, res, next) => {
 });
 
 export const updateData = catchError(async (req, res) => {
-  let result = await bookModel.find();
-  result = result.map((el) => {
-    let n = uuidv4();
-    n = n.split("-")[0].substring(0, 6);
-    el.slug = slugify(el.name)+"-"+ n;
-    return el;
+  const allBooks = await bookModel.updateMany({"variations.variation_name": "hard cover"},{
+    $set: {
+      "variations.$.variation_name": "hardcover",
+    },
   });
-  const option = {
-    slug : slugify()
-  }
-  await result.save()
-  // result.bulkWrite({
-  //   updateOne{
-  //     flter:{$exis}
-  //   }
-  // })
-  res.json(result);
+  // console.log(allBooks.length);
+  // for (const book of allBooks) {
+  //   const price = book.variations[0].variation_price
+  //   console.log(price);
+  //   book.price = price
+  //   await book.save();
+  // }
+  res.status(201).json({ message: "success", allBooks });
+  // let result = await bookModel.find();
+  // result = result.map((el) => {
+  //   let n = uuidv4();
+  //   n = n.split("-")[0].substring(0, 6);
+  //   el.slug = slugify(el.name) + "-" + n;
+  //   return el;
+  // });
+  // const option = {
+  //   slug: slugify(),
+  // };
+  // await result.save();
+  // // result.bulkWrite({
+  // //   updateOne{
+  // //     flter:{$exis}
+  // //   }
+  // // })
+  // res.json(result);
+});
+
+export const getAuthors = catchError(async (req, res) => {
+  const authors = await bookModel.find().distinct("author");
+  res.json({ message: "success", authors });
 });

@@ -4,6 +4,8 @@ import categoryModel from "../../DB/models/category.model.js";
 import cloudinary from "../multer/cloudinary.js";
 import { ApiFeatures } from "./ApiFeatures.js";
 import { AppError } from "./ErrorHandler/AppError.js";
+import reviewModel from "../../DB/models/review.model.js";
+import { getRating } from "./helper-functions.js";
 
 export const getData = (model) => {
   return async (req, res) => {
@@ -33,9 +35,21 @@ export const deleteData = (model) => {
       return next(new AppError("Not Found", 404));
     }
     if (result.user) {
-      if (result.user !== userId) {
+      if (result.user._id.toHexString() !== req.user._id.toHexString()) {
         return next(new AppError("Not Authorized", 401));
       }
+    }
+    if (model == reviewModel) {
+      const existBook = await bookModel.findById(result.book);
+      existBook.reviews = await reviewModel.find({book:existBook._id})
+      if (!(await getRating(existBook._id))) {
+        existBook.rating=0
+      }else{
+
+        existBook.rating = await getRating(existBook._id);
+      }
+  
+      existBook.save();
     }
     res.status(201).json({ message: "success", result });
   };
@@ -45,24 +59,23 @@ export const getDocById = (model) => {
   return async (req, res, next) => {
     const { slug } = req.params;
     const { user } = req;
-    const result = await model.findOne({slug:slug});
+    const result = await model.findOne({ slug: slug });
     if (!result) {
       return next(new AppError("Not Found", 404));
     }
     if (user) {
-      console.log(user.searchedBooks);
       const id = new mongoose.Types.ObjectId(result._id);
       if (model === bookModel) {
         if (!user.searchedBooks.includes(id)) {
           user.searchedBooks.push(id);
           await user.save();
-        }
-        else{
-          const index = user.searchedBooks.findIndex((ele) => ele.toString()===id.toJSON())
-          user.searchedBooks.splice(index,1)
+        } else {
+          const index = user.searchedBooks.findIndex(
+            (ele) => ele.toString() === id.toString()
+          );
+          user.searchedBooks.splice(index, 1);
           user.searchedBooks.push(id);
           await user.save();
-          console.log(user.searchedBooks);
         }
       }
       if (model === categoryModel) {
@@ -72,14 +85,17 @@ export const getDocById = (model) => {
         }
       }
     }
-    if (model=== bookModel) {
-      const catOfBook= await categoryModel.findOne({slug:result.category.slug})
-      const bookCategory = await bookModel.find({category:catOfBook._id}).limit(10)
-      const books = await bookModel.find().limit(10)
-      res.status(200).json({ message: "success", result,bookCategory,books });
-   }
+    if (model === bookModel) {
+      const catOfBook = await categoryModel.findOne({
+        slug: result.category.slug,
+      });
+      const bookCategory = await bookModel
+        .find({ category: catOfBook._id })
+        .limit(10);
+      const books = await bookModel.find().limit(10);
+      res.status(200).json({ message: "success", result, bookCategory, books });
+    }
 
-    
     res.status(200).json({ message: "success", result });
   };
 };

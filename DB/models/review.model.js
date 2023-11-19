@@ -8,7 +8,7 @@ const reviewSchema = new Schema(
       require: [true, "Review Comment Required"],
     },
     book: { type: Types.ObjectId, require: true, ref: "book" },
-    user: { type: Types.ObjectId, require: true, ref: "user" },
+    user: { type: Types.ObjectId, require: true, ref: "User" },
     rating: { type: Number, min: 1, max: 5 },
   },
   { timestamps: true }

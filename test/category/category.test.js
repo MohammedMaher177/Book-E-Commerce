@@ -26,9 +26,7 @@ describe("Category controllers", () => {
                 this.message = data.message;
               }
             };
-      
             await catchError(getData(categoryModel))
-            console.log(res);
             expect(res.statusCode).to.be.equal(200);
             expect(res.message).to.be.equal("success");
       

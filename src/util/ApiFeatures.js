@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bookModel from "../../DB/models/book.model.js";
+import categoryModel from "../../DB/models/category.model.js";
 
 export class ApiFeatures {
   totalCount;
@@ -26,22 +28,84 @@ export class ApiFeatures {
     delObj.forEach((ele) => {
       delete filterObj[ele];
     });
-    filterObj = JSON.stringify(filterObj);
-    filterObj = filterObj.replace(
-      /\b(gt|gte|lt|lte)\b/g,
-      (match) => `$${match}`
-    );
+    let finalFilter = {};
+    for (const key in filterObj) {
+      if (key === "price") {
+        let val = filterObj[key].split("-");
+        val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+        val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+        finalFilter[key] = { $gte: val[0], $lte: val[1] };
+      }
+      if (key === "published") {
+        let published = filterObj[key];
+        if (typeof published === "string") {
+          let val = filterObj[key].split("-");
+          val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+          val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+          finalFilter[key] = { $gte: val[0], $lte: val[1] };
+        } else {
+          published.forEach((ele) => {
+            let val = ele.split("-");
+            val[0] = Number(val[0].replace(/["]/g, (match) => (match = "")));
+            val[1] = Number(val[1].replace(/["]/g, (match) => (match = "")));
+            const old = finalFilter["$or"] || [];
+            finalFilter["$or"] = [
+              ...old,
+              { [key]: { $gte: val[0], $lte: val[1] } },
+            ];
+          });
+        }
+      }
 
-    filterObj = JSON.parse(filterObj);
-    if (filterObj._id !== undefined) {
-      const { name, value } = filterObj._id;
-      filterObj[name] = new mongoose.Types.ObjectId(value);
-      delete filterObj._id;
-    } else {
-      delete filterObj._id;
+      if (key === "author" || key === "publisher" || key === "lang") {
+        let elements = filterObj[key].split(",");
+        elements.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+        const options = elements.map((el) => new RegExp(el, "i"));
+        finalFilter[key] = { $in: options };
+      }
+      if (key === "format") {
+        let elements = filterObj[key].split(",");
+        elements.map((el) => el.replace(/[^\w\s]/gi, (match) => `\\${match}`));
+        const options = elements.map((el) => new RegExp(el, "i"));
+        finalFilter["variations.variation_name"] = { $in: options };
+      }
+      if (key === "stock" && filterObj["format"]) {
+        let element = filterObj[key];
+        console.log(filterObj);
+        if (
+          element === "true" &&
+          filterObj["format"].toLowerCase() === "hardcover"
+        ) {
+          finalFilter["variations.variation_qty"] = { $gt: 0 };
+          // continue;
+        }
+        // finalFilter["variations.variation_is_available"] = false;
+      }
+      if (key === "rate") {
+        const element = +filterObj[key];
+        if (element > 5) continue;
+        if (element === 5) {
+          finalFilter["rating"] = 5;
+          continue;
+        }
+        finalFilter["rating"] = { $gte: element };
+      }
+      if (key === "category") {
+        let elements = filterObj[key].split(",");
+        let c = await categoryModel
+          .find({
+            slug: { $in: elements },
+          })
+          .select("_id");
+        finalFilter.category = { $in: c.map((ele) => ele._id) };
+      }
     }
-    this.totalCount = await this.mongooseQuery.find(filterObj).count().clone();
-    this.mongooseQuery.find(filterObj);
+    this.totalCount = await this.mongooseQuery
+      .find(finalFilter)
+      .count()
+      .clone();
+    this.mongooseQuery.find(finalFilter);
+
     return this;
   }
 
@@ -56,8 +120,10 @@ export class ApiFeatures {
   //4 - search
   async #search() {
     if (this.queryString.keyword) {
-      let key = this.queryString.keyword.replace(/[^\w\s]/gi, (match) => `\\${match}`);
-      console.log(key);
+      let key = this.queryString.keyword.replace(
+        /[^\w\s]/gi,
+        (match) => `\\${match}`
+      );
       this.totalCount = await this.mongooseQuery
         .find({
           $or: [
@@ -122,3 +188,20 @@ export class ApiFeatures {
     return this;
   }
 }
+
+/*
+filterObj = {
+  name: [],
+  price: {$gt:22, $lt:33},
+  category: [],
+  author: [],
+  publisher: [],
+  publishe:{$gt:22, $lt:33}
+}
+filterObj = {
+  category: [],
+  author: [],
+  publisher: [],
+  publishe:{$gt:22, $lt:33}
+}
+*/

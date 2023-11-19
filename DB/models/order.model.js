@@ -51,10 +51,7 @@ const orderSchema = new Schema({
     type:Date
   },
   totalAmountAfterDisc: { type: Number, default: 0 },
-  coupon_code: {
-    type: Types.ObjectId,
-    ref: "copon",
-  }
+  coupon_code: {type:String}
 });
 
 

@@ -35,7 +35,7 @@ export const checkout = catchError(async (req, res, next) => {
     var discount = [];
     if (cart.discount) {
       const coupon = await stripe.coupons.create({
-        percent_off: cart.discount,
+        percent_off: cart.discount * 100,
         duration: "once",
         name: cart.coupon_code,
       });
@@ -130,7 +130,11 @@ export const getPdf = catchError(async (req, res, next) => {
   let pdfBooks = [];
   for (const el of orders) {
     for (const book of el.books) {
-      if (book.variation_name == "pdf") {
+      if (
+        book.variation_name == "pdf" &&
+        !pdfBooks.includes(book.book._id) &&
+        el.isPaid
+      ) {
         pdfBooks.push(book.book._id);
       }
     }

@@ -206,11 +206,14 @@ export const forYou = catchError(async (req, res, next) => {
 });
 
 export const updateData = catchError(async (req, res) => {
-  const allBooks = await bookModel.updateMany({"variations.variation_name": "hard cover"},{
-    $set: {
-      "variations.$.variation_name": "hardcover",
-    },
-  });
+  const allBooks = await bookModel.updateMany(
+    { "variations.variation_name": "hard cover" },
+    {
+      $set: {
+        "variations.$.variation_name": "hardcover",
+      },
+    }
+  );
   // console.log(allBooks.length);
   // for (const book of allBooks) {
   //   const price = book.variations[0].variation_price
@@ -241,4 +244,22 @@ export const updateData = catchError(async (req, res) => {
 export const getAuthors = catchError(async (req, res) => {
   const authors = await bookModel.find().distinct("author");
   res.json({ message: "success", authors });
+});
+
+export const addPdfUrl = catchError(async (req, res) => {
+  const books = await bookModel.find({});
+  for (const book of books) {
+    const { public_id, secure_url } = await cloudinary.uploader.upload(
+      req.files[0].path,
+      { folder: `BookStore/Book/pdf_${book._id}` }
+    );
+    
+    book.variations[0].variation_url.public_id=public_id;
+    book.variations[0].variation_url.secure_url=secure_url;
+    book.save()
+    
+  }
+
+  
+  res.status(201).json({ message: "success"});
 });

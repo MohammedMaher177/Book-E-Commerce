@@ -56,6 +56,7 @@ const bookSchema = new Schema(
           },
           variation_price: { type: Number, required: true },
           variation_qty: Number,
+          variation_url: { public_id: String, secure_url: String },
           variation_is_available: {
             type: Boolean,
             required: true,

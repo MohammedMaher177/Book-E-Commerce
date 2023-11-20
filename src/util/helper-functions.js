@@ -91,4 +91,16 @@ export const getRating = async (book) => {
   avg = total / reviews.length;
   return avg;
 };
-
+export const sendFeedbackEmail = async (email) => {
+  const url ="google.com"
+  await sendEmail({
+    to: email,
+    subject: "Feedback Email",
+    text : "Feedback Email",
+    html: feedbackEmail(
+      "Feedback Email",
+      `Thanks for using Book Store E-Commerce. Let us know your feedback`,
+      url
+    ),
+  });
+};

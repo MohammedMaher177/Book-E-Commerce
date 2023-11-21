@@ -75,7 +75,7 @@ userSchema.pre(/^find/, async function () {
     this.populate("fav_cats")
 })
 userSchema.pre(/^find/, async function () {
-    this.populate("orders")
+    // this.populate("orders")
 })
 // userSchema.pre(/^find/, async function () {
 //     this.populate("whish_list")

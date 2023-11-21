@@ -6,7 +6,7 @@ export const addToCartValidation = {
     .object({
       book: idValidation,
       qty: joi.number().positive(),
-      type: joi
+      variation_name: joi
         .string()
         .required()
         .valid("hardcover", "pdf", "e-book", "audio")
@@ -24,16 +24,16 @@ export const createCartValidation = {
             .object({
               _id: idValidation,
             })
-            .required(),
+            .required().options({allowUnknown: true}),
           qty: joi.number().positive().required(),
-          type: joi
+          variation_name: joi
             .string()
             .valid("hardcover", "pdf", "e-book", "audio")
             .required(),
         })
         .required(),
     })
-    .required(),
+    .required().options({allowUnknown: true}),
 };
 
 export const updateCartQtyValidation = {

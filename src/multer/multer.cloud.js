@@ -2,7 +2,7 @@ import multer from "multer";
 
 export const uploadValidation = {
   image: ["image/jpeg", "image/png"],
-  pdf: ["applicatioon/pdf"],
+  pdf: ["application/pdf"],
 };
 
 export const uploadImage = (customValidation) => {

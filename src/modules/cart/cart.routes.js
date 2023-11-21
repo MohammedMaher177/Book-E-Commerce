@@ -26,13 +26,6 @@ cartRouter
   .post(authMiddleware, validate(addToCartValidation), addToCart)
   .patch(authMiddleware, validate(updateCartQtyValidation), updateCartQty)
   .delete(authMiddleware, removeCart);
-  
-  cartRouter
-  .route("/coupon")
-  .patch(authMiddleware, addCouponToCart)
-  .delete("/:code", authMiddleware, removeCouponFromCart)
-  // cartRouter.patch("/coupon", authMiddleware, addCouponToCart);
-  // cartRouter.delete("/coupon/:code", authMiddleware, removeCouponFromCart);
 
 cartRouter.post(
   "/createCart",
@@ -40,6 +33,11 @@ cartRouter.post(
   validate(createCartValidation),
   creatUserCart
 );
+
+
+cartRouter.patch("/coupon", authMiddleware, addCouponToCart);
+cartRouter.delete("/coupon/:code", authMiddleware, removeCouponFromCart);
+
 cartRouter.delete(
   "/:id/:variation_name",
   authMiddleware,

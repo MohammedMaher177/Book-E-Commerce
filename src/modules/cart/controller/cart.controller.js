@@ -119,14 +119,15 @@ export const addToCart = catchError(async (req, res, next) => {
       el.book._id == req.body.book &&
       el.variation_name == req.body.variation_name
   );
-
+  req.body.book = {_id:req.body.book};
   if (index === -1) {
     await addNewBook(cart, req.body);
   } else {
     if (req.body.variation_name === "hardcover") {
-      req.body.qty += cart.books[index].qty;
-      req.body.totalPrice = req.body.qty * cart.books[index].price;
-      cart.books[index] = { ...req.body };
+
+      cart.books[index].qty += req.body.qty;
+      cart.books[index].totalPrice = cart.books[index].qty * cart.books[index].price;
+      // cart.books[index] = { ...req.body };
     }
   }
   calcPrice(cart);
@@ -148,16 +149,17 @@ export const updateCartQty = catchError(async (req, res, next) => {
   );
   if (index == -1) throw new AppError("In-Valid book ID", 404);
 
-  req.body.totalPrice = req.body.qty * cart.books[index].book.price;
-  req.body.price = cart.books[index].book.price;
-  req.body.variation_name = "hardcover";
-  cart.books[index].qty =  req.body.qty;
-
+  // req.body.totalPrice = req.body.qty * cart.books[index].book.price;
+  // req.body.price = cart.books[index].book.price;
+  // req.body.variation_name = "hardcover";
+  // cart.books[index].qty = req.body.qty;
+  cart.books[index].qty = req.body.qty;
+  cart.books[index].totalPrice = cart.books[index].qty * cart.books[index].price;
   calcPrice(cart);
   calcDiscount(cart);
 
   await cart.save();
-  
+
   return res.status(202).json({ message: "success", cart });
 });
 
@@ -166,12 +168,13 @@ export const removeItem = catchError(async (req, res, next) => {
   const { id, variation_name } = req.params;
   let cart = await cartModel.findOne({ user: _id });
   if (!cart) return new AppError("Cart Not Found", 404);
+  console.log(cart.books);
   let index = cart.books.findIndex(
-    (el) => el.book.id == id && el.variation_name == variation_name
+    (el) => el.book._id == id && el.variation_name == variation_name
   );
   if (index == -1) throw new AppError("In-Valid Product ID", 404);
   cart.books.splice(index, 1);
-
+  console.log(cart.books);
   calcPrice(cart);
   calcDiscount(cart);
   await cart.save();

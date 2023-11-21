@@ -6,17 +6,27 @@ const orderSchema = new Schema({
     required: true,
     ref: "User",
   },
+  name:{
+    type:String,
+    required:true,
+  },
   books: [
     {
       book: { type: Types.ObjectId, ref: "book", required: true },
-      qty: { type: Number },
+      variation_name: {
+        type: String,
+        required: true,
+        enum: ["hardcover", "pdf", "e-book", "audio"],
+      },
+      qty: { type: Number, default: 1 },
       price: Number,
-      totalPrice:Number
+      totalPrice: Number,
+      _id: false,
     },
   ],
   totalOrderPrice: { type: Number},
   shippingAdress:{
-   street:{type:String},
+   adress:{type:String},
    city:{type:String},
    country:{type:String},
    phone:{type:Number},
@@ -41,16 +51,13 @@ const orderSchema = new Schema({
     type:Date
   },
   totalAmountAfterDisc: { type: Number, default: 0 },
-  coupon_code: {
-    type: Types.ObjectId,
-    ref: "copon",
-  }
+  coupon_code: {type:String}
 });
 
 
-// orderSchema.pre([/^find/, 'save'], function () {
-//   this.populate("books.book", "image name price slug")
-// });
+orderSchema.pre([/^find/, 'save'], function () {
+  this.populate("books.book", "image name price slug")
+});
 
 export const orderModel = model("order", orderSchema);
 

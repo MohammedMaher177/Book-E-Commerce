@@ -78,12 +78,29 @@ export const suggestCategory = async (categories) => {
 };
 export const getRating = async (book) => {
   let reviews = await reviewModel.find({ book: book });
+  var avg;
+  if (!reviews) {
+    avg =0
+    return avg;
+  }
   reviews = reviews.map((el) => el.rating);
   var total = 0;
   for (var i = 0; i < reviews.length; i++) {
     total += reviews[i];
   }
-  var avg = total / reviews.length;
+  avg = total / reviews.length;
   return avg;
 };
-
+export const sendFeedbackEmail = async (email) => {
+  const url ="google.com"
+  await sendEmail({
+    to: email,
+    subject: "Feedback Email",
+    text : "Feedback Email",
+    html: feedbackEmail(
+      "Feedback Email",
+      `Thanks for using Book Store E-Commerce. Let us know your feedback`,
+      url
+    ),
+  });
+};

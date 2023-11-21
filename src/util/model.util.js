@@ -42,7 +42,13 @@ export const deleteData = (model) => {
     if (model == reviewModel) {
       const existBook = await bookModel.findById(result.book);
       existBook.reviews = await reviewModel.find({book:existBook._id})
-      existBook.rating = await getRating(existBook._id);
+      if (!(await getRating(existBook._id))) {
+        existBook.rating=0
+      }else{
+
+        existBook.rating = await getRating(existBook._id);
+      }
+  
       existBook.save();
     }
     res.status(201).json({ message: "success", result });
@@ -54,6 +60,7 @@ export const getDocById = (model) => {
     const { slug } = req.params;
     const { user } = req;
     const result = await model.findOne({ slug: slug });
+    console.log(result);
     if (!result) {
       return next(new AppError("Not Found", 404));
     }

@@ -8,6 +8,7 @@ import reviewRouter from "./modules/review/review.routes.js";
 import cartRouter from "./modules/cart/cart.routes.js";
 import couponRouter from "./modules/coupon/coupon.routes.js";
 import orderRouter from "./modules/order/order.route.js";
+import feedbackRouter from "./modules/feedback/feedback.routes.js";
 
 export const bootstrap = (app) => {
   connectionDb();
@@ -19,6 +20,8 @@ export const bootstrap = (app) => {
   app.use("/api/v1/cart", cartRouter);
   app.use("/api/v1/coupon", couponRouter);
   app.use("/api/v1/order", orderRouter);
+  app.use("/api/v1/feedback", feedbackRouter);
+  
 
   app.all("*", (req, res, next) => {
     next(new AppError("Page Not Found", 404));

@@ -70,6 +70,7 @@ export const profile = catchError(async (req, res, next) => {
     fav_cats: await user.fav_cats,
     wish_List:await user.whish_list,
   };
+  console.log(user.whish_ist);
   res.status(200).json({ message: "success", user: returnUser });
 });
 

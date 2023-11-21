@@ -69,17 +69,26 @@ export class ApiFeatures {
         const options = elements.map((el) => new RegExp(el, "i"));
         finalFilter["variations.variation_name"] = { $in: options };
       }
-      if (key === "stock") {
+      if (key === "stock" && filterObj["format"]) {
         let element = filterObj[key];
         console.log(filterObj);
         if (
           element === "true" &&
-          filterObj[key].toLowerCase() === "hardcover"
+          filterObj["format"].toLowerCase() === "hardcover"
         ) {
           finalFilter["variations.variation_qty"] = { $gt: 0 };
           // continue;
         }
         // finalFilter["variations.variation_is_available"] = false;
+      }
+      if (key === "rate") {
+        const element = +filterObj[key];
+        if (element > 5) continue;
+        if (element === 5) {
+          finalFilter["rating"] = 5;
+          continue;
+        }
+        finalFilter["rating"] = { $gte: element };
       }
       if (key === "category") {
         let elements = filterObj[key].split(",");

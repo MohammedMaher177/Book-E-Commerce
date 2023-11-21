@@ -16,6 +16,13 @@ const bookSchema = new Schema(
     pages: { type: Number, required: true },
     image: { public_id: String, secure_url: String },
     sold: { type: Number, default: 0 },
+    // sold: {
+    //   type: {
+    //     pdf: { type: Number, default: 0 },
+    //     ebook: { type: Number, default: 0 },
+    //     hardcover: { type: Number, default: 0 },
+    //   },
+    // },
     price: { type: Number, required: true },
     discount: { type: Number, default: 0 },
     author: { type: String, required: true, trim: true },
@@ -49,6 +56,7 @@ const bookSchema = new Schema(
           },
           variation_price: { type: Number, required: true },
           variation_qty: Number,
+          variation_url: { public_id: String, secure_url: String },
           variation_is_available: {
             type: Boolean,
             required: true,
@@ -75,21 +83,21 @@ const bookSchema = new Schema(
 );
 
 bookSchema.pre(/^find/, { document: false, query: true }, function () {
-  // this.populate([
-  //   {
-  //     path: "category",
-  //     select: "name slug",
-  //   },
-  // ]);
+  this.populate([
+    {
+      path: "category",
+      select: "name slug",
+    },
+  ]);
 });
 
 bookSchema.pre(/^find/, { document: false, query: true }, function () {
-  // this.populate([
-  //   {
-  //     path: "reviews",
-  //     select: "user content rating",
-  //   },
-  // ]);
+  this.populate([
+    {
+      path: "reviews",
+      select: "user content rating",
+    },
+  ]);
 });
 // bookSchema.virtual("reviews", {
 //   ref: "review",

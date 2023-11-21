@@ -15,7 +15,7 @@ export const createCoupon = catchError(async (req, res, next) => {
 //     res.status(201).json({message: "success", coupon});
 // })
 export const deleteCoupon = catchError(async (req, res, next) => {
-    const {code} = req.params;
-    await Coupon.findOneAndRemove({code})
+    const {id} = req.params;
+    await Coupon.findByIdAndRemove(id)
     res.status(201).json({message: "deleted success"})
 })

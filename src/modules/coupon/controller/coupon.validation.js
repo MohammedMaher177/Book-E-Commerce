@@ -14,7 +14,7 @@ export const createCouponValidation = {
 export const deleteCouponValidation = {
   params: joi
     .object({
-      code: joi.string().required(),
+      id: idValidation,
     })
     .required(),
 };

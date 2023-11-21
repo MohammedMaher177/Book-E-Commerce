@@ -12,7 +12,7 @@ couponRouter.route('/')
 .get(authMiddleware, checkRole(['Admin']), getCoupons)
 .post(authMiddleware, checkRole(['Admin']), validate(createCouponValidation), createCoupon)
 
-couponRouter.delete('/:code', authMiddleware, checkRole(['Admin']), validate(deleteCouponValidation), deleteCoupon)
+couponRouter.delete('/:id', authMiddleware, checkRole(['Admin']), validate(deleteCouponValidation), deleteCoupon)
 
 
 export default couponRouter;

@@ -81,7 +81,7 @@ export const deleteUser = catchError(async (req, res, next) => {
 export const signin = catchError(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await UserModel.findOne({ email });
+  const user = await UserModel.findOne({ email: {$regex: email, $options: "i"} });
   if (!user) {
     throw new AppError("this email doesn't exist", 404);
   }

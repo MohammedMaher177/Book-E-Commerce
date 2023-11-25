@@ -22,18 +22,29 @@ async function existingBook(id) {
   const existBook = await bookModel.findById(id).select("price");
   return existBook;
 }
+
 async function addNewBook(cart, el) {
-  const product = await bookModel.findById(el.book._id).select("price");
+  const product = await bookModel
+    .findById(el.book._id)
+    .select("price variations name");
   if (!product) {
     throw new AppError(`In-Valid Book Id ${el.book._id}`);
+  }
+  product.cuurent_varaton = product.variations.find((book) => {
+    if (book.variation_name === el.variation_name) return book;
+  });
+  if (!product.cuurent_varaton) {
+    throw new AppError(`In-Valid Variation name of ${product.name}`);
   }
   return cart.books.push({
     book: el.book._id,
     qty: el.qty,
-    price: product.price,
-    totalPrice: el.qty * product.price,
+    price: product.cuurent_varaton.variation_price,
+    totalPrice: el.qty * product.cuurent_varaton.variation_price,
+    variation_name: el.variation_name,
   });
 }
+
 export const getCartDetails = catchError(async (req, res, next) => {
   const { _id } = req.user;
   let cart = await cartModel.findOne({ user: _id });
@@ -45,18 +56,26 @@ export const getCartDetails = catchError(async (req, res, next) => {
 
 export const creatUserCart = catchError(async (req, res, next) => {
   const { books } = req.body;
-  console.log(books);
+  // console.log(books);
   const { _id } = req.user;
   const existCart = await cartModel.findOne({ user: _id });
-  if (existCart.books.length > 0) {
+  if (!existCart.books.length) {
+    for (let i = 0; i < books.length; i++) {
+      await addNewBook(existCart, books[i]);
+    }
+  } else if (existCart.books.length > 0) {
     for (const el of books) {
       let flag = true;
-
       existCart.books.map((existBook) => {
-        if (el.book._id.toString() === existBook.book._id.toString()) {
+        if (
+          el.book._id.toString() === existBook.book._id.toString() &&
+          el.variation_name === existBook.variation_name
+        ) {
           flag = false;
-          existBook.qty += el.qty;
-          existBook.totalPrice = existBook.qty * existBook.price;
+          if (el.variation_name === "hardcover") {
+            existBook.qty = el.qty;
+            existBook.totalPrice = existBook.qty * existBook.price;
+          }
         }
       });
 
@@ -65,46 +84,50 @@ export const creatUserCart = catchError(async (req, res, next) => {
       }
       await addNewBook(existCart, el);
     }
-  } else {
-    for (let i = 0; i < books.length; i++) {
-      await addNewBook(existCart, books[i]);
-    }
   }
   calcPrice(existCart);
   calcDiscount(existCart);
-  // await existCart.save();
-  const realCart = await cartModel.findOne({user: _id})
-  res.json({ cart: existCart, message: "success" });
+  console.log(existCart);
+  await existCart.save();
+  const realCart = await cartModel.findOne({ user: _id });
+  res.json({ cart: realCart, message: "success" });
 });
+
 export const addToCart = catchError(async (req, res, next) => {
   const { _id } = req.user;
   console.log(req.body);
-  req.body.variation_name = req.body.type
   const existBook = await existingBook(req.body.book);
 
   if (!existBook) throw new AppError("In-Valid book ID", 404);
-  req.body.qty = req.body.variation_name !== "hardcover" ?  1 :  req.body.qty || 1;
-  req.body.totalPrice = req.body.qty * existBook.price;
-  req.body.price = existBook.price;
+  req.body.qty =
+    req.body.variation_name !== "hardcover" ? 1 : req.body.qty || 1;
   let cart = await cartModel.findOne({ user: _id });
 
   if (!cart) {
     cart = await cartModel.create({
       user: _id,
-      books: req.body,
-      totalAmount: req.body.totalPrice,
+      books: [],
+      totalAmount: 0,
     });
+    await addNewBook(cart, req.body);
+    await cart.save();
     return res.status(201).json({ message: "success", cart });
   }
-  let index = cart.books.findIndex((el) => el.book._id == req.body.book && el.variation_name == req.body.variation_name);
 
+  let index = cart.books.findIndex(
+    (el) =>
+      el.book._id == req.body.book &&
+      el.variation_name == req.body.variation_name
+  );
+  req.body.book = {_id:req.body.book};
   if (index === -1) {
-    cart.books.push(req.body);
+    await addNewBook(cart, req.body);
   } else {
-    if(req.body.variation_name === "hardcover"){
-      req.body.qty += cart.books[index].qty;
-      req.body.totalPrice = req.body.qty * cart.books[index].price;
-      cart.books[index] = { ...req.body };
+    if (req.body.variation_name === "hardcover") {
+
+      cart.books[index].qty += req.body.qty;
+      cart.books[index].totalPrice = cart.books[index].qty * cart.books[index].price;
+      // cart.books[index] = { ...req.body };
     }
   }
   calcPrice(cart);
@@ -120,36 +143,42 @@ export const updateCartQty = catchError(async (req, res, next) => {
   let cart = await cartModel.findOne({ user: _id });
 
   if (!cart) return new AppError("Cart Not Found", 404);
-  if (!req.body.qty) throw new AppError("In-Valid book QTY", 403);
 
-  let index = cart.books.findIndex((el) => el.book.id == book && el.variation_name === "hardcover");
+  let index = cart.books.findIndex(
+    (el) => el.book._id == book && el.variation_name == "hardcover"
+  );
   if (index == -1) throw new AppError("In-Valid book ID", 404);
 
-  req.body.totalPrice = req.body.qty * cart.books[index].book.price;
-  req.body.price = cart.books[index].book.price;
-  cart.books[index] = req.body;
-
+  // req.body.totalPrice = req.body.qty * cart.books[index].book.price;
+  // req.body.price = cart.books[index].book.price;
+  // req.body.variation_name = "hardcover";
+  // cart.books[index].qty = req.body.qty;
+  cart.books[index].qty = req.body.qty;
+  cart.books[index].totalPrice = cart.books[index].qty * cart.books[index].price;
   calcPrice(cart);
-
   calcDiscount(cart);
+
   await cart.save();
-  const existCart = await cartModel.findOne({ user: _id }); //.populate("book", "price ");
-  // await cart.populate("book", "price image");
+
   return res.status(202).json({ message: "success", cart });
 });
 
 export const removeItem = catchError(async (req, res, next) => {
   const { _id } = req.user;
-  const { id } = req.params;
+  const { id, variation_name } = req.params;
   let cart = await cartModel.findOne({ user: _id });
   if (!cart) return new AppError("Cart Not Found", 404);
-  let index = cart.books.findIndex((el) => el.book.id == id);
+  console.log(cart.books);
+  let index = cart.books.findIndex(
+    (el) => el.book._id == id && el.variation_name == variation_name
+  );
   if (index == -1) throw new AppError("In-Valid Product ID", 404);
   cart.books.splice(index, 1);
+  console.log(cart.books);
   calcPrice(cart);
-
   calcDiscount(cart);
   await cart.save();
+
   return res.json({ message: "success", cart });
 });
 

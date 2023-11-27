@@ -79,6 +79,7 @@ export const deleteUser = catchError(async (req, res, next) => {
 });
 
 export const signin = catchError(async (req, res, next) => {
+  console.log(33333333);
   const { email, password } = req.body;
 
   const user = await UserModel.findOne({ email });

@@ -4,6 +4,7 @@ import { AppError } from "../util/ErrorHandler/AppError.js";
 import UserModel from "../../DB/models/user.model.js";
 
 export const authMiddleware = catchError(async (req, res, next) => {
+  console.log('4444444');
   const { authorization } = req.headers;
   if (!authorization) {
     return next(new AppError("unauthorized", 401));

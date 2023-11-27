@@ -35,6 +35,7 @@ async function addNewBook(cart, el) {
   });
 }
 export const getCartDetails = catchError(async (req, res, next) => {
+  console.log("111");
   const { _id } = req.user;
   let cart = await cartModel.findOne({ user: _id });
   if (!cart) {

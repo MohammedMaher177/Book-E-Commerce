@@ -14,7 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
   const { email } = req.user;
-  const { shippingAdress, name, paymentMethod } = req.body;
+  const { shippingAddress, name, paymentMethod } = req.body;
   const user = await UserModel.findOne({ email });
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
@@ -22,15 +22,18 @@ export const checkout = catchError(async (req, res, next) => {
   if (cart.books.length == 0) {
     throw new AppError("there are no books in the cart", 404);
   }
+  let orderCount = await orderModel.find().count();
+  // console.log(orderCount);
   const order = await orderModel.create({
     user: user._id,
     name: name || user.userName,
     books: cart.books,
     totalOrderPrice: cart.totalOrderPrice,
     totalAmountAfterDisc: cart.totalAmountAfterDisc,
-    shippingAdress: shippingAdress,
+    shippingAddress: shippingAddress,
     coupon_code: cart.coupon_code,
     paymentMethod: paymentMethod,
+    serial_number: orderCount+1,
   });
   user.orders.push(order._id);
   user.save();

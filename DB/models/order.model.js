@@ -25,11 +25,11 @@ const orderSchema = new Schema({
     },
   ],
   totalOrderPrice: { type: Number},
-  shippingAdress:{
-   adress:{type:String},
+  shippingAddress:{
+   address:{type:String},
    city:{type:String},
    country:{type:String},
-   phone:{type:Number},
+   phone:{type:String},
   },
   paymentMethod:{
    type:String,
@@ -51,7 +51,8 @@ const orderSchema = new Schema({
     type:Date
   },
   totalAmountAfterDisc: { type: Number, default: 0 },
-  coupon_code: {type:String}
+  coupon_code: {type:String},
+  serial_number:{type:Number,min:1}
 });
 
 

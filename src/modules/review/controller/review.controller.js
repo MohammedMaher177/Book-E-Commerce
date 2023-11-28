@@ -60,3 +60,28 @@ export const UpdateReview = catchError(async (req, res, next) => {
 });
 
 export const deleteReview = catchError(deleteData(reviewModel));
+// export const deleteReview = catchError(async(res,req)=>{
+//   const { id } = req.params;
+//   const result = await reviewModel.findById(id);
+//   if (!result) {
+//     return next(new AppError("Not Found", 404));
+//   }
+//   if (result.user) {
+//     if (result.user._id.toHexString() !== req.user._id.toHexString()) {
+//       return next(new AppError("Not Authorized", 401));
+//     }
+//   }
+//   await reviewModel.findByIdAndDelete(id)
+//     const existBook = await bookModel.findById(result.book);
+    
+//     existBook.reviews = await reviewModel.find({book:existBook._id})
+//     if (!(await getRating(existBook._id))) {
+//       existBook.rating=0
+//     }else{
+//       existBook.rating = await getRating(existBook._id);
+//     }
+
+//     existBook.save();
+  
+//   res.status(201).json({ message: "success"  });
+// });

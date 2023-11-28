@@ -4,8 +4,13 @@ import { idValidation } from "../../user/controller/user.validation.js";
 export const checkoutValidation = {
   body: joi
     .object({
-      shippingAdress: joi
-        .object().required(),
+      shippingAddress: joi
+        .object({
+          address : joi.string(),
+          city : joi.string(),
+          country : joi.string(),
+          phone : joi.string(),
+        }).required(),
       name: joi.string(),
       paymentMethod:joi.string(),
     })

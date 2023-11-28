@@ -7,11 +7,14 @@ import { orderModel } from "../../../../DB/models/order.model.js";
 import bookModel from "../../../../DB/models/book.model.js";
 import { use } from "chai";
 import Feedback from "../../../../DB/models/feedBack.model.js";
+import sendEmail from "../../../util/email/sendEmail.js";
+import { feedbackEmail } from "../../../util/email/feedback.mail.js";
+import { createToken, getTokens, sendFeedbackEmail } from "../../../util/helper-functions.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
   const { email } = req.user;
-  const { shippingAdress, name, paymentMethod } = req.body;
+  const { shippingAddress, name, paymentMethod } = req.body;
   const user = await UserModel.findOne({ email });
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
@@ -25,7 +28,7 @@ export const checkout = catchError(async (req, res, next) => {
     books: cart.books,
     totalOrderPrice: cart.totalOrderPrice,
     totalAmountAfterDisc: cart.totalAmountAfterDisc,
-    shippingAdress: shippingAdress,
+    shippingAddress: shippingAddress,
     coupon_code: cart.coupon_code,
     paymentMethod: paymentMethod,
   });
@@ -35,7 +38,7 @@ export const checkout = catchError(async (req, res, next) => {
     var discount = [];
     if (cart.discount) {
       const coupon = await stripe.coupons.create({
-        percent_off: cart.discount,
+        percent_off: cart.discount * 100,
         duration: "once",
         name: cart.coupon_code,
       });
@@ -108,6 +111,9 @@ export const successCheckOut = catchError(async (request, response) => {
       }
       book.save();
     }
+    const token = createToken(user._id);
+    const url = process.env.MODE == "PRODUCTION"? `https://bookstore-front.codecraftsportfolio.online/feedback/${token}`:`http://localhost:3000/feedback/${token}`;
+    sendFeedbackEmail(user.email, url);
     const cart = await cartModel.findOne({ user: user._id });
     await cartModel.findByIdAndDelete(cart._id);
     //-------------------------------------------
@@ -130,11 +136,23 @@ export const getPdf = catchError(async (req, res, next) => {
   let pdfBooks = [];
   for (const el of orders) {
     for (const book of el.books) {
-      if (book.variation_name == "pdf") {
-        pdfBooks.push(book.book._id);
+      if (
+        book.variation_name == "pdf" &&
+        !pdfBooks.includes(book.book._id) &&
+        el.isPaid
+      ) {
+        pdfBooks.push(
+          await bookModel.findById(book.book._id)
+          
+          );
       }
     }
   }
-
   res.json({ message: "success", pdfBooks, orders });
 });
+
+export const sendFeadbackEmail = catchError(async (req,res,next)=>{
+  const {  email } = req.params;
+  sendFeedbackEmail(email);
+  res.json({ message: "success" });
+})

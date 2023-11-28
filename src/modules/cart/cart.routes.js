@@ -33,13 +33,15 @@ cartRouter.post(
   validate(createCartValidation),
   creatUserCart
 );
+
+
+cartRouter.patch("/coupon", authMiddleware, addCouponToCart);
+cartRouter.delete("/coupon/:code", authMiddleware, removeCouponFromCart);
+
 cartRouter.delete(
   "/:id/:variation_name",
   authMiddleware,
   validate(removeCartItemValidation),
   removeItem
 );
-
-cartRouter.patch("/coupon", authMiddleware, addCouponToCart);
-cartRouter.delete("/coupon/:code", authMiddleware, removeCouponFromCart);
 export default cartRouter;

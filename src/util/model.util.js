@@ -60,6 +60,7 @@ export const getDocById = (model) => {
     const { slug } = req.params;
     const { user } = req;
     const result = await model.findOne({ slug: slug });
+    console.log(result);
     if (!result) {
       return next(new AppError("Not Found", 404));
     }

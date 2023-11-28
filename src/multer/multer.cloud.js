@@ -1,8 +1,9 @@
 import multer from "multer";
+import { AppError } from "../util/ErrorHandler/AppError.js";
 
 export const uploadValidation = {
   image: ["image/jpeg", "image/png"],
-  pdf: ["applicatioon/pdf"],
+  pdf: ["application/pdf"],
 };
 
 export const uploadImage = (customValidation) => {

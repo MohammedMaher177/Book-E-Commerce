@@ -28,7 +28,7 @@ export const bootstrap = (app) => {
   });
 
   app.use((err, req, res, next) => {
-    console.log(err);
+    // console.log(err);
     const error = err.message;
     const code = err.statusCode || 500;
     process.env.MODE == "PRODUCTION"

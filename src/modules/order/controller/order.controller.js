@@ -9,7 +9,7 @@ import { use } from "chai";
 import Feedback from "../../../../DB/models/feedBack.model.js";
 import sendEmail from "../../../util/email/sendEmail.js";
 import { feedbackEmail } from "../../../util/email/feedback.mail.js";
-import { sendFeedbackEmail } from "../../../util/helper-functions.js";
+import { createToken, getTokens, sendFeedbackEmail } from "../../../util/helper-functions.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
@@ -111,7 +111,9 @@ export const successCheckOut = catchError(async (request, response) => {
       }
       book.save();
     }
-    sendFeedbackEmail(user.email);
+    const token = createToken(user._id);
+    const url = process.env.MODE == "PRODUCTION"? `https://bookstore-front.codecraftsportfolio.online/feedback/${token}`:`http://localhost:3000/feedback/${token}`;
+    sendFeedbackEmail(user.email, url);
     const cart = await cartModel.findOne({ user: user._id });
     await cartModel.findByIdAndDelete(cart._id);
     //-------------------------------------------

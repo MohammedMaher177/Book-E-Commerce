@@ -4,6 +4,15 @@ import cloudinary from "../multer/cloudinary.js";
 import { v4 as uuidv4 } from "uuid";
 import bookModel from "../../DB/models/book.model.js";
 import reviewModel from "../../DB/models/review.model.js";
+
+export const createToken = async (id, role) => {
+  const token = jwt.sign({
+    id,
+    role,
+  }, process.env.TOKEN_SECRET);
+
+  return token;
+}
 export const getTokens = async (id, role) => {
   const token = jwt.sign(
     {
@@ -91,8 +100,7 @@ export const getRating = async (book) => {
   avg = total / reviews.length;
   return avg;
 };
-export const sendFeedbackEmail = async (email) => {
-  const url ="google.com"
+export const sendFeedbackEmail = async (email, url) => {
   await sendEmail({
     to: email,
     subject: "Feedback Email",

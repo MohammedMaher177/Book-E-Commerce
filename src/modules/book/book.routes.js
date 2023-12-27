@@ -33,8 +33,8 @@ bookRouter.get("/:slug", isLoggedIn, getBook);
 bookRouter.post("/addBook",uploadImage(uploadValidation.image).single("image"),validate(bookValidation),addBook);
 bookRouter.patch("/:bookId",validate(bookValidation),updateBook);
 
-bookRouter.put("/updateMany", updateData)
+// bookRouter.put("/updateMany", updateData)
 
-bookRouter.post("/updatedata", updateData)
+// bookRouter.post("/updatedata", updateData)
 bookRouter.post("/updateurl",uploadImage(uploadValidation.pdf).any("pdf"), addPdfUrl)
 export default bookRouter;

@@ -28,7 +28,7 @@ export const checkout = catchError(async (req, res, next) => {
     books: cart.books,
     totalOrderPrice: cart.totalOrderPrice,
     totalAmountAfterDisc: cart.totalAmountAfterDisc,
-    shippingAdress: shippingAdress,
+    shippingAddress: shippingAddress,
     coupon_code: cart.coupon_code,
     paymentMethod: paymentMethod,
   });
@@ -61,7 +61,7 @@ export const checkout = catchError(async (req, res, next) => {
         };
       }),
       mode: "payment",
-      success_url: "https://bookstore-front.codecraftsportfolio.online/",
+      success_url: url || "https://bookstore-front.codecraftsportfolio.online/",
       cancel_url: "https://bookstore-front.codecraftsportfolio.online/cart",
       customer_email: email,
       discounts: discount,

@@ -14,7 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
   const { email } = req.user;
-  const { shippingAddress, name, paymentMethod ,url } = req.body;
+  const { shippingAddress, name, paymentMethod ,successCallbackURL } = req.body;
   const user = await UserModel.findOne({ email });
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
@@ -61,7 +61,7 @@ export const checkout = catchError(async (req, res, next) => {
         };
       }),
       mode: "payment",
-      success_url: url || "https://bookstore-front.codecraftsportfolio.online/",
+      success_url: successCallbackURL ,
       cancel_url: "https://bookstore-front.codecraftsportfolio.online/cart",
       customer_email: email,
       discounts: discount,
@@ -80,7 +80,7 @@ export const checkout = catchError(async (req, res, next) => {
   }
   await cartModel.findByIdAndDelete(cart._id);
 
-  res.json({ message: "success", order });
+  res.json({ message: "success" , url:successCallbackURL , order });
 });
 
 export const successCheckOut = catchError(async (request, response) => {

@@ -13,10 +13,10 @@ import { sendFeedbackEmail } from "../../../util/helper-functions.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
-  const { email } = req.user;
+  const { user } = req;
   const { shippingAdress, name, paymentMethod } = req.body;
-  const user = await UserModel.findOne({ email });
-  if (!user) throw new AppError("this email doesn't exist", 404);
+  // const user = await UserModel.findOne({ email });
+  // if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
   if (!cart) throw new AppError("this user dosen't have cart", 404);
   if (cart.books.length == 0) {

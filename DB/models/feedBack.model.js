@@ -5,7 +5,7 @@ const feedbackSchema = new Schema(
       type: Types.ObjectId,
       required: true,
     },
-    testimonial: {
+    product_rating: {
       type: String,
       required: true,
     },

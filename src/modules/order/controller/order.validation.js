@@ -5,7 +5,9 @@ export const checkoutValidation = {
   body: joi
     .object({
       shippingAddress: joi
-        .object().required(),
+        .object({
+          
+        }).required(),
       name: joi.string(),
       paymentMethod:joi.string(),
       successCallbackURL:joi.string()

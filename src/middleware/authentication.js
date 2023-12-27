@@ -5,17 +5,22 @@ import UserModel from "../../DB/models/user.model.js";
 
 export const authMiddleware = catchError(async (req, res, next) => {
   const { authorization } = req.headers;
+  console.log(req.headers);
   if (!authorization) {
-    return next(new AppError("unauthorized", 401));
+    return next(new AppError("unauthorized, Token Not-Found", 401));
   }
-  const decoded = jwt.verify(authorization, process.env.TOKEN_SECRET, (err, decoded) => {
-    if(err && err.name === "TokenExpiredError"){
-      return next(new AppError("jwt expired", 403));
+  const decoded = jwt.verify(
+    authorization,
+    process.env.TOKEN_SECRET,
+    (err, decoded) => {
+      if (err && err.name === "TokenExpiredError") {
+        return next(new AppError("jwt expired", 403));
+      }
+      if (decoded) {
+        return decoded;
+      }
     }
-    if(decoded){
-      return decoded;
-    }
-  });
+  );
   if (!decoded) {
     return next(new AppError("access denied", 403));
   }
@@ -24,7 +29,7 @@ export const authMiddleware = catchError(async (req, res, next) => {
   if (!user) {
     return next(new AppError("access denied", 403));
   }
-  
+
   if (user.passwordChangedAt) {
     const passwordChangedAt = parseInt(user.passwordChangedAt.getTime() / 1000);
     if (passwordChangedAt > decoded.iat) {
@@ -37,6 +42,7 @@ export const authMiddleware = catchError(async (req, res, next) => {
 
 export const allowedTo = (...roles) => {
   return catchError(async (req, res, next) => {
+    console.log(req.user.role);
     if (!roles.includes(req.user.role)) {
       return next(new AppError("Not Authorized to perform this action", 401));
     }

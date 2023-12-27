@@ -3,6 +3,25 @@ import { orderModel } from "../../../../DB/models/order.model.js";
 import { AppError } from "../../../util/ErrorHandler/AppError.js";
 import { catchError } from "../../../util/ErrorHandler/catchError.js";
 
+export const checkToken = catchError(async (req, res, next) => {
+  const { token } = req.params;
+  const decoded = jwt.verify(
+    token,
+    process.env.TOKEN_SECRET,
+    (err, decoded) => {
+      if (err && err.name === "TokenExpiredError") {
+        return next(new AppError("jwt expired", 403));
+      }
+      if (decoded) {
+        return decoded;
+      }
+    }
+  );
+  if (!decoded) {
+    return next(new AppError("access denied", 403));
+  }
+});
+
 export const createFeedback = catchError(async (req, res, next) => {
   const { user } = req;
   const {

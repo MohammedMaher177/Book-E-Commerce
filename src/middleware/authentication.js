@@ -5,7 +5,6 @@ import UserModel from "../../DB/models/user.model.js";
 
 export const authMiddleware = catchError(async (req, res, next) => {
   const { authorization } = req.headers;
-  console.log(req.headers);
   if (!authorization) {
     return next(new AppError("unauthorized, Token Not-Found", 401));
   }
@@ -42,7 +41,6 @@ export const authMiddleware = catchError(async (req, res, next) => {
 
 export const allowedTo = (...roles) => {
   return catchError(async (req, res, next) => {
-    console.log(req.user.role);
     if (!roles.includes(req.user.role)) {
       return next(new AppError("Not Authorized to perform this action", 401));
     }

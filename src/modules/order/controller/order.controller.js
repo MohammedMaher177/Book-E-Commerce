@@ -155,6 +155,6 @@ export const getPdf = catchError(async (req, res, next) => {
 
 export const sendFeadbackEmail = catchError(async (req,res,next)=>{
   const {  email } = req.params;
-  sendFeedbackEmail(email);
+  await sendFeedbackEmail(email);
   res.json({ message: "success" });
 })

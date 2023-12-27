@@ -206,21 +206,14 @@ export const forYou = catchError(async (req, res, next) => {
 });
 
 export const updateData = catchError(async (req, res) => {
-  const allBooks = await bookModel.updateMany(
-    { "variations.variation_name": "hard cover" },
-    {
-      $set: {
-        "variations.$.variation_name": "hardcover",
-      },
-    }
-  );
-  // console.log(allBooks.length);
-  // for (const book of allBooks) {
-  //   const price = book.variations[0].variation_price
-  //   console.log(price);
-  //   book.price = price
-  //   await book.save();
-  // }
+  const allBooks = await bookModel.find({});
+  console.log(allBooks.length);
+  for (const book of allBooks) {
+    const price = book.variations[1].variation_price
+    console.log(price);
+    book.price = price
+    await book.save();
+  }
   res.status(201).json({ message: "success", allBooks });
   // let result = await bookModel.find();
   // result = result.map((el) => {

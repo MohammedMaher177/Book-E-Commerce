@@ -4,15 +4,19 @@ import cloudinary from "../multer/cloudinary.js";
 import { v4 as uuidv4 } from "uuid";
 import bookModel from "../../DB/models/book.model.js";
 import reviewModel from "../../DB/models/review.model.js";
-
+import { feedbackEmail } from "./email/feedback.mail.js";
+import UserModel from "../../DB/models/user.model.js";
 export const createToken = async (id, role) => {
-  const token = jwt.sign({
-    id,
-    role,
-  }, process.env.TOKEN_SECRET);
+  const token = jwt.sign(
+    {
+      id,
+      role,
+    },
+    process.env.TOKEN_SECRET
+  );
 
   return token;
-}
+};
 export const getTokens = async (id, role) => {
   const token = jwt.sign(
     {
@@ -89,7 +93,7 @@ export const getRating = async (book) => {
   let reviews = await reviewModel.find({ book: book });
   var avg;
   if (!reviews) {
-    avg =0
+    avg = 0;
     return avg;
   }
   reviews = reviews.map((el) => el.rating);
@@ -100,11 +104,14 @@ export const getRating = async (book) => {
   avg = total / reviews.length;
   return avg;
 };
-export const sendFeedbackEmail = async (email, url) => {
+export const sendFeedbackEmail = async (email) => {
+  const user = await UserModel.findOne({ email: email });
+  const { token } = await getTokens(user._id, user.role);
+  const url = `${process.env.BASE_URL}/${token}`;
   await sendEmail({
     to: email,
     subject: "Feedback Email",
-    text : "Feedback Email",
+    text: "Feedback Email",
     html: feedbackEmail(
       "Feedback Email",
       `Thanks for using Book Store E-Commerce. Let us know your feedback`,

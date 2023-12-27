@@ -86,6 +86,7 @@ export const checkout = catchError(async (req, res, next) => {
 export const successCheckOut = catchError(async (request, response) => {
   const sig = request.headers["stripe-signature"].toString();
   let event;
+  const hardcoverFound = 0;
   try {
     event = stripe.webhooks.constructEvent(
       request.body,
@@ -108,12 +109,13 @@ export const successCheckOut = catchError(async (request, response) => {
       book.sold += el.qty;
       if (el.variation_name == "hardcover") {
         book.variations[1].variation_qty -= el.qty;
+         hardcoverFound = 1;
       }
       book.save();
     }
-    const token = createToken(user._id);
-    const url = process.env.MODE == "PRODUCTION"? `https://bookstore-front.codecraftsportfolio.online/feedback/${token}`:`http://localhost:3000/feedback/${token}`;
-    sendFeedbackEmail(user.email, url);
+    if (!hardcoverFound) {
+      sendFeedbackEmail(user.email);
+    }
     const cart = await cartModel.findOne({ user: user._id });
     await cartModel.findByIdAndDelete(cart._id);
     //-------------------------------------------

@@ -13,8 +13,8 @@ export const checkoutValidation = {
         })
         .required(),
       name: joi.string(),
-      paymentMethod: joi.string(),
-      successCallbackURL: joi.string(),
+      paymentMethod: joi.string().required(),
+      successCallbackURL: joi.string().required(),
     })
     .required(),
 };

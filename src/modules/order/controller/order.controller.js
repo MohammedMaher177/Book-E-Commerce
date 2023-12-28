@@ -9,12 +9,17 @@ import { use } from "chai";
 import Feedback from "../../../../DB/models/feedBack.model.js";
 import sendEmail from "../../../util/email/sendEmail.js";
 import { feedbackEmail } from "../../../util/email/feedback.mail.js";
-import { createToken, getTokens, sendFeedbackEmail } from "../../../util/helper-functions.js";
+import {
+  createToken,
+  getTokens,
+  sendFeedbackEmail,
+} from "../../../util/helper-functions.js";
 const stripe = new Stripe(process.env.STRIPE_SECRETE_KEY);
 
 export const checkout = catchError(async (req, res, next) => {
   const { email } = req.user;
-  const { shippingAddress, name, paymentMethod ,successCallbackURL } = req.body;
+  const { shippingAddress, name, paymentMethod, successCallbackURL } = req.body;
+  console.log(successCallbackURL);
   const user = await UserModel.findOne({ email });
   if (!user) throw new AppError("this email doesn't exist", 404);
   const cart = await cartModel.findOne({ user: user._id });
@@ -61,9 +66,9 @@ export const checkout = catchError(async (req, res, next) => {
         };
       }),
       mode: "payment",
-      success_url: successCallbackURL ,
+      success_url: successCallbackURL,
       cancel_url: "https://bookstore-front.codecraftsportfolio.online/cart",
-      customer_email: email,
+      customer_email: user.email,
       discounts: discount,
       client_reference_id: order._id.toString(),
     });
@@ -80,7 +85,7 @@ export const checkout = catchError(async (req, res, next) => {
   }
   await cartModel.findByIdAndDelete(cart._id);
 
-  res.json({ message: "success" , url:successCallbackURL , order });
+  res.json({ message: "success", url: successCallbackURL, order });
 });
 
 export const successCheckOut = catchError(async (request, response) => {
@@ -109,7 +114,7 @@ export const successCheckOut = catchError(async (request, response) => {
       book.sold += el.qty;
       if (el.variation_name == "hardcover") {
         book.variations[1].variation_qty -= el.qty;
-         hardcoverFound = 1;
+        hardcoverFound = 1;
       }
       book.save();
     }
@@ -143,18 +148,15 @@ export const getPdf = catchError(async (req, res, next) => {
         !pdfBooks.includes(book.book._id) &&
         el.isPaid
       ) {
-        pdfBooks.push(
-          await bookModel.findById(book.book._id)
-          
-          );
+        pdfBooks.push(await bookModel.findById(book.book._id));
       }
     }
   }
   res.json({ message: "success", pdfBooks, orders });
 });
 
-export const sendFeadbackEmail = catchError(async (req,res,next)=>{
-  const {  email } = req.params;
-  sendFeedbackEmail(email);
+export const sendFeadbackEmail = catchError(async (req, res, next) => {
+  const { email } = req.params;
+  await sendFeedbackEmail(email);
   res.json({ message: "success" });
-})
+});

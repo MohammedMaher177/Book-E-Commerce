@@ -6,11 +6,15 @@ export const checkoutValidation = {
     .object({
       shippingAddress: joi
         .object({
-          
-        }).required(),
+          address: joi.string().required(),
+          city: joi.string().required(),
+          country: joi.string().required(),
+          phone: joi.string().required(),
+        })
+        .required(),
       name: joi.string(),
-      paymentMethod:joi.string(),
-      successCallbackURL:joi.string()
+      paymentMethod: joi.string().required(),
+      successCallbackURL: joi.string().required(),
     })
     .required(),
 };

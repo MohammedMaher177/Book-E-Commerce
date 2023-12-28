@@ -49,3 +49,17 @@ export const createFeedback = catchError(async (req, res, next) => {
   });
   res.status(201).json({ message: "success", feedback });
 });
+
+export const checkuser = catchError(async (req, res) => {
+  const alreadySubmitted = await Feedback.alreadySubmittedFeedback(
+    req.user._id
+  );
+  if (alreadySubmitted) {
+    throw new AppError("already made a feedback", 409);
+  }
+  const order = await orderModel.findOne({ user: req.user._id });
+  if (!order) {
+    throw new AppError("make order first to do a feedback", 403);
+  }
+  return res.json({ message: "success", param: true });
+});

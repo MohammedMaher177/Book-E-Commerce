@@ -4,6 +4,7 @@ import { validate } from "../../middleware/validate.js";
 import { createFeedbackValidation } from "./controller/feedback.validation.js";
 import {
   checkToken,
+  checkuser,
   createFeedback,
 } from "./controller/feedback.controller.js";
 
@@ -16,5 +17,5 @@ feedbackRouter.post(
   validate(createFeedbackValidation),
   createFeedback
 );
-
+feedbackRouter.get("/checkuser", authMiddleware, checkuser);
 export default feedbackRouter;
